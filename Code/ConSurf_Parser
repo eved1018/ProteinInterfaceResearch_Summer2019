@@ -1,2 +1,0 @@
-
-cat consurf\ copy\ scores | cut -f 1-4|sort -k4 -n | > C_score.txt

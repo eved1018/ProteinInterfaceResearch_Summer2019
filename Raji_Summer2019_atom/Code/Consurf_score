@@ -1,0 +1,10 @@
+
+#!/bin/bash
+cd ..
+cd ConsurfScore_server
+read protienID HTML
+#cat consurf.grades | grep '150'| cut -f 1-4|sort -k4 -n | > C_score_$protienID.txt
+#printf '1\ni\nPOS\tSEQ\t3LATOM\t\tSCORE\n.\nw\n' | ed -s  C_score_$protienID.txt
+
+wget -qO- $HTML| sed -e 's/<[^>]*>//g' | grep '150'| cut -f 1-4|sort -k4 -n | > C_score_$protienID.txt
+printf '1\ni\nPOS\tSEQ\t3LATOM\t\tSCORE\n.\nw\n' | ed -s  C_score_$protienID.txt

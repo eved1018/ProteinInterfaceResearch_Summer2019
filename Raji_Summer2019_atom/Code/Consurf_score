@@ -1,10 +1,15 @@
 
 #!/bin/bash
+
+### wget -qO- $HTML| sed -e 's/<[^>]*>//g' -> input variable HTML and returns website as text file
+### grep '150'| cut -f 1-4|sort -k4 -n | > C_score_$protienID.txt -> input Protein ID and text file. retunrs parsered text file and saves it under protein id
+### printf '1\ni\nPOS\tSEQ\t3LATOM\t\tSCORE\n.\nw\n' | ed -s  C_score_$protienID.txt -> adds header to file
+
+
 cd ..
 cd ConsurfScore_server
-read protienID HTML
 #cat consurf.grades | grep '150'| cut -f 1-4|sort -k4 -n | > C_score_$protienID.txt
 #printf '1\ni\nPOS\tSEQ\t3LATOM\t\tSCORE\n.\nw\n' | ed -s  C_score_$protienID.txt
-
+read HTML protienID
 wget -qO- $HTML| sed -e 's/<[^>]*>//g' | grep '150'| cut -f 1-4|sort -k4 -n | > C_score_$protienID.txt
 printf '1\ni\nPOS\tSEQ\t3LATOM\t\tSCORE\n.\nw\n' | ed -s  C_score_$protienID.txt

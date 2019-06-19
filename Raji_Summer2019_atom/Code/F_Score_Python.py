@@ -50,8 +50,10 @@ def Fscore():
             F_score = True_Positives / known_residues
             print("F_score = ", F_score)
 
+            filepath = str(os.getcwd())
+            filepath_new = filepath + "F_score_python.txt"
 
-            with open('/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_scores.txt', 'a+') as file3:
+            with open(filepath_new, 'a+') as file3:
                 file3.write(fileid)
                 file3.write("    ")
                 file3.write(str(F_score))

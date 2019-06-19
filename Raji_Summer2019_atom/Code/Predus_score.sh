@@ -14,17 +14,17 @@ do
   echo "Processing $f file..."
   fileid=`echo $f | awk -F/ '{print toupper $11}' | awk -F. '{print $2}' | sed 's/\_/./g'`
   echo "protien id"
-  echo $fileid | tee -a /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_score_unix
+  echo $fileid
   cat $f | awk '{print $4,$5,$6,$11}' | uniq | sort -k4 -nr > /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/P_score_${fileid}.txt
   file1=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/testquery30_interface/${fileid}
   file2=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/P_score_${fileid}.txt
   file3=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/P_score_${fileid}.txthead.txt
-  echo "" | tee -a /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_score_unix
+  echo ""
   cd ..
   cat "$file2" | awk '{print $3, $1}' > "$file3"
   cd /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code
-  python3 F_score_Python.py "$file1" "$file3" "$fileid" | tee -a /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_score_unix
-  echo | tee -a /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_score_unix
+  python3 F_score_Python.py "$file1" "$file3" "$fileid"
   echo
-  echo 
-done
+  echo
+  echo
+done > /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_score_data_Predus.txt

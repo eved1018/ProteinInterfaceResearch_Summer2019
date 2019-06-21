@@ -12,6 +12,7 @@ def Fscore():
     my_set1= set()
     my_set2 = set()
     head = 0
+    f_score_all = 0
     with open(fileA, 'r+') as file1:
 
             for line in file1:
@@ -30,34 +31,41 @@ def Fscore():
 
 
             known_residues = len(my_set1)
-            print(known_residues , "experimental/known interface residues")
+            print(known_residues , "experimental/known interface")
             print(my_set1)
 
             predicted_residues = len(my_set2)
-            print(predicted_residues, "predicted interface resiues")
+            print(predicted_residues, "predicted interface")
             print(my_set2)
 
             True_Positives = len(my_set1 & my_set2)
-            print(True_Positives,"correctly predicted residues")
+            print("correctly predicted s")
             print(my_set1 & my_set2)
 
 
+
             False_positives = len(my_set2 - my_set1)
-            print(False_positives, "False positives")
+            print("incorrectly predicted ")
             print(my_set2 - my_set1)
 
+            print("true positives", True_Positives)
+            print("False positives", False_positives)
+            print("residues",known_residues )
 
             F_score = True_Positives / known_residues
             print("F_score = ", F_score)
 
+
             filepath = str(os.getcwd())
             filepath_new = filepath + "F_score_python.txt"
+
 
             with open(filepath_new, 'a+') as file3:
                 file3.write(fileid)
                 file3.write("    ")
                 file3.write(str(F_score))
                 file3.write("\n")
+
 
 
 

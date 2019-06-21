@@ -27,4 +27,17 @@ do
   echo
   echo
   echo
+  cd /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score
+  rm "$file3"
 done > /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_score_data_Predus.txt
+
+
+
+
+avrg=`cat /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_score_data_Predus.txt | grep F_score | awk -F "F_score = "  '{ sum += $2 } END { print sum / NR }'`
+sum_TP=`cat /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_score_data_Predus.txt | grep "true positives" | awk -F "true positives"   '{ sum += $2 } END { print sum }'`
+sum_interface=`cat /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/F_score_data_Predus.txt | grep "residues" | awk -F "residues" '{ sum += $2 } END { print sum }'`
+f_score=`echo "scale=3; $sum_TP/$sum_interface" | bc -l`
+
+cd /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus
+echo -e "\nglobal F score = ${f_score} \naverage F score = ${avrg}"  >> F_score_only_unix_Table.txt

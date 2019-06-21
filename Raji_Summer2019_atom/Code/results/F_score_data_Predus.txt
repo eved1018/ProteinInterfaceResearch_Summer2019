@@ -1,0 +1,456 @@
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1ACB_E.comb.pdb file...
+protien id
+1ACB.E
+
+13 experimental/known interface
+{'193 GLY', '58 CYS', '214 SER', '57 HIS', '39 PHE', '191 CYS', '192 MET', '216 GLY', '41 PHE', '146 TYR', '215 TRP', '218 SER', '195 SER'}
+13 predicted interface
+{'172 TRP', '151 THR', '191 CYS', '143 LEU', '192 MET', '145 ARG', '216 GLY', '98 THR', '150 ASN', '146 TYR', '99 ILE', '175 LYS', '144 THR'}
+correctly predicted s
+{'191 CYS', '192 MET', '146 TYR', '216 GLY'}
+incorrectly predicted 
+{'172 TRP', '151 THR', '143 LEU', '145 ARG', '98 THR', '150 ASN', '99 ILE', '175 LYS', '144 THR'}
+true positives 4
+False positives 9
+residues 13
+F_score =  0.3076923076923077
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1ACB_I.comb.pdb file...
+protien id
+1ACB.I
+
+11 experimental/known interface
+{'47 LEU', '44 THR', '68 HIS', '41 SER', '42 PRO', '46 ASP', '48 ARG', '45 LEU', '55 PHE', '49 TYR', '43 VAL'}
+11 predicted interface
+{'47 LEU', '70 GLY', '44 THR', '46 ASP', '48 ARG', '51 ARG', '53 ARG', '50 ASN', '45 LEU', '49 TYR', '43 VAL'}
+correctly predicted s
+{'47 LEU', '44 THR', '46 ASP', '48 ARG', '45 LEU', '49 TYR', '43 VAL'}
+incorrectly predicted 
+{'70 GLY', '51 ARG', '53 ARG', '50 ASN'}
+true positives 7
+False positives 4
+residues 11
+F_score =  0.6363636363636364
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1AHW_A.comb.pdb file...
+protien id
+1AHW.A
+
+20 experimental/known interface
+{'93 GLU', '91 HIS', '531 ASP', '555 ASN', '554 GLU', '600 ASN', '50 TYR', '94 SER', '530 LYS', '552 ASP', '533 TYR', '601 SER', '96 TYR', '557 ASN', '532 TYR', '602 TYR', '92 GLY', '30 ARG', '32 TYR', '559 ILE'}
+20 predicted interface
+{'93 GLU', '89 LEU', '49 TYR', '91 HIS', '87 TYR', '50 TYR', '95 PRO', '94 SER', '96 TYR', '46 THR', '92 GLY', '98 PHE', '45 LYS', '97 THR', '53 SER', '56 ASP', '36 TYR', '100 GLY', '30 ARG', '32 TYR'}
+correctly predicted s
+{'93 GLU', '96 TYR', '92 GLY', '50 TYR', '30 ARG', '94 SER', '32 TYR', '91 HIS'}
+incorrectly predicted 
+{'87 TYR', '89 LEU', '97 THR', '53 SER', '56 ASP', '36 TYR', '49 TYR', '100 GLY', '46 THR', '95 PRO', '45 LYS', '98 PHE'}
+true positives 8
+False positives 12
+residues 20
+F_score =  0.4
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1DE4_E.comb.pdb file...
+protien id
+1DE4.E
+
+21 experimental/known interface
+{'98 ASP', '14 PRO', '67 TYR', '55 SER', '65 LEU', '60 TRP', '53 ASP', '3 ARG', '24 ASN', '10 TYR', '99 MET', '31 HIS', '8 GLN', '12 ARG', '13 HIS', '62 PHE', '56 PHE', '54 LEU', '59 ASP', '11 SER', '1 ILE'}
+21 predicted interface
+{'98 ASP', '14 PRO', '67 TYR', '63 TYR', '55 SER', '60 TRP', '57 SER', '24 ASN', '58 LYS', '10 TYR', '99 MET', '12 ARG', '13 HIS', '62 PHE', '56 PHE', '54 LEU', '96 ASP', '59 ASP', '15 ALA', '11 SER', '28 SER'}
+correctly predicted s
+{'12 ARG', '13 HIS', '62 PHE', '24 ASN', '59 ASP', '55 SER', '56 PHE', '60 TRP', '98 ASP', '54 LEU', '11 SER', '14 PRO', '67 TYR', '10 TYR', '99 MET'}
+incorrectly predicted 
+{'96 ASP', '63 TYR', '15 ALA', '57 SER', '58 LYS', '28 SER'}
+true positives 15
+False positives 6
+residues 21
+F_score =  0.7142857142857143
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1DFJ_I.comb.pdb file...
+protien id
+1DFJ.I
+
+18 experimental/known interface
+{'117 ASP', '436 GLU', '6 HIS', '397 GLU', '316 LYS', '405 VAL', '202 GLU', '433 TYR', '283 GLU', '453 ARG', '257 TRP', '428 VAL', '404 CYS', '259 TRP', '456 SER', '430 TYR', '89 ASN', '431 ASP'}
+18 predicted interface
+{'117 ASP', '436 GLU', '405 VAL', '146 TYR', '148 ARG', '435 THR', '433 TYR', '174 ASN', '202 GLU', '176 ASP', '428 VAL', '404 CYS', '456 SER', '430 TYR', '60 THR', '89 ASN', '431 ASP', '402 ASN'}
+correctly predicted s
+{'117 ASP', '436 GLU', '405 VAL', '433 TYR', '202 GLU', '428 VAL', '404 CYS', '456 SER', '430 TYR', '89 ASN', '431 ASP'}
+incorrectly predicted 
+{'146 TYR', '148 ARG', '435 THR', '174 ASN', '176 ASP', '60 THR', '402 ASN'}
+true positives 11
+False positives 7
+residues 18
+F_score =  0.6111111111111112
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1DQJ_A.comb.pdb file...
+protien id
+1DQJ.A
+
+18 experimental/known interface
+{'558 TYR', '532 ASP', '598 TRP', '530 THR', '552 SER', '53 GLN', '533 TYR', '531 SER', '550 TYR', '556 SER', '50 TYR', '96 TYR', '31 ASN', '30 SER', '554 SER', '553 TYR', '92 ASN', '32 ASN'}
+18 predicted interface
+{'95 PRO', '89 GLN', '34 HIS', '87 PHE', '94 TRP', '98 PHE', '49 LYS', '91 SER', '97 THR', '50 TYR', '96 TYR', '46 LEU', '100 GLY', '44 PRO', '1 ASP', '92 ASN', '32 ASN', '93 SER'}
+correctly predicted s
+{'50 TYR', '96 TYR', '92 ASN', '32 ASN'}
+incorrectly predicted 
+{'95 PRO', '89 GLN', '34 HIS', '87 PHE', '94 TRP', '98 PHE', '49 LYS', '91 SER', '97 THR', '46 LEU', '100 GLY', '44 PRO', '1 ASP', '93 SER'}
+true positives 4
+False positives 14
+residues 18
+F_score =  0.2222222222222222
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1E4K_C.comb.pdb file...
+protien id
+1E4K.C
+
+12 experimental/known interface
+{'86 GLY', '117 LYS', '116 HIS', '131 HIS', '132 HIS', '155 VAL', '126 ASP', '158 LYS', '87 TRP', '85 ILE', '110 TRP', '152 ARG'}
+12 predicted interface
+{'132 HIS', '129 TYR', '116 HIS', '117 LYS', '86 GLY', '133 ASN', '126 ASP', '87 TRP', '85 ILE', '110 TRP', '127 ARG', '130 PHE'}
+correctly predicted s
+{'132 HIS', '117 LYS', '116 HIS', '86 GLY', '126 ASP', '87 TRP', '85 ILE', '110 TRP'}
+incorrectly predicted 
+{'129 TYR', '127 ARG', '133 ASN', '130 PHE'}
+true positives 8
+False positives 4
+residues 12
+F_score =  0.6666666666666666
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1E6J_H.comb.pdb file...
+protien id
+1E6J.H
+
+7 experimental/known interface
+{'591 ASN', '31 SER', '105 TYR', '50 TYR', '592 TYR', '52 ASN', '33 THR'}
+7 predicted interface
+{'110 TRP', '105 TYR', '50 TYR', '102 ARG', '109 TYR', '100 VAL', '106 ASN'}
+correctly predicted s
+{'105 TYR', '50 TYR'}
+incorrectly predicted 
+{'110 TRP', '102 ARG', '109 TYR', '100 VAL', '106 ASN'}
+true positives 2
+False positives 5
+residues 7
+F_score =  0.2857142857142857
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1EXB_E.comb.pdb file...
+protien id
+1EXB.E
+
+3 experimental/known interface
+{'80 TYR', '75 PRO', '78 ASN'}
+3 predicted interface
+{'80 TYR', '72 TYR', '74 ASP'}
+correctly predicted s
+{'80 TYR'}
+incorrectly predicted 
+{'72 TYR', '74 ASP'}
+true positives 1
+False positives 2
+residues 3
+F_score =  0.3333333333333333
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1F34_A.comb.pdb file...
+protien id
+1F34.A
+
+23 experimental/known interface
+{'109 GLY', '290 ASP', '66 ALA', '189 TYR', '289 MET', '34 GLY', '68 SEP', '72 SER', '130 ALA', '75 TYR', '74 THR', '131 SER', '86 TYR', '79 SER', '218 THR', '70 GLU', '65 GLU', '300 ILE', '71 LEU', '76 GLY', '128 ILE', '69 GLN', '292 PRO'}
+23 predicted interface
+{'243 GLY', '242 ASP', '108 PRO', '111 PHE', '239 GLU', '110 SER', '112 LEU', '278 ASP', '75 TYR', '10 LEU', '240 ASN', '77 THR', '116 PRO', '7 GLU', '114 TYR', '9 TYR', '158 ASN', '160 ASP', '241 SER', '48 LEU', '53 HIS', '159 ASP', '113 TYR'}
+correctly predicted s
+{'75 TYR'}
+incorrectly predicted 
+{'243 GLY', '242 ASP', '108 PRO', '111 PHE', '239 GLU', '110 SER', '112 LEU', '278 ASP', '10 LEU', '240 ASN', '77 THR', '116 PRO', '7 GLU', '114 TYR', '9 TYR', '158 ASN', '160 ASP', '241 SER', '48 LEU', '53 HIS', '159 ASP', '113 TYR'}
+true positives 1
+False positives 22
+residues 23
+F_score =  0.043478260869565216
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1FC2_D.comb.pdb file...
+protien id
+1FC2.D
+
+10 experimental/known interface
+{'253 ILE', '311 GLN', '435 HIS', '432 LEU', '434 ASN', '251 LEU', '252 MET', '433 HIS', '309 LEU', '254 SER'}
+10 predicted interface
+{'253 ILE', '311 GLN', '397 VAL', '399 ASP', '398 LEU', '297 ASN', '314 LEU', '298 SER', '407 TYR', '405 PHE'}
+correctly predicted s
+{'253 ILE', '311 GLN'}
+incorrectly predicted 
+{'397 VAL', '399 ASP', '398 LEU', '297 ASN', '314 LEU', '298 SER', '407 TYR', '405 PHE'}
+true positives 2
+False positives 8
+residues 10
+F_score =  0.2
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1FFW_A.comb.pdb file...
+protien id
+1FFW.A
+
+8 experimental/known interface
+{'106 TYR', '92 LYS', '126 LYS', '105 GLY', '96 ILE', '100 GLN', '122 LYS', '103 ALA'}
+8 predicted interface
+{'17 MET', '13 ASP', '15 SER', '19 ARG', '16 THR', '18 ARG', '14 PHE', '20 ILE'}
+correctly predicted s
+set()
+incorrectly predicted 
+{'17 MET', '13 ASP', '15 SER', '19 ARG', '16 THR', '18 ARG', '14 PHE', '20 ILE'}
+true positives 0
+False positives 8
+residues 8
+F_score =  0.0
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1FFW_B.comb.pdb file...
+protien id
+1FFW.B
+
+10 experimental/known interface
+{'178 GLU', '207 ASP', '215 VAL', '181 HIS', '213 CYS', '182 LEU', '203 ILE', '216 ILE', '217 GLU', '214 PHE'}
+10 predicted interface
+{'215 VAL', '210 ALA', '213 CYS', '226 VAL', '202 ASP', '160 ARG', '182 LEU', '198 ILE', '185 LEU', '214 PHE'}
+correctly predicted s
+{'214 PHE', '213 CYS', '182 LEU', '215 VAL'}
+incorrectly predicted 
+{'202 ASP', '226 VAL', '160 ARG', '198 ILE', '185 LEU', '210 ALA'}
+true positives 4
+False positives 6
+residues 10
+F_score =  0.4
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1FLE_E.comb.pdb file...
+protien id
+1FLE.E
+
+11 experimental/known interface
+{'192 GLN', '57 HIS', '195 SER', '217 ARG', '216 VAL', '99 ALA', '214 SER', '193 GLY', '172 TRP', '97 ASP', '215 PHE'}
+11 predicted interface
+{'170 SER', '99 VAL', '122 VAL', '94 TRP', '204 ASN', '202 LEU', '206 GLN', '203 VAL', '172 TRP', '205 GLY', '207 TYR'}
+correctly predicted s
+{'172 TRP'}
+incorrectly predicted 
+{'170 SER', '99 VAL', '207 TYR', '94 TRP', '204 ASN', '202 LEU', '206 GLN', '203 VAL', '205 GLY', '122 VAL'}
+true positives 1
+False positives 10
+residues 11
+F_score =  0.09090909090909091
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1GHQ_A.comb.pdb file...
+protien id
+1GHQ.A
+
+5 experimental/known interface
+{'70 SER', '116 LEU', '170 ASN', '119 GLN', '117 GLU'}
+5 predicted interface
+{'47 GLU', '41 TRP', '48 LYS', '46 LEU', '50 GLN'}
+correctly predicted s
+set()
+incorrectly predicted 
+{'47 GLU', '41 TRP', '48 LYS', '46 LEU', '50 GLN'}
+true positives 0
+False positives 5
+residues 5
+F_score =  0.0
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1GXD_A.comb.pdb file...
+protien id
+1GXD.A
+
+21 experimental/known interface
+{'550 LYS', '618 SER', '579 ASP', '580 ALA', '566 LYS', '575 LYS', '581 TRP', '570 ASP', '586 ASP', '561 ARG', '623 SER', '547 LYS', '607 TYR', '552 TYR', '559 PHE', '582 ASN', '622 GLY', '617 LYS', '620 LYS', '616 LEU', '621 PHE'}
+21 predicted interface
+{'148 GLU', '154 PRO', '146 ARG', '107 ASP', '78 VAL', '86 ARG', '151 ASP', '193 ARG', '149 HIS', '82 ASN', '203 TYR', '202 GLU', '76 PRO', '152 GLY', '83 PHE', '85 PRO', '80 ASN', '81 TYR', '153 TYR', '150 GLY', '147 TRP'}
+correctly predicted s
+set()
+incorrectly predicted 
+{'148 GLU', '154 PRO', '146 ARG', '107 ASP', '78 VAL', '86 ARG', '151 ASP', '147 TRP', '193 ARG', '149 HIS', '82 ASN', '202 GLU', '76 PRO', '152 GLY', '83 PHE', '85 PRO', '80 ASN', '81 TYR', '153 TYR', '150 GLY', '203 TYR'}
+true positives 0
+False positives 21
+residues 21
+F_score =  0.0
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1GXD_C.comb.pdb file...
+protien id
+1GXD.C
+
+18 experimental/known interface
+{'147 LEU', '136 ILE', '138 CYS', '177 TRP', '187 GLU', '190 ASP', '139 TYR', '185 LYS', '189 LEU', '186 GLN', '188 PHE', '170 ARG', '174 SER', '179 ARG', '153 THR', '192 GLU', '152 VAL', '172 ASP'}
+18 predicted interface
+{'136 ILE', '190 ASP', '138 CYS', '38 ASN', '35 ILE', '187 GLU', '189 LEU', '37 GLY', '191 ILE', '149 MET', '40 ILE', '186 GLN', '132 ARG', '151 TRP', '188 PHE', '135 MET', '34 ASP', '152 VAL'}
+correctly predicted s
+{'136 ILE', '190 ASP', '187 GLU', '138 CYS', '189 LEU', '186 GLN', '188 PHE', '152 VAL'}
+incorrectly predicted 
+{'38 ASN', '35 ILE', '37 GLY', '191 ILE', '149 MET', '40 ILE', '132 ARG', '151 TRP', '135 MET', '34 ASP'}
+true positives 8
+False positives 10
+residues 18
+F_score =  0.4444444444444444
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1IRA_X.comb.pdb file...
+protien id
+1IRA.X
+
+23 experimental/known interface
+{'26 ARG', '126 GLU', '147 TYR', '127 ALA', '128 ASP', '54 HIS', '27 ASN', '39 ASN', '14 ARG', '42 LEU', '8 SER', '25 LEU', '50 PRO', '51 ILE', '53 PRO', '11 GLN', '20 GLN', '34 TYR', '16 TRP', '37 GLY', '150 GLU', '36 GLN', '18 VAL'}
+23 predicted interface
+{'138 ASP', '126 GLU', '137 PRO', '147 TYR', '19 ASN', '125 MET', '24 TYR', '128 ASP', '39 ASN', '14 ARG', '42 LEU', '149 GLN', '107 PRO', '40 VAL', '20 GLN', '38 PRO', '34 TYR', '16 TRP', '136 MET', '37 GLY', '36 GLN', '18 VAL', '35 LEU'}
+correctly predicted s
+{'34 TYR', '16 TRP', '37 GLY', '126 GLU', '147 TYR', '39 ASN', '20 GLN', '36 GLN', '18 VAL', '14 ARG', '42 LEU', '128 ASP'}
+incorrectly predicted 
+{'138 ASP', '38 PRO', '136 MET', '35 LEU', '107 PRO', '137 PRO', '40 VAL', '125 MET', '19 ASN', '24 TYR', '149 GLN'}
+true positives 12
+False positives 11
+residues 23
+F_score =  0.5217391304347826
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1JIW_I.comb.pdb file...
+protien id
+1JIW.I
+
+15 experimental/known interface
+{'62 ARG', '77 THR', '64 THR', '3 LEU', '74 GLY', '83 ARG', '84 GLN', '66 ALA', '39 SER', '4 ILE', '65 PRO', '76 LEU', '5 LEU', '2 SER', '1 SER'}
+15 predicted interface
+{'41 TYR', '102 ARG', '34 GLU', '85 GLY', '87 GLY', '103 ARG', '75 GLY', '73 ARG', '84 GLN', '83 ARG', '39 SER', '37 GLU', '33 SER', '53 TRP', '76 LEU'}
+correctly predicted s
+{'83 ARG', '84 GLN', '76 LEU', '39 SER'}
+incorrectly predicted 
+{'41 TYR', '102 ARG', '34 GLU', '87 GLY', '85 GLY', '103 ARG', '75 GLY', '73 ARG', '37 GLU', '33 SER', '53 TRP'}
+true positives 4
+False positives 11
+residues 15
+F_score =  0.26666666666666666
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1JIW_P.comb.pdb file...
+protien id
+1JIW.P
+
+20 experimental/known interface
+{'186 HIS', '225 ASP', '216 TYR', '218 GLU', '176 HIS', '134 ALA', '177 GLU', '158 TYR', '169 TYR', '192 ALA', '133 GLY', '220 GLN', '227 LYS', '228 GLY', '135 ALA', '278 LYS', '180 HIS', '230 TYR', '191 ASN', '196 ASP'}
+20 predicted interface
+{'198 THR', '30 TYR', '216 TYR', '199 TYR', '218 GLU', '73 TRP', '78 ASP', '195 GLY', '158 TYR', '24 VAL', '230 TYR', '201 ASP', '79 ILE', '76 VAL', '197 PRO', '196 ASP', '221 ASN', '75 TYR', '28 PRO', '77 SER'}
+correctly predicted s
+{'230 TYR', '196 ASP', '216 TYR', '218 GLU', '158 TYR'}
+incorrectly predicted 
+{'198 THR', '30 TYR', '76 VAL', '197 PRO', '199 TYR', '221 ASN', '73 TRP', '75 TYR', '28 PRO', '78 ASP', '195 GLY', '201 ASP', '77 SER', '79 ILE', '24 VAL'}
+true positives 5
+False positives 15
+residues 20
+F_score =  0.25
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1JPS_H.comb.pdb file...
+protien id
+1JPS.H
+
+16 experimental/known interface
+{'30 LYS', '57 ASN', '31 GLU', '32 TYR', '550 TYR', '594 SER', '101 ALA', '59 ILE', '100 THR', '591 HIS', '532 TYR', '55 GLN', '592 GLY', '593 GLU', '33 TYR', '52 ASP'}
+16 predicted interface
+{'31 GLU', '105 ASP', '98 ARG', '50 LEU', '32 TYR', '102 ALA', '101 ALA', '100 THR', '95 TYR', '104 PHE', '103 TYR', '106 TYR', '109 GLN', '107 TRP', '33 TYR', '35 HIS'}
+correctly predicted s
+{'31 GLU', '32 TYR', '101 ALA', '100 THR', '33 TYR'}
+incorrectly predicted 
+{'98 ARG', '105 ASP', '102 ALA', '95 TYR', '104 PHE', '103 TYR', '106 TYR', '109 GLN', '107 TRP', '35 HIS', '50 LEU'}
+true positives 5
+False positives 11
+residues 16
+F_score =  0.3125
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1KAC_A.comb.pdb file...
+protien id
+1KAC.A
+
+9 experimental/known interface
+{'497 SER', '498 VAL', '494 GLN', '487 GLN', '426 LEU', '429 LYS', '418 PRO', '415 ASP', '451 LYS'}
+9 predicted interface
+{'452 GLY', '493 ARG', '405 TYR', '519 PRO', '433 CYS', '411 TRP', '435 THR', '407 PRO', '453 ASN'}
+correctly predicted s
+set()
+incorrectly predicted 
+{'452 GLY', '493 ARG', '405 TYR', '435 THR', '433 CYS', '411 TRP', '519 PRO', '407 PRO', '453 ASN'}
+true positives 0
+False positives 9
+residues 9
+F_score =  0.0
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1KAC_B.comb.pdb file...
+protien id
+1KAC.B
+
+12 experimental/known interface
+{'75 LEU', '84 ASP', '123 LYS', '128 PRO', '58 GLU', '83 ASP', '125 LYS', '77 SER', '127 ALA', '54 PRO', '72 VAL', '85 TYR'}
+12 predicted interface
+{'75 LEU', '84 ASP', '82 TYR', '83 ASP', '81 ILE', '78 GLY', '77 SER', '90 LYS', '72 VAL', '87 PRO', '85 TYR', '80 LYS'}
+correctly predicted s
+{'75 LEU', '84 ASP', '83 ASP', '77 SER', '72 VAL', '85 TYR'}
+incorrectly predicted 
+{'82 TYR', '81 ILE', '78 GLY', '90 LYS', '87 PRO', '80 LYS'}
+true positives 6
+False positives 6
+residues 12
+F_score =  0.5
+
+
+
+Processing /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/PD2.1KLU_D.comb.pdb file...
+protien id
+1KLU.D
+
+11 experimental/known interface
+{'44 PHE', '94 TYR', '67 GLU', '45 PHE', '96 SER', '211 SER', '89 TYR', '47 TRP', '112 TYR', '212 LYS', '43 SER'}
+11 predicted interface
+{'23 ASN', '90 TYR', '20 THR', '94 TYR', '95 PHE', '91 VAL', '26 TYR', '92 ASN', '31 HIS', '22 GLY', '176 PHE'}
+correctly predicted s
+{'94 TYR'}
+incorrectly predicted 
+{'23 ASN', '90 TYR', '20 THR', '95 PHE', '91 VAL', '26 TYR', '92 ASN', '31 HIS', '22 GLY', '176 PHE'}
+true positives 1
+False positives 10
+residues 11
+F_score =  0.09090909090909091
+
+
+

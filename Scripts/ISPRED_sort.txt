@@ -1,0 +1,5 @@
+#!/bin/bash
+for file in ~/Desktop/ISPRED_30_protein_predictions/*
+do pwd
+cat $file | awk '{print $4,$6,$11}' | uniq | sort -k 3nr > $file.sorted
+done

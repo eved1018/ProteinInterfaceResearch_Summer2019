@@ -1,0 +1,9 @@
+#!/bin/bash
+
+tp_sum=`cat ~/Desktop/ISPRED.Fscores.table.txt | awk '{s+=$2}END{print s}'`
+n_sum=`cat ~/Desktop/ISPRED.Fscores.table.txt | awk '{s+=$4}END{print s}'`
+global_fscore=`echo "scale=3; $tp_sum/$n_sum" | bc -l`
+echo "Global F_score =" $global_fscore >> ~/Desktop/ISPRED.Fscores.table.txt
+avg=`cat ~/Desktop/ISPRED.Fscores.table.txt | awk '{total += $5} END {print total/NR}'`
+echo "Average F_score =" $avg  >> ~/Desktop/ISPRED.Fscores.table.txt
+

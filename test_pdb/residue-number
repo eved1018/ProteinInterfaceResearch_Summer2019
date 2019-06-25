@@ -1,0 +1,9 @@
+#!/bin/bash
+for file in ~/Desktop/test_pdb/*.epitope
+ do num_residue=`cat $file | wc -l` 
+echo ${file##*/} $num_residue >> summary
+ done
+for file in ~/Desktop/test_pdb/*.pdb
+ do total_residue=`awk '{print $4,$6}' | uniq | wc -l`
+echo $total_residue >> summary
+done 

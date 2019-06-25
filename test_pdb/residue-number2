@@ -1,0 +1,5 @@
+#!/bin/bash
+for file in ~/Desktop/test_pdb/*.pdb
+ do total_residue=`awk '{print $4,$6}' | uniq | wc -l`
+echo $total_residue >> summary
+done

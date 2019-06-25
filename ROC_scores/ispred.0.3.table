@@ -1,0 +1,10 @@
+Protein  Threshold  TP  FP  N   Neg  TPR    FPR
+1ACB.E   0.3        9   47  13  159  .692   .295
+1ACB.I   0.3        6   2   11  44   .545   .045
+1AHW.A   0.3        8   44  8   164  1.000  .268
+1KAC.B   0.3        0   4   12  89   0      .044
+1KLU.D   0.3        2   4   11  154  .181   .025
+Global_TPR =  .454
+Global_FPR =  .165
+avg_TPR =  0.403
+avg_FPR =  0.112833

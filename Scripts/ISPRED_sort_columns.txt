@@ -1,0 +1,7 @@
+#!/bin/bash
+for file in ~/Desktop/ISPRED_30_protein_predictions/*
+do 
+B=`echo $file | awk -F/ '{print $4}' | awk -F_ '{print $2}' | awk -F. '{print $1}'` 
+C=`echo $file | awk -F/ '{print $4}' | awk -F_ '{print $2}' | awk -F. '{print $2}'` 
+cat $file | awk '{print $2,$1}' | > ~/Desktop/ISPRED_Columns/${B}.${C}_ispred
+done

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for file in ~/Desktop/test_pdb/*
+  do grep -w 1.00 $file | awk '{print $4,$6}' | uniq > $file.epitope
+done

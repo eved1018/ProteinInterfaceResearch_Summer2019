@@ -1,0 +1,30 @@
+sensitivity = TP/(TP+FN)
+specificty(TP/(TP+FP))
+
+ROC curve
+
+x-axis= False Positive rate = specificty
+Y -axis- true postivice rate = sensitivity
+
+FPR= fp/(tn+ fp)
+
+true negative = ( all solvent exposed - annotaded)
+
+
+threshold : 5-95
+
+
+for each residue -> each property
+                    rank top residues per property
+                    find avrg rank
+                    find scaled rank -> sacled by f_score over sum F_score
+
+
+finish consurf
+
+rank per property
+construct series
+compare
+
+
+roc curve per property and for series 

@@ -1,7 +1,0 @@
-sensitivity = TP/(TP+FN)
-specificty(TP/(TP+FP))
-
-ROC curve
-
-x-axis= False Positive rate = specificty
-Y -axis- true postivice rate = sensitivity

@@ -1,0 +1,33 @@
+protein  tp  fp  interface_residues  F_Score
+1ACB.E   4   9   13                  .307
+1ACB.I   9   2   11                  .818
+1AHW.A   3   17  20                  .150
+1AK4.A   3   6   9                   .333
+1AVX.A   9   10  19                  .473
+1AY7.A   5   4   9                   .555
+1AY7.B   3   6   9                   .333
+1BGX.H   7   24  31                  .225
+1DE4.E   8   13  21                  .380
+1DFJ.E   2   16  18                  .111
+1DFJ.I   7   11  18                  .388
+1DQJ.A   4   14  18                  .222
+1E4K.C   2   10  12                  .166
+1E6J.H   1   6   7                   .142
+1EXB.E   1   2   3                   .333
+1F34.A   10  13  23                  .434
+1FC2.D   0   10  10                  0
+1FFW.A   2   6   8                   .250
+1FFW.B   4   6   10                  .400
+1FLE.E   0   11  11                  0
+1GHQ.A   0   5   5                   0
+1GXD.A   2   19  21                  .095
+1GXD.C   5   13  18                  .277
+1IRA.X   13  10  23                  .565
+1JIW.I   6   9   15                  .400
+1JIW.P   7   13  20                  .350
+1JPS.H   3   13  16                  .187
+1KAC.A   0   9   9                   0
+1KAC.B   3   9   12                  .250
+1KLU.D   2   9   11                  .181
+Global F_score = .290
+Average F_score = 0.260156

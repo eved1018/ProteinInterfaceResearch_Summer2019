@@ -27,4 +27,13 @@ construct series
 compare
 
 
-roc curve per property and for series 
+roc curve per property and for series
+# avg_FPR=`cat $table | awk '{total += $8} END {print total/NR}'`
+
+
+ protiens to run on predus
+
+  1AK4.A
+  1AVX.A
+  1BGX.H
+  1DFG.E

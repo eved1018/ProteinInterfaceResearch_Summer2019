@@ -22,3 +22,16 @@ Proteinid  Number_of_known_Interface_residues  True_positives  False_positives  
 
 global F score = .102 
 average F score = 0.094
+
+consurf pdb not on database
+
+1AHW.A
+1AY7.B
+1BGX.H
+1DFJ.I
+1FFW.B
+1FLE.E
+1GXD.A
+1JIW.I
+1KAC.B
+1KLU.D

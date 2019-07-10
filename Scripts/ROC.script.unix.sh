@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Threshold" "Global_TPR" "Global_FPR" >> ~/Desktop/LAB/ROC.threholds
-for i in $(seq 0 .05 1)
+for i in $(seq 0 .01 1.01)
 do
    echo $i
    echo "Protein" "Threshold" "TP" "FP" "N" "Neg" "TPR" "FPR" >> ~/Desktop/LAB/ROC_scores/ispred.${i}
@@ -13,7 +13,7 @@ do
         echo $fileid
         interface=~/Desktop/LAB/Testquery30_interface/${fileid}
         combined_file=~/Desktop/LAB/Combined_ROCfiles/${fileid}.combined
-        cat "$file" | grep '0.' | tail -n +2 | awk '{if($4 >= 0.05) {print $1,$10}}'| sed 's/-/0.00/g' | awk -v p=$i '{if($2 >= p) {print $1}}' >> ${combined_file}.${i}
+        cat "$file" | grep '0.' | tail -n +2 | awk '{if($4 >= 0.00) {print $1,$10}}'| sed 's/-/0.00/g' | awk -v p=$i '{if($2 >= p) {print $1}}' >> ${combined_file}.${i}
         M=`cat "${combined_file}.${i}" | awk 'END{print NR}'`
         echo "M =" $M
         cat "$interface" >> ${combined_file}.${i}
@@ -21,7 +21,7 @@ do
         echo "TP =" $TP
         N=`cat "$interface" | awk 'END{print NR}'`
         FP=$((M-TP))
-        Surf=`cat "$file" | grep '0.' | tail -n +2 | awk '{if($4 >= 0.05) {print $1}}' | awk 'END{print NR}'`
+        Surf=`cat "$file" | grep '0.' | tail -n +2 | awk '{if($4 >= 0.00) {print $1}}' | awk 'END{print NR}'`
         Neg=$((Surf-N))
         echo "Surf = " $Surf "Neg = " $Neg
         TPR=`bc <<<"scale=3; $TP/$N"`

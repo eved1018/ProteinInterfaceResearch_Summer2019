@@ -2,4 +2,4 @@
 33	THR
 50	TYR
 52	ASN
-
+105	TYR

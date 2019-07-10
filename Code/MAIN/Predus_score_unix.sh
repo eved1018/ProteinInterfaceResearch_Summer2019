@@ -1,4 +1,5 @@
 #!/bin/sh
+
 cd /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus
 echo "Proteinid Number_of_known_Interface_residues True_positives False_positives F_Score" > F_score_only_unix.txt
 cd predus_outputfiles
@@ -11,7 +12,7 @@ do
   cat $f | awk '{print $4,$5,$6,$11}' | uniq | sort -k4 -nr > /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/P_score_${protienID}
   interface=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/testquery30_interface/${protienID}
   Predus_prediction=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/P_score_${protienID}
-  combined_file=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/P_score_${protienID}.txthead.txt
+  combined_file=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/P_score_${protienID}.txthead.txt
   N=`cat "$interface" | awk 'END{print NR}'`
   echo $N
   cat "$Predus_prediction" | head -n"$N" | awk '{print $3, $1}' > "$combined_file"

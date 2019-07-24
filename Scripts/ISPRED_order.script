@@ -1,0 +1,10 @@
+#!/bin/bash
+for file in ~/Desktop/LAB/ISPRED_30_protein_data/*
+  do
+    pdb=`echo $file | awk -F/ '{print $7}' | awk -F'_' '{print $1}' | awk -F. '{print $1}'`
+    chain=`echo $file | awk -F/ '{print $7}' | awk -F'_' '{print $1}' | awk -F. '{print $2}'`
+    fileid=${pdb}.${chain}
+    echo $fileid
+    cat "$file" | grep '0.' | tail -n +2 | awk '{print $1,$10}' | sed 's/-/0.00/g' | column -t > ~/Desktop/LAB/ISPRED_30_resorder/${fileid}_iorder
+    cat ~/Desktop/LAB/ISPRED_30_resorder/${fileid}_iorder | awk '{print $1, $2 * 0.487294469}' | column -t > ~/Desktop/LAB/ISPRED_30_fcoef/${fileid}_fcoef
+  done

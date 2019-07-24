@@ -1,0 +1,13 @@
+#!/bin/sh
+
+for file in /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/results/CoeffeciantROC/coeffeciant/*
+do
+
+  protienID=`echo $file | awk -F/ '{print $11}' | awk -F_ '{print $1}'`
+  paste $file /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/results/CoeffeciantROC/ISPRED_30_fcoef/${protienID}_fcoef | column -t | awk '{print $1, $3 + $6 }' | column -t > /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/results/CoeffeciantROC/intergratedscores/intergratedscoretemp_${protienID}.txt
+  f=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/results/CoeffeciantROC/intergratedscores/intergratedscoretemp_${protienID}.txt
+  topval=`cat $f | sort -k2 -nr | awk 'NR == 1 {print $2}' `
+  cat $f | awk -v y="$topval" '{print $1, $2/y }' | sort -k2 -nr | column -t > /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/results/CoeffeciantROC/intergratedscores/intergratedscoreA_${protienID}.txt
+  rm $f
+  paste
+done

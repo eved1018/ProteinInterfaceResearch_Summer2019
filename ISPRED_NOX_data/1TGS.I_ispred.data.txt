@@ -1,0 +1,72 @@
+ispred prediction results
+  Copyright (C) 2016 Castrense Savojardo
+  Department of Biological, Geological and Environmental Sciences (BiGeA)
+  Bologna Biocomputing Group
+  University of Bologna, Italy.
+  savojard@biocomp.unibo.it
+
+Protein info
+---------------------------------------
+
+ Protein id: 1TGS [chain I]
+ Protein length: 55
+ Surface length: 44
+
+
+ResNum	ResType	ASA	RSA	PredRSA	Depth	Protrusion	Surf	Inter	Probability
+-------------------------------------------------------------------------------------------
+1	T	164	1.0	0.29	0.0	2.93	yes	no	0.02
+2	P	90	0.66	0.29	0.18	1.78	yes	no	0.01
+3	Q	175	0.88	0.37	0.17	2.89	yes	no	0.01
+4	R	101	0.41	0.15	0.33	0.96	yes	no	0.0
+5	E	152	0.78	0.25	0.3	1.44	yes	no	0.01
+6	A	20	0.19	0.42	0.29	0.7	yes	no	0.01
+7	T	117	0.82	0.37	0.37	1.87	yes	no	0.13
+8	C	63	0.47	0.36	0.0	1.27	yes	no	0.09
+10	T	140	0.99	0.38	0.0	3.07	yes	no	0.21
+11	S	60	0.46	0.39	0.0	1.84	yes	no	0.14
+12	E	197	1.0	0.11	0.0	4.68	yes	no	0.17
+13	V	100	0.7	0.15	0.0	2.82	yes	yes	0.53
+14	S	127	0.98	0.39	0.0	3.35	yes	yes	0.72
+15	G	37	0.44	0.35	0.0	1.65	yes	yes	0.91
+16	C	40	0.3	0.34	0.25	1.18	yes	yes	0.99
+17	P	81	0.6	0.41	0.18	1.5	yes	no	0.42
+18	K	219	1.0	0.29	0.0	3.53	yes	yes	0.52
+19	I	99	0.59	0.18	0.0	1.71	yes	yes	0.92
+20	Y	159	0.72	0.15	0.11	1.68	yes	yes	0.97
+21	N	100	0.64	0.19	0.34	1.04	yes	yes	0.66
+22	P	15	0.11	-	-	-	no	-	-
+23	V	5	0.04	-	-	-	no	-	-
+24	C	2	0.01	-	-	-	no	-	-
+25	G	0	0.0	-	-	-	no	-	-
+26	T	50	0.35	0.26	0.21	0.67	yes	no	0.07
+27	D	67	0.41	0.16	0.43	0.99	yes	no	0.04
+28	G	45	0.54	0.4	0.33	1.15	yes	no	0.01
+29	I	90	0.53	0.16	0.8	0.98	yes	no	0.01
+30	T	57	0.4	0.21	0.39	0.64	yes	no	0.01
+31	Y	9	0.04	-	-	-	no	-	-
+32	S	51	0.39	0.35	0.65	0.6	yes	no	0.11
+33	N	9	0.06	-	-	-	no	-	-
+34	E	39	0.2	0.24	0.3	0.41	yes	no	0.03
+35	C	28	0.21	0.35	0.21	0.42	yes	yes	0.98
+36	V	35	0.25	0.19	1.73	0.46	yes	no	0.39
+37	L	0	0.0	-	-	-	no	-	-
+38	C	16	0.12	-	-	-	no	-	-
+39	S	41	0.32	0.31	0.21	0.75	yes	no	0.44
+40	E	65	0.34	0.33	0.83	0.89	yes	no	0.26
+41	N	24	0.15	-	-	-	no	-	-
+42	K	163	0.8	0.39	0.16	1.42	yes	no	0.36
+43	K	161	0.79	0.29	0.15	1.94	yes	no	0.09
+44	R	81	0.33	0.14	0.45	1.06	yes	no	0.06
+45	Q	200	1.0	0.31	0.0	3.85	yes	no	0.12
+46	T	84	0.59	0.22	0.37	1.88	yes	no	0.05
+47	P	75	0.55	0.32	0.43	0.94	yes	no	0.02
+48	V	13	0.09	-	-	-	no	-	-
+49	L	30	0.18	0.46	1.01	0.52	yes	no	0.01
+50	I	2	0.01	-	-	-	no	-	-
+51	Q	110	0.56	0.53	0.33	0.78	yes	no	0.01
+52	K	99	0.48	0.34	0.71	1.07	yes	no	0.01
+53	S	80	0.62	0.25	0.24	1.12	yes	no	0.01
+54	G	23	0.27	0.27	0.98	0.74	yes	no	0.01
+55	P	67	0.49	0.23	0.61	1.18	yes	no	0.01
+56	C	81	0.6	0.23	0.63	1.24	yes	no	0.1

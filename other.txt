@@ -39,3 +39,5 @@ roc curve per property and for series
   1DFG.E
 
 68
+
+awk '!seen[$1]++'

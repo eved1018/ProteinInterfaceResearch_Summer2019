@@ -1,24 +1,23 @@
 #!/bin/sh
 
-
-mkdir /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores
-mkdir /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC_combined
-mkdir /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/Pscores
-echo "Threshold" "Global_TPR" "Global_FPR" >> /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC.thresholds
+mkdir /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores
+mkdir /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/ROC_combined
+mkdir /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/Pscores
+echo "Threshold" "Global_TPR" "Global_FPR" >> /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/ROC.thresholds
 for i in $(seq 0 .01 1.1)
 do
    echo $i
-   echo "Protein" "Threshold" "TP" "FP" "N" "Neg" "TPR" "FPR" >> /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/Pscores/P_score_.${i}
+   echo "Protein" "Threshold" "TP" "FP" "N" "Neg" "TPR" "FPR" >> /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/Pscores/P_score_.${i}
 
-      for file in /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/*
+      for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/Predus_Score/Predus_Score/*
       do
         echo "Processing $file file..."
         protienID=`echo $file | awk -F_ '{print $7}'`
         echo "protien id"
         echo $protienID
-        interface=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/testquery30_interface/${protienID}
-        Predus_prediction=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/P_score_${protienID}
-        combined_file=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC_combined/${protienID}.combined
+        interface=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/Testquery30_Interface/${protienID}
+        Predus_prediction=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/Predus_Score/P_score_${protienID}
+        combined_file=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/P_score_${protienID}.txthead.txt
         N=`cat "$interface" | awk 'END{print NR}'`
         cat "$file" | awk '{print $3, $4}'| awk -v p=$i '{if($2 >= p) {print $1}}' | awk '!seen[$1]++' >> ${combined_file}.${i}
         M=`cat "${combined_file}.${i}" | awk 'END{print NR}'`
@@ -28,16 +27,16 @@ do
         echo "TP =" $TP
         N=`cat "$interface" | awk 'END{print NR}'`
         FP=$((M-TP))
-        Surface_predictions=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ISPRED_30_protein_data/${protienID}_ispred.data.txt
+        Surface_predictions=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ISPRED/ISPRED_30_fcoef/${protienID}_ispred.data.txt
         Surf=`cat "$Surface_predictions" | grep '0.' | tail -n +2 | awk '{if($4 >= 0.00) {print $1}}' | awk 'END{print NR}'`
         Neg=$((Surf-N))
         echo "Surf = " $Surf "Neg = " $Neg
         TPR=`bc <<<"scale=3; $TP/$N"`
         FPR=`bc <<<"scale=3; $FP/$Neg"`
-        echo $protienID $i $TP $FP $N $Neg $TPR $FPR >> /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/Pscores/P_score_.${i}
+        echo $protienID $i $TP $FP $N $Neg $TPR $FPR >> /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/Pscores/P_score_.${i}
        done
-    table=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/Pscores/P_score_.${i}.table
-    cat /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/Pscores/P_score_.${i} | column -t >> $table
+    table=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/Pscores/P_score_.${i}.table
+    cat /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/Pscores/P_score_.${i} | column -t >> $table
     tp_sum=`cat $table | awk '{s+=$3}END{print s}'`
     fp_sum=`cat $table | awk '{s+=$4}END{print s}'`
     n_sum=`cat $table | awk '{s+=$5}END{print s}'`
@@ -50,13 +49,13 @@ do
     echo "Global_FPR = " $Global_FPR >> $table
     echo "avg_TPR = " $avg_TPR >> $table
     echo "avg_FPR = " $avg_FPR >> $table
-    echo $i $Global_TPR $Global_FPR >> /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC.thresholds
+    echo $i $Global_TPR $Global_FPR >> /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/ROC.thresholds
 done
 
-    rm /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC_combined/*
-    echo SEP=, > /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC.thresholds.table.csv
-    cat /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC.thresholds | column -t -s \t | sed 's/ /,/g' >> /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC.thresholds.table.csv
-    rm -r /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC_combined
+    rm //Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/ROC_combined/*
+    echo SEP=, > /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/ROC.thresholds.table.csv
+    cat /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/ROC.thresholds | column -t -s \t | sed 's/ /,/g' >> /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/ROC.thresholds.table.csv
+    rm -r /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_scores/ROC_combined
 
 # for file in /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/ROC_scores/Pscores/*
 # do

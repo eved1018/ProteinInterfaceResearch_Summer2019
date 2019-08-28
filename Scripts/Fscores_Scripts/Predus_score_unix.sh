@@ -1,18 +1,18 @@
 #!/bin/sh
 
-cd /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus
+cd /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus
 echo "Proteinid Number_of_known_Interface_residues True_positives False_positives F_Score" > F_score_only_unix.txt
 cd predus_outputfiles
-for f in /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/predus_outputfiles/*
+for f in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/predus_outputfiles/*
 do
   echo "Processing $f file..."
   protienID=`echo $f | awk -F/ '{print toupper $11}' | awk -F. '{print $2}' | sed 's/\_/./g'`
   echo "protien id"
   echo $protienID
   cat $f | awk '{print $4,$5,$6,$11}' | uniq | sort -k4 -nr > /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/P_score_${protienID}
-  interface=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/testquery30_interface/${protienID}
-  Predus_prediction=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/Predus_Score/P_score_${protienID}
-  combined_file=/Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/Data_files/Predus/P_score_${protienID}.txthead.txt
+  interface=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/Testquery30_Interface/${protienID}
+  Predus_prediction=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/Predus_Score/P_score_${protienID}
+  combined_file=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/P_score_${protienID}.txthead.txt
   N=`cat "$interface" | awk 'END{print NR}'`
   echo $N
   cat "$Predus_prediction" | head -n"$N" | awk '{print $3, $1}' > "$combined_file"

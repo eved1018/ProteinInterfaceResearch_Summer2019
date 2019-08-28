@@ -41,3 +41,9 @@ roc curve per property and for series
 68
 
 awk '!seen[$1]++'
+
+
+  september: Goals
+    1) predus 241
+    2) combined ROC curves- go through and make sure it makes sense clean up maybe use perl
+    3) 

@@ -50,8 +50,6 @@ do
     echo "avg_FPR = " $avg_FPR >> $table
     echo $i $Global_TPR $Global_FPR >> /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Combined_Scores/ROC.thresholds
 done
-
-    # rm /Users/evanedelstein/Desktop/LAB/Raji_Summer2019_atom/Code/results/CoeffeciantROC/roccombined/*
     echo SEP=, > /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Combined_Scores/ROC.thresholds.table.csv
     table=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Combined_Scores/ROC.thresholds.table.csv
     cat /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Combined_Scores/ROC.thresholds | column -t -s \t | sed 's/ /,/g' >> $table

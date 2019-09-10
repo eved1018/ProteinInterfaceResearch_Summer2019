@@ -1,6 +1,4 @@
 #!/bin/bash
-for i in ~/Desktop/Research_Mordechai/Data_Files/Dock_freq/*.docking_freq
-  do j="${i%.docking_freq}"
-     mv "$i" "${j^^}.docking_freq"
+for i in *.docking_freq
+  do mv "$i" $(echo "$i" | awk '{ sub(/.docking_freq$/,""); print toupper($0) ".docking_freq" }')
   done
-  

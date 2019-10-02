@@ -10,6 +10,7 @@ for f in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen
 do
   proteinname=`echo $f | awk -F/ '{print $9}' | awk -F_ '{print $1}'`
   residue=`cat $f | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
+
   echo "delete all
   fetch $proteinname , async = 0
   color white, resi $residue
@@ -25,10 +26,6 @@ do
   sleep 5
 
 done
-
-
-
-
 
 cd /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/
 rm 'image'*

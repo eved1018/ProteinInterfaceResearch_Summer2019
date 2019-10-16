@@ -5,6 +5,7 @@ temppdbssorted=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/P
 temppred=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/temppred.txt
 temppredsorted=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/temppredsorted.txt
 missingpdbs=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/tempmissing.txt
+
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/PDB241/Dbmark_Raji_PDB/*
 do
   echo $file | awk -F/ '{print $10}' | awk -F. '{print $1}' >> $temppdbs
@@ -19,10 +20,6 @@ for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_
 do
   echo $file | awk -F/ '{print $9}' |awk -F. '{print $1}' | awk -F_ '{print $2 "_"$3}' >> $temppred
 done
-
-# cat $temp | sort | uniq -ui > /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/missingpdbs.txt
-# cat /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/missingpdbs.txt | awk 'END{print NR}'
-
 
 sort $temppdbs > $temppdbssorted
 sort $temppred > $temppredsorted

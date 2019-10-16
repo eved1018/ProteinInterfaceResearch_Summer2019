@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# read -p "predus job id " jobid
+cat /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/jobids2.txt | while read line
+do
+  jobid=`echo $line`
+  proteinid=`curl -s https://bhapp.c2b2.columbia.edu/PredUs/cgi-bin/results_omega.cgi?jobid=${jobid} | grep -E 'PDB: ' |  awk -F'[][]' '{print $2}' `
+  Proteinname=`echo $proteinid | awk -F: '{print $2}' | awk -F'&' '{print $1}'`
+  proteinchain=`echo $proteinid | awk -F: '{print $3}'`
+  id=${Proteinname}_${proteinchain}
+  Proteinid=`echo ${id//[[:blank:]]/}`
+  output=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/Predus_241/predus_${Proteinid}.pdb
+  curl -o $output https://bhapp.c2b2.columbia.edu/PredUs/data/job_data/${jobid}/PD2.${Proteinid}.comb.pdb
+done

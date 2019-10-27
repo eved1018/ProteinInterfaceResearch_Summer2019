@@ -5,11 +5,13 @@
 ###  delete image script after
 ### create general image script
 ###
-
-for f in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/*
+for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/residues/*
 do
-  proteinname=`echo $f | awk -F/ '{print $9}' | awk -F_ '{print $1}'`
-  residue=`cat $f | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
+  residue=`cat $file | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
+  proteinname=`echo $file | awk -F/ '{print $9}' | awk -F_ '{print $3}' | awk -F. '{print $1"." $2}'`
+  echo $proteinname
+  echo $residue
+
 
   echo "delete all
   fetch $proteinname , async = 0

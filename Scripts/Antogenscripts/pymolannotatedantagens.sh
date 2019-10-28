@@ -7,15 +7,20 @@
 ###
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/residues/*
 do
-  residue=`cat $file | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
-  proteinname=`echo $file | awk -F/ '{print $9}' | awk -F_ '{print $3}' | awk -F. '{print $1"." $2}'`
+  predus_residue=`cat $file | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
+  proteinname=`echo $file | awk -F/ '{print $9}' | awk -F_ '{print $3}' | awk -F. '{print $1"." $2}'| awk '{print toupper}'`
   echo $proteinname
-  echo $residue
+  echo $predus_residue
 
+  interfacefile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/${proteinname}
+  interface_residue=`cat $interfacefile | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
+  echo $interface_residue
 
   echo "delete all
   fetch $proteinname , async = 0
-  color white, resi $residue
+  color white
+  color blue, resi $predus_residue
+  color red, resi $interface_residue
   " > /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/script_${proteinname}.pml
   echo "
   png  ~/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolimages/${proteinname}.png

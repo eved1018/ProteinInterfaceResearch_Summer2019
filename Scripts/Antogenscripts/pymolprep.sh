@@ -2,7 +2,7 @@
 
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/Predus_antogens/*
 do
-  protienID=`echo $file | awk -F/ '{print $9}' | sed 's/\_/./g' | awk -F. '{print $2"."$3}' `
+  protienID=`echo $file | awk -F/ '{print $9}' | sed 's/\_/./g' | awk -F. '{print $2}' `
   echo $protienID
   predictionfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/residues/P_score_${protienID}.prediction.txt
   interface=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/${protienID}

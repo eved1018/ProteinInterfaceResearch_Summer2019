@@ -7,31 +7,35 @@
 ###
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/residues/*
 do
-  predus_residue=`cat $file | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
-  proteinname=`echo $file | awk -F/ '{print $9}' | awk -F_ '{print $3}' | awk -F. '{print $1"." $2}'| awk '{print toupper}'`
+  proteinname=`echo $file | awk -F/ '{print $9}' | sed 's/\_/./g' | awk -F. '{print $3}' | awk '{print toupper}'`
   echo $proteinname
-  echo $predus_residue
 
   interfacefile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/${proteinname}
-  interface_residue=`cat $interfacefile | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
-  echo $interface_residue
+  interfacefilesorted=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/sorted/${proteinname}_sorted
+  cat $interfacefile | sort -k1 -n > $interfacefilesorted
+
+  predus_residue_comm=`comm -23 $file $interfacefilesorted | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
+  interface_residue_comm=`comm -13 $file $interfacefilesorted| awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
+  correrct_residue_comm=`comm -12 $file $interfacefilesorted | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
+  echo $predus_residue_comm
+  echo $interface_residue_comm
+  echo $correrct_residue_comm
+  correrct_residue_comm_check=`test -z "$correrct_residue_comm" && echo "" || echo "; color green, resi $correrct_residue_comm"`
+  echo $correrct_residue_comm_check
 
   echo "delete all
-  fetch $proteinname , async = 0
-  color white
-  color blue, resi $predus_residue
-  color red, resi $interface_residue
+  fetch $proteinname, async = 0
+  color white; color blue, resi $predus_residue_comm; color red, resi $interface_residue_comm $correrct_residue_comm_check
+  png ~/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolimages/${proteinname}.png, ray=1, quiet=1
   " > /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/script_${proteinname}.pml
-  echo "
-  png  ~/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolimages/${proteinname}.png
-  quit
-  " > /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/image_${proteinname}.pml
+
+  # echo "
+  # png ~/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolimages/${proteinname}.png, ray=1, quit=1
+  # " > /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/image_${proteinname}.pml
 
   open -a "Pymol" /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/script_${proteinname}.pml
-  sleep 10
-  open -a "Pymol" /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/image_${proteinname}.pml
-  sleep 5
-
+  # open -a "Pymol" /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/image_${proteinname}.pml
+  # sleep 5
 done
 
 cd /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/

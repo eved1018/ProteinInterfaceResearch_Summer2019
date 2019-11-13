@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 
+# spheres on all colored, label on green, remove water groups
+
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/predus_outputfiles/*
 do
   proteinname=`echo $file | awk -F/ '{print $10}'| awk -F. '{print $2}' | sed 's/\_/./g'`
@@ -22,6 +24,10 @@ delete all
 fetch $proteinname, async = 0
 color white; color blue, resi $predus_residue_comm; color red, resi $interface_residue_comm $correrct_residue_comm_check
 zoom complete=1
+pyhton
+
+
+python end
 png ~/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/Images/${proteinname}.png, width=900, height=900,ray=1, dpi=500
 delete all" >> ../../Data_Files/PymolPredus/Scripts/script.pml
 

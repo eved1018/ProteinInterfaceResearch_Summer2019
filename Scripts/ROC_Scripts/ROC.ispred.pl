@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 #declaration of file names as variables
-my $preddir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Data_Files/ISPRED/ISPRED_DBMark_data_sorted/>;
+my $Dbmark_preddir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Data_Files/ISPRED/ISPRED_DBMark_data_sorted/>;
 my $Dbmark_annotateddir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Annotated_Residues/Dbmark_Annotated_Residues>;
 my $NOX_annotateddir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Annotated_Residues/NOX_Annotated_Residues>;
 #creating file w/ data table of gloabal TPR/FPR values at each threshold
 my $ROC_File = </Users/mordechaiwalder/Desktop/Research_Mordechai/Results/ROC_Curves_Results/ROC_Data/ISPRED/Ispred.ROC.thresholds.csv>;
 if (my $ROC_Data = open $ROC_File, :w) {
-  $ROC_Data.print("Threshold", ",", "Global_Dbmark_TPR", ",", "Global_Dbmark_FPR", ",", "Global_NOX_TPR", ",", "Global_NOX_FPR", ",", "Global_Total_TPR", ",", "Global_Total_FPR", "\n");
+  $ROC_Data.print("Threshold", ",", "Global_Dbmark_TPR", ",", "Global_Dbmark_FPR", ",", "Predicted_Total", ",", "Annotated_Total", ",", "Global_NOX_TPR", ",", "Global_NOX_FPR", ",", "Global_Total_TPR", ",", "Global_Total_FPR", "\n");
 }
 #creating file w/ data table of TPR/FPR values for each protein at the 0 threshold mark
 my $Zero_Threshold_File = </Users/mordechaiwalder/Desktop/Research_Mordechai/Results/ROC_Curves_Results/ROC_Data/ISPRED/Ispred.ROC.zero_threshold.proteins.csv>;
@@ -36,7 +36,7 @@ for 0.00, 1.01, 0.01 -> $start, $stop, $inc
          my $Dbmark_filename = split('/', $file.IO.path)[7];
          my $Dbmark_protein = split('_', $Dbmark_filename)[0];
   #       say $Dbmark_protein;
-         my $Dbmark_protein_ispred = "$preddir$Dbmark_protein.ispred_sorted";
+         my $Dbmark_protein_ispred = "$Dbmark_preddir$Dbmark_protein.ispred_sorted";
          for $file.IO.lines -> $line {
            my ($annres_num, $annres) = $line.split('_');
            @annotatedres.push: $annres_num;
@@ -87,6 +87,8 @@ for 0.00, 1.01, 0.01 -> $start, $stop, $inc
       $Ressum_Dbmark += $N;
       $Neg_Dbmark_sum += $neg;
       }
+      my $Seq_Dbmark_sum = $Neg_Dbmark_sum + $Ressum_Dbmark;
+      my $Pred_Dbmark_sum = $TP_Dbmark_sum + $FP_Dbmark_sum;
       say "my TP_Dbmark_sum = ", $TP_Dbmark_sum;
       say "my FP_Dbmark_sum = ", $FP_Dbmark_sum;
       say "my Ressum_Dbmark = ", $Ressum_Dbmark;
@@ -96,7 +98,7 @@ for 0.00, 1.01, 0.01 -> $start, $stop, $inc
       say "my Global_Dbmark_TPR = ", $Global_Dbmark_TPR;
       say "my Global_Dbmark_FPR = ", $Global_Dbmark_FPR;
       if (my $ROC_Data = open $ROC_File, :a) {
-      $ROC_Data.print($threshold, ",", $Global_Dbmark_TPR, ",", $Global_Dbmark_FPR, "\n");
+      $ROC_Data.print($threshold, ",", $Global_Dbmark_TPR, ",", $Global_Dbmark_FPR, ",", $Pred_Dbmark_sum, ",", $Ressum_Dbmark, "\n");
       }
     }
 }

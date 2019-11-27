@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 
-# spheres on all colored, label on green, remove water groups
-
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/predus_outputfiles/*
 do
   proteinname=`echo $file | awk -F/ '{print $10}'| awk -F. '{print $2}' | sed 's/\_/./g'`
@@ -28,11 +26,8 @@ color white; color blue, resi $predus_residue_comm; color red, resi $interface_r
 select color blue; show spheres, SEL
 select color red; show spheres, SEL
 $correct_res_sphere
-label resi $predus_residue_comm, ID
-set label_position,(3,2,1)
-label resi $interface_residue_comm, ID
-set label_position,(3,2,1)
 $correct_res_label
+remove resn hoh
 zoom complete=1
 png ~/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/Images/${proteinname}.png, width=900, height=900,ray=1, dpi=500
 delete all" >> ../../Data_Files/PymolPredus/Scripts/script.pml
@@ -50,3 +45,8 @@ done
 open -a "Pymol" /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/Scripts/script.pml
 
 # /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/Scripts/script.pml
+
+# label resi $predus_residue_comm, ID
+# set label_position,(3,2,1)
+# label resi $interface_residue_comm, ID
+# set label_position,(3,2,1)

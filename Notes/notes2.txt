@@ -1,0 +1,70 @@
+Notes: 
+
+
+
+
+
+E1) sort predus - col1 residue id col2 is score 
+M2) fix docking freq files 
+M3) fix nox files
+E4) take 30 from inspired dock and predus 
+	A) create csv file -for each residue pull inspired, predus and dockpred score, and as Y value 	anotated 0=not interface 1= interface 
+	B) using python script do linear regression on that file - 
+
+M5) send 30 ispred and dockpred proteins to evan 
+E6) send sorted prides files to M
+M7) Dynamic cutoff from ROC 
+
+1AK4_A 1
+1ARO_L
+1F34_A 1
+1KAC_A 1
+1QBK_B
+1TAB_I
+1TMQ_A 1
+2SIC_I 1
+4M76_A
+
+PU2719889
+PU2819909
+PU2819910
+PU2819911
+PU2819912
+PU2819913
+PU2819914
+PU2819915
+
+PU2819916
+
+PU2819947
+PU2819948
+PU2819949
+PU2819950
+
+1FFW_A 1 
+1FFW_B 1
+1FLE_E 1
+1GHQ_A 1
+1GXD_A 1
+1GXD_C 1
+1IRA_X 1
+1JIW_I 1
+1JIW_P 1
+1JPS_H 1
+1KAC_A 1
+1KAC_B 1
+1KLU_D 1
+
+PU2819917
+PU2819918
+PU2819919
+PU2819920
+PU2819921
+PU2819922
+PU2819923
+PU2819924
+PU2819925
+PU2819926
+PU2819927
+PU2819928
+PU2819929

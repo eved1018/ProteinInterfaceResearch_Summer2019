@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 
+### change n to be cutoff of interface
 
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/predus_outputfiles/*
 do
   proteinname=`echo $file | awk -F/ '{print $10}'| awk -F. '{print $2}' | sed 's/\_/./g'`
 
-  outputfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/predsort/predsort_${proteinname}.txt
-  cat $file | awk '{print $6, $11}' | uniq |sort -k2 -nr| uniq | head -n"15" | awk '{print $1}'> $outputfile
 
   interfacefile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/Testquery30_Interface/$proteinname
   interfaceoutput=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/interfaceoutput/interfaceoutput_${proteinname}.txt
   cat $interfacefile | awk '{print $1}' | sort > $interfaceoutput
+
+  outputfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/predsort/predsort_${proteinname}.txt
+  N=`cat "$interfaceoutput" | awk 'END{print NR}'`
+  cat $file | awk '{print $6, $11}' | uniq |sort -k2 -nr| uniq | head -n"$N" | awk '{print $1}'> $outputfile
+
   predus_residue_comm=`comm -23 $outputfile $interfaceoutput | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
   interface_residue_comm=`comm -13 $outputfile $interfaceoutput| awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
   correrct_residue_comm=`comm -12 $outputfile $interfaceoutput | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`

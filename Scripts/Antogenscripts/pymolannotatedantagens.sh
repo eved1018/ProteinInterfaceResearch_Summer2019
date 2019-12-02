@@ -26,7 +26,11 @@ do
   echo "delete all
   fetch $proteinname, async = 0
   color white; color blue, resi $predus_residue_comm; color red, resi $interface_residue_comm $correrct_residue_comm_check
+
+
   png ~/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolimages/${proteinname}.png, ray=1, quiet=1
+
+
   " > /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/script_${proteinname}.pml
 
 
@@ -35,4 +39,10 @@ done
 
 cd /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/pymolscripts/
 rm 'image'*
-rm *'cif'
+rm *'ci
+# zoom complete=1
+# rotate x, 180
+# orient resi ---
+# unset opaque-background
+# dpi = 300
+# show spheres

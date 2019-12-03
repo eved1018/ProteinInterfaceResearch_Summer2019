@@ -31,6 +31,7 @@ select color blue; show spheres, SEL
 select color red; show spheres, SEL
 $correct_res_sphere
 $correct_res_label
+set sphere_scale, 0.50, (all)
 remove resn hoh
 zoom complete=1
 png ~/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/Images/${proteinname}.png, width=900, height=900,ray=1, dpi=500

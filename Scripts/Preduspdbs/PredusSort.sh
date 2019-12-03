@@ -35,3 +35,21 @@ for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data
 do
   sed -i '' '/^,/d' $file
 done
+
+outputfilesort=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort.csv
+echo "residue,predus,ispred,dockpred,annotated" > $outputfilesort
+
+for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final/*
+do
+  outputfilesort=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort.csv
+  proteinname=`echo $file | awk -F/ '{print $10}'| awk -F_ '{print $1}'`
+  echo $proteinname
+  awk -v var=$proteinname -F, '{print $1=$1"_"var","$2","$3","$4","$5 }' $file >> $outputfilesort
+done
+
+for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final/*
+do
+  outputfilesort=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort_noheader.csv
+  cat $file >> $outputfilesort
+
+done

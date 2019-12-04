@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# counts which predus files are downloaded and which arent 
+
 temppdbs=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/temppdbs.txt
 temppdbssorted=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/temppdbssorted.txt
 temppred=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/temppred.txt

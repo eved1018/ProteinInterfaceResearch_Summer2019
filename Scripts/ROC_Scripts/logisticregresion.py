@@ -14,8 +14,10 @@ from sklearn.metrics import confusion_matrix
 
 col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
 # load dataset
-pima = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort_noheader.csv", header=None, names=col_names)
-print(pima.head())
+df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort_noheader.csv", header=None, names=col_names)
+print(df.head())
+df.isnull().any()
+pima = df.fillna(method='ffill')
 
 feature_cols = ['residue', 'predus', 'ispred', 'dockpred']
 X = pima[feature_cols] # Features

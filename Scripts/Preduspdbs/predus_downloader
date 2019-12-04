@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
+# text file- list of predus job ids
 jobidsfinal=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/jobids/jobtest
 
-
+# funtion 1- downloads pdb with predus prediction
 cat $jobidsfinal | while read line
 do
   jobid=`echo $line`
@@ -14,6 +15,8 @@ do
   output=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/Predus_241/pred1/predus_${Proteinid}.pdb
   curl -o $output https://bhapp.c2b2.columbia.edu/PredUs/data/job_data/${jobid}/PD2.${Proteinid}.comb.pdb
 done
+
+# function 2- some cases are case sensitive so the script is run twice, above changing the case this time not
 
 cat $jobidsfinal | while read line
 do
@@ -27,6 +30,8 @@ do
   curl -o $output https://bhapp.c2b2.columbia.edu/PredUs/data/job_data/${jobid}/PD2.${Proteinid}.comb.pdb
 done
 
+#function 3-  filter through the first function and any output that is a pdb w prediction  is placed into prediction folder
+
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/Predus_241/pred1/*
 do
   if grep -q -w "Not Found" "$file"; then
@@ -37,6 +42,9 @@ do
     mv $file /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/Predus_241_for_real/
   fi
 done
+
+
+#function 4 -  filter through the second function and any output that is a pdb w prediction  is placed into prediction folder
 
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/Predus_241/pred2/*
 do

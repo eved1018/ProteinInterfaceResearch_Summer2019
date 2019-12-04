@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Predus/predus_outputfiles/*
+# Function 1- Create CSV file from Predus,Ispred, Dockpred.
+
+for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/Predus_241_for_real/*
 do
   proteinname=`echo $file | awk -F/ '{print $10}'| awk -F. '{print $2}' | sed 's/\_/./g'`
   ###Predus
@@ -18,7 +20,7 @@ do
   predcorrectfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/predcorrect/correct.${proteinname}
   cat $dockpredoutput | while read line
   do
-    annotatedfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/Testquery30_Interface/$proteinname
+    annotatedfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/Annotated/${proteinname}_Interface_Residues
     residue=`echo $line | awk -F, '{print $1}'`
     if grep -q -w "$residue" "$annotatedfile"; then
       echo $residue,1 >> $predcorrectfile
@@ -28,16 +30,16 @@ do
   done
   finaloutput=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final/${proteinname}_final.csv
   cat $predcorrectfile | awk -F, '{print $2}'| paste -d "," $dockpredoutput - > $finaloutput
-
 done
+
+# honestly not sure
 
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final/*
 do
   sed -i '' '/^,/d' $file
 done
 
-outputfilesort=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort.csv
-echo "residue,predus,ispred,dockpred,annotated" > $outputfilesort
+# appends protein name to begining of residue
 
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final/*
 do
@@ -47,9 +49,12 @@ do
   awk -v var=$proteinname -F, '{print $1=$1"_"var","$2","$3","$4","$5 }' $file >> $outputfilesort
 done
 
+# created headers
+
+outputfilesort=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort.csv
+echo "residue,predus,ispred,dockpred,annotated" > $outputfilesort
 for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final/*
 do
   outputfilesort=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort_noheader.csv
   cat $file >> $outputfilesort
-
 done

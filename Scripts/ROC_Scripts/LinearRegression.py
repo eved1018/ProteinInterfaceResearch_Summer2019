@@ -18,7 +18,7 @@ from scipy.special import expit
 
 
 #linear regresion#
-
+#
 # df = pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort.csv')
 # df.isnull().any()
 # dataset = df.fillna(method='ffill')
@@ -32,15 +32,17 @@ from scipy.special import expit
 # results = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
 # print(results.head(50))
 
-#logistic regresion#
+#logistic regresion
 
 df = pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort.csv')
 df.isnull().any()
 dataset = df.fillna(method='ffill')
 X = dataset[['predus', 'ispred', 'dockpred']].values
 y = dataset['annotated'].values
+print(X)
+print(y)
 lr = LogisticRegression()
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 lr.fit(X_train, y_train)
 print(lr.coef_)
 print(lr.intercept_)

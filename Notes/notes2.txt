@@ -1,9 +1,5 @@
 Notes: 
 
-
-
-
-
 E1) sort predus - col1 residue id col2 is score 
 M2) fix docking freq files 
 M3) fix nox files
@@ -14,6 +10,7 @@ E4) take 30 from inspired dock and predus
 M5) send 30 ispred and dockpred proteins to evan 
 E6) send sorted prides files to M
 M7) Dynamic cutoff from ROC 
+8) pymol for all antogens 
 
 1AK4_A 1
 1ARO_L

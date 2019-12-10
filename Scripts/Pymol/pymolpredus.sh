@@ -16,7 +16,8 @@ do
   cat $file | awk '{print $6, $11}' | uniq |sort -k2 -nr| uniq | head -n"$N" | awk '{print $1}'> $outputfile
 
 # Function 2 - comparison of predicted and annnotated residues
-
+  #ispred_pred_comm
+  #dock_pred_comm=
   predus_residue_comm=`comm -23 $outputfile $interfaceoutput | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
   interface_residue_comm=`comm -13 $outputfile $interfaceoutput| awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
   correrct_residue_comm=`comm -12 $outputfile $interfaceoutput | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`

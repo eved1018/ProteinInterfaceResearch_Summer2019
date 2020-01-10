@@ -54,7 +54,6 @@ do
   awk -v var=$proteinname -F, '{print $1=$1"_"var","$2","$3","$4","$5 }' $file >> $outputfilesort
 done
 
-
 #header
 
 outputfilesortheader=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_241/final_sort_headers.csv
@@ -63,4 +62,4 @@ for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data
 do
   outputfilesortheader=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_241/final_sort_headers.csv
   cat $file >> $outputfilesortheader
- done
+done

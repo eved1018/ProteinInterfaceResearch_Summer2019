@@ -37,21 +37,28 @@ import numpy as np
 
 #logistic regresion
 
-df = pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final_sort.csv')
+df = pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/noxdata.csv')
 df.isnull().any()
 dataset = df.fillna(method='ffill')
-
 X = dataset[['predus', 'ispred', 'dockpred']].values
 y = dataset['annotated'].values
 
 lr = LogisticRegression()
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1)
 lr.fit(X_train, y_train)
 print(lr.coef_)
 print(lr.intercept_)
 y_pred = lr.predict(X_test)
-print(confusion_matrix(y_test, y_pred))
-#
+# print(confusion_matrix(y_test, y_pred))
+print(y_pred)
+results = pd.DataFrame({"protein": X , "predicted": y_pred})
+path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_241/data_241.txt"
+results.to_csv(path,sep=",", index=False, header=True)
+
+
+
+
+
 # df = pd.DataFrame({'x': X_test[:,0], 'y': y_test})
 # df = df.sort_values(by='x')
 # from scipy.special import expit

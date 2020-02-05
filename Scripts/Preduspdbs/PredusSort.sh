@@ -19,11 +19,11 @@ do
   ispredfakeout=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/ispred/${proteinname}_ispred_fakeout.csv
   ispredoutput=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/ispred/${proteinname}_ispred.csv
   firstline=`cat $ispredfile | head -n 1 | awk -F, '{print $1}'`
-  while [ -z "$firstline" ]
-    do
-      sed -i "" '1d' $ispredfile
-      firstline=`cat $ispredfile | head -n 1 | awk -F, '{print $1}'`
-    done
+  # while [ -z "$firstline" ]
+  #   do
+  #     sed -i "" '1d' $ispredfile
+  #     firstline=`cat $ispredfile | head -n 1 | awk -F, '{print $1}'`
+  #   done
   cat $ispredfile | awk -F, '{print $1","$2}'| sed 's/^ *//g'| paste -d "," $output - > $ispredfakeout
   cat $ispredfakeout | awk -F, '{if ($1==$3) print $4; else print "null"}'| paste -d "," $output - > $ispredoutput
   # rm $ispredfakeout

@@ -4,9 +4,9 @@
 my $Dbmark_preddir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Data_Files/ISPRED/ISPRED_DBMark_data_sorted/>;
 my $NOX_preddir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Data_Files/ISPRED/ISPRED_NOX_data_sorted/>;
 my $dockdir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Data_Files/Dock_freq/Sorted_adjusted/>;
-my $sequence_check_file = </Users/mordechaiwalder/Desktop/Research_Mordechai/Results/ROC_Curves_Results/ROC_Data/ISPRED/ispred_dock_sequence_check.csv>;
+my $sequence_check_file = </Users/mordechaiwalder/Desktop/Research_Mordechai/Results/ispred_dock_sequence_check.csv>;
 if (my $sequence_data = open $sequence_check_file, :w) {
-  $sequence_data.print("Protein", ",", "dock_not_ispred", ",", "ispred_not_dock", "\n");
+  $sequence_data.print("Protein", ",", "dock_not_ispred", ",", "ispred_not_dock", ",", "ispred_res", ",", "dock_res", ",", "delta_ispred_dock", "\n");
 }
 for dir($Dbmark_preddir) -> $file {
   my $Dbmark_filename = split('/', $file.IO.path)[8];
@@ -46,8 +46,12 @@ for dir($Dbmark_preddir) -> $file {
       @isprednotdock.push: $res;
       }
     }
-    my $a = say @docknotispred;
-    my $b = say @isprednotdock;
+    my $y = @ispredseq.elems;
+    my $z = @dockseq.elems;
+    my $deltaispreddock = $y - $z;
+    if (my $sequence_data = open $sequence_check_file, :a) {
+      $sequence_data.print($Dbmark_pdb, ",", @docknotispred, ",", @isprednotdock, ",", $y, ",", $z, ",", $deltaispreddock, "\n");
+    }
 }
 for dir($NOX_preddir) -> $file {
   my $NOX_filename = split('/', $file.IO.path)[8];
@@ -69,7 +73,7 @@ for dir($NOX_preddir) -> $file {
   my $dockfile = open $dock, :r;
   my $dockdata = $dockfile.slurp;
   for $dockdata.lines -> $prediction {
-    my ($predres_num, $predval) = split ', ', $prediction;
+    my ($predres_num, $predval) = split ',', $prediction;
     @dockseq.push: $predres_num;
 }
   $dockfile.close;
@@ -86,5 +90,11 @@ for dir($NOX_preddir) -> $file {
       unless (%docklookup{ $res }) {
       @isprednotdock.push: $res;
       }
+    }
+    my $y = @ispredseq.elems;
+    my $z = @dockseq.elems;
+    my $deltaispreddock = $y - $z;
+    if (my $sequence_data = open $sequence_check_file, :a) {
+      $sequence_data.print($NOX_pdb, ",", @docknotispred, ",", @isprednotdock, ",", $y, ",", $z, ",", $deltaispreddock, "\n");
     }
 }

@@ -42,41 +42,41 @@ def log_reg():
     y_pred=logreg.predict(X_test)
     #output
     cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
-    # print(cnf_matrix)
+    print(cnf_matrix)
     print(logreg.coef_)
     print(logreg.intercept_)
-    # #auc
+    #auc
     y_pred_proba = logreg.predict_proba(X_test)[::,1]
     print(y_pred_proba)
-    # fpr, tpr, threshold = metrics.roc_curve(y_test,  y_pred_proba)
-    # final = pd.DataFrame({"fpr": fpr, "tpr": tpr,"threshold": threshold})
-    # # print(final)
-    # auc = metrics.roc_auc_score(y_test, y_pred_proba)
-    # plt.plot(fpr,tpr,label="data 1, auc="+str(auc))
-    # plt.legend(loc=4)
-    results = pd.DataFrame({"protein":protein, "predicted": y_pred})
-    # print(auc)
-    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_241/regresiondatanox.txt"
+    fpr, tpr, threshold = metrics.roc_curve(y_test,  y_pred_proba)
+    final = pd.DataFrame({"fpr": fpr, "tpr": tpr,"threshold": threshold})
+    # print(final)
+    auc = metrics.roc_auc_score(y_test, y_pred_proba)
+    plt.plot(fpr,tpr,label="data 1, auc="+str(auc))
+    plt.legend(loc=4)
+    results = pd.DataFrame({"predicted": y_pred, "annotated": y)
+    print(auc)
+    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/regresiondatanox.txt"
     results.to_csv(path,sep=",", index=False, header=True)
-    # # plt.show()
-    # # return auc
+    plt.show()
+    return auc
 log_reg()
 
 
-# def main():
-#     appended_data = []
-#     for i in range(1,5):
-#         numb = randrange(10)
-#         # print(numb)
-#         result = log_reg(numb)
-#         print(result)
-#         data = pd.DataFrame({"trail":[i],"auc":result})
-#
-#         appended_data.append(data)
-#     appended_data = pd.concat(appended_data)
-#     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_241/auc_random_test.txt"
-#     appended_data.to_csv(path,sep=",", index=False, header=True)
-#     print("data was output to" + path)
-#
-#
-# main()
+def main():
+    appended_data = []
+    for i in range(1,5):
+        numb = randrange(10)
+        # print(numb)
+        result = log_reg(numb)
+        print(result)
+        data = pd.DataFrame({"trail":[i],"auc":result})
+
+        appended_data.append(data)
+    appended_data = pd.concat(appended_data)
+    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_241/auc_random_test.txt"
+    appended_data.to_csv(path,sep=",", index=False, header=True)
+    print("data was output to" + path)
+
+
+main()

@@ -18,13 +18,22 @@ do
   ispredfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ISPRED/ispred241/${proteinname}.ispred_unsorted.csv
   ispredfakeout=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/ispred/${proteinname}_ispred_fakeout.csv
   ispredoutput=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/ispred/${proteinname}_ispred.csv
+  firstline=`cat $ispredfile | head -n 1 | awk -F, '{print $1}'`
+  while [ -z "$firstline" ]
+    do
+      sed -i "" '1d' $ispredfile
+      firstline=`cat $ispredfile | head -n 1 | awk -F, '{print $1}'`
+    done
   cat $ispredfile | awk -F, '{print $1","$2}'| sed 's/^ *//g'| paste -d "," $output - > $ispredfakeout
   cat $ispredfakeout | awk -F, '{if ($1==$3) print $4; else print "null"}'| paste -d "," $output - > $ispredoutput
-  rm $ispredfakeout
+  # rm $ispredfakeout
   ###Dockpred
   dockpredfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Dockpred/Unsorted_adjusted/${proteinname}.docking_freq.csv
+  dockfake=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/dockpred/${proteinname}_dockpred_fakeout.csv
   dockpredoutput=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/dockpred/${proteinname}_dockpred.csv
-  cat $dockpredfile |sort -n | awk -F, '{print $2}'| paste -d "," $ispredoutput - > $dockpredoutput
+  cat $dockpredfile |sort -n | awk -F, '{print $1","$2}'| paste -d "," $ispredfakeout - > $dockfake
+  cat $dockfake | awk -F, '{if ($1==$5) print $6; else print "null"}'| paste -d "," $ispredoutput - > $dockpredoutput
+  # rm $dockfake
   ##anotated
   predcorrectfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predcorrect/correct.${proteinname}
   cat $dockpredoutput | while read line

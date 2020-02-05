@@ -1,4 +1,6 @@
 #!/bin/sh
+
+# sorts based on nox or benchmark 
 file=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/PDB241/Nox_Raji_PDB/*
 for f in $file
 do

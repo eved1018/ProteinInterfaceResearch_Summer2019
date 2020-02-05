@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #declaration of file names as variables
+#shell('rm ~/Desktop/Research_Mordechai/Annotated_Residues/Dbmark_Annotated_Residues/.DS_Store');
 my $Dbmark_preddir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Data_Files/ISPRED/ISPRED_DBMark_data_sorted/>;
 my $NOX_preddir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Data_Files/ISPRED/ISPRED_NOX_data_sorted/>;
 my $Dbmark_annotateddir = </Users/mordechaiwalder/Desktop/Research_Mordechai/Annotated_Residues/Dbmark_Annotated_Residues>;

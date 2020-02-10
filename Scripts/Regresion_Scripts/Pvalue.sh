@@ -10,14 +10,10 @@ do
   predusval=`echo $line | awk -F',' '{print $2}'`
   ispredval=`echo $line | awk -F',' '{print $3}'`
   dockpredval=`echo $line | awk -F',' '{print $4}'`
-  # preduscoef=2.07435466
-  # ispredcoef=2.43193857
-  # dockpredcoef=0.69229295
-  # yintercept=-3.47243398
-  preduscoef=1.91094191
-  ispredcoef=2.62568153
-  dockpredcoef=3.23866855
-  yintercept=-4.14426836
+  preduscoef=
+  ispredcoef=
+  dockpredcoef=
+  yintercept=
 
   exponent=$(bc <<< "-($yintercept + $preduscoef * $predusval + $ispredcoef * $ispredval+$dockpredval * $dockpredcoef)")
   pval=`awk -v exponent=$exponent 'BEGIN{print 1/(1+(2.71828**exponent))}'`

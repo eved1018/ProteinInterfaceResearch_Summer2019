@@ -9,7 +9,7 @@ do
   protienID=`echo $f | awk -F/ '{print $10}'| awk -F. '{print $1}' | sed 's/\_/./g'| awk '{print toupper}'`
   echo $protienID >> /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/Noxfiles/noxpdbs.csv
 done
-csvfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final.csv
+csvfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv
 cat $csvfile | while read line
 do
   # echo $line

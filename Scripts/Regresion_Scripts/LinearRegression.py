@@ -37,7 +37,7 @@ import numpy as np
 
 #logistic regresion
 
-df = pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv')
+df = pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/noxdata.csv')
 df.isnull().any()
 dataset = df.fillna(method='ffill')
 protein = dataset['residue'].values
@@ -57,7 +57,8 @@ y_pred_proba = lr.predict_proba(X_test)[::,0]
 results = pd.DataFrame({"predicted": y_pred_proba, "annotated": y_test})
 path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/data_241.txt"
 results.to_csv(path,sep=",", index=False, header=True)
-
+f = open('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/regresiondata.txt', 'w')
+print(lr.summary(), file = f)
 
 # df = pd.DataFrame({'x': X_test[:,0], 'y': y_test})
 # df = df.sort_values(by='x')

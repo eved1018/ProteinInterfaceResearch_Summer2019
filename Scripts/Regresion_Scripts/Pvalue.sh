@@ -15,7 +15,7 @@ do
   dockpredcoef=1.81020245
   yintercept=3.65825493
 
-  exponent=$(bc <<< "-(-$yintercept + $preduscoef * $predusval + $ispredcoef * $ispredval+$dockpredval * $dockpredcoef)")
+  exponent=$(bc -l <<< "-(-$yintercept + $preduscoef * $predusval + $ispredcoef * $ispredval+$dockpredval * $dockpredcoef)")
   pval=`awk -v exponent=$exponent 'BEGIN{print 1/(1+(2.71828**exponent))}'`
   echo $proteinname,$pval >> /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/pvaltest.csv
 

@@ -30,7 +30,7 @@ def log_reg():
     protein = data.residue
     X = data[feature_cols] # Features
     y = data.annotated # Target variable
-    X_train,X_test,y_train,y_test=train_test_split(X,y)
+    # X_train,X_test,y_train,y_test=train_test_split(X,y)
 
     # instantiate the model (using the default parameters)
     logreg = LogisticRegression()
@@ -39,12 +39,13 @@ def log_reg():
     logreg.fit(X_train,y_train)
 
     #prediction
-    y_pred=logreg.predict(X_test)
+    y_pred=logreg.predict(X)
     #output
-    cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+    cnf_matrix = metrics.confusion_matrix(y, y_pred)
     print(cnf_matrix)
     print(logreg.coef_)
     print(logreg.intercept_)
+
     #auc
     y_pred_proba = logreg.predict_proba(X_test)[::,1]
     print(y_pred_proba)
@@ -63,20 +64,20 @@ def log_reg():
 log_reg()
 
 
-def main():
-    appended_data = []
-    for i in range(1,5):
-        numb = randrange(10)
-        # print(numb)
-        result = log_reg(numb)
-        print(result)
-        data = pd.DataFrame({"trail":[i],"auc":result})
+# def main():
+#     appended_data = []
+#     for i in range(1,5):
+#         numb = randrange(10)
+#         # print(numb)
+#         result = log_reg(numb)
+#         print(result)
+#         data = pd.DataFrame({"trail":[i],"auc":result})
+#
+#         appended_data.append(data)
+#     appended_data = pd.concat(appended_data)
+#     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_241/auc_random_test.txt"
+#     appended_data.to_csv(path,sep=",", index=False, header=True)
+#     print("data was output to" + path)
+#
 
-        appended_data.append(data)
-    appended_data = pd.concat(appended_data)
-    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_241/auc_random_test.txt"
-    appended_data.to_csv(path,sep=",", index=False, header=True)
-    print("data was output to" + path)
-
-
-main()
+# main()

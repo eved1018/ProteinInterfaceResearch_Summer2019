@@ -16,6 +16,7 @@ from sklearn.metrics import confusion_matrix
 import pandas as pd
 from scipy.special import expit
 import numpy as np
+import statsmodels.api as sm
 
 
 #linear regresion#
@@ -36,29 +37,42 @@ import numpy as np
 
 
 #logistic regresion
+col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
 
-df = pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/noxdata.csv')
+df = pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/noxdata.csv',header=None, names=col_names)
 df.isnull().any()
 dataset = df.fillna(method='ffill')
 protein = dataset['residue'].values
 X = dataset[['predus', 'ispred', 'dockpred']].values
 y = dataset['annotated'].values
 lr = LogisticRegression()
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1)
-print(y_train)
-lr.fit(X_train, y_train)
+# X_train, X_test, y_train, y_test = train_test_split(X, y)
+# print(y_train)
+lr.fit(X, y)
 print(lr.coef_)
 print(lr.intercept_)
-y_pred = lr.predict(X_test)
-print(confusion_matrix(y_test, y_pred))
-y_pred_proba = lr.predict_proba(X_test)[::,0]
+# y_pred = lr.predict(X)
+# print(confusion_matrix(y, y_pred))
+y_pred_proba = lr.predict_proba(X)[::,0]
 # print(y_pred)
-# print(y_pred_proba)
-results = pd.DataFrame({"predicted": y_pred_proba, "annotated": y_test})
-path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/data_241.txt"
-results.to_csv(path,sep=",", index=False, header=True)
-f = open('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/regresiondata.txt', 'w')
-print(lr.summary(), file = f)
+print(y_pred_proba)
+# results = pd.DataFrame({"predicted": y_pred_proba, "annotated": y_test})
+# path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/data_241.txt"
+# results.to_csv(path,sep=",", index=False, header=True)
+
+import statsmodels.api as sm
+
+x_train = sm.add_constant(X)
+lm_1 = sm.OLS(y, x_train).fit()
+print(lm_1.summary())
+# logit_model=sm.Logit(X,Y)
+# result=logit_model.fit()
+#
+# print(result.summary2())
+#
+# f = open('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/regresiondata.txt', 'w')
+# print(result.summary2(), file = f)
+
 
 # df = pd.DataFrame({'x': X_test[:,0], 'y': y_test})
 # df = df.sort_values(by='x')

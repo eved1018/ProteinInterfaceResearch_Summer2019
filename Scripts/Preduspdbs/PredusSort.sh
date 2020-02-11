@@ -71,8 +71,5 @@ done
 
 outputfilesortheader=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort_headers.csv
 echo "residue,predus,ispred,dockpred,annotated" > $outputfilesortheader
-for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final/*
-do
-  outputfilesortheader=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort_headers.csv
-  cat $file >> $outputfilesortheader
-done
+outputfilesortheader=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort_headers.csv
+cat $outputfilesort >> $outputfilesortheader

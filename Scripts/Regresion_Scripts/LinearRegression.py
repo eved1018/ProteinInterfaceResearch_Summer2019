@@ -17,6 +17,7 @@ import pandas as pd
 from scipy.special import expit
 import numpy as np
 import statsmodels.api as sm
+import csv 
 
 
 #linear regresion#
@@ -59,12 +60,21 @@ print(y_pred_proba)
 # results = pd.DataFrame({"predicted": y_pred_proba, "annotated": y_test})
 # path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/data_241.txt"
 # results.to_csv(path,sep=",", index=False, header=True)
+print(lr.coef_[0,0])
+print(lr.coef_[0,1])
+print(lr.coef_[0,2])
+# benchmark= pd.readcsv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/benchmarkdata.csv', header=None, name=col_names)
+# Predusval = dataset['predus'].values
+# ispredval = dataset['ispred'].values
+# dockpred = dataset['dockpred'].values
+# predcoef = lr.coef_
 
-import statsmodels.api as sm
 
-x_train = sm.add_constant(X)
-lm_1 = sm.OLS(y, x_train).fit()
-print(lm_1.summary())
+# import statsmodels.api as sm
+
+# x_train = sm.add_constant(X)
+# lm_1 = sm.OLS(y, x_train).fit()
+# print(lm_1.summary())
 # logit_model=sm.Logit(X,Y)
 # result=logit_model.fit()
 #

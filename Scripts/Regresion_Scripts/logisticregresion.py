@@ -32,27 +32,30 @@ def log_reg_nox():
     y = data.annotated # Target variable
     # X_train,X_test,y_train,y_test=train_test_split(X,y)
     # instantiate the model (using the default parameters)
-    logreg = LogisticRegression()
+    # logreg = LogisticRegression()
     # fit the model with data
-    logreg.fit(X,y)
+    # logreg.fit(X,y)
     x = sm.add_constant(X)
     logit_model=sm.Logit(y,x)
     result=logit_model.fit()
     print(result.summary2())
-    print(logreg.coef_)
-    print(logreg.intercept_)
+    # print(logreg.coef_)
+    # print(logreg.intercept_)
     coefficients = result.params
-    print(coefficients)
-    #output
+    print(coefficients[1])
+    print(coefficients[2])
+    print(coefficients[3])
+    print(coefficients[0])
+    
     benchmark= pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/benchmarkdata.csv', header=None, names=col_names)
     protein= benchmark.residue
     predusval = benchmark.predus
     ispredval = benchmark.ispred
     dockpred = benchmark.dockpred
-    predcoef = logreg.coef_[0,0]
-    ispredcoef = logreg.coef_[0,1]
-    dockpredcoef= logreg.coef_[0,2]
-    val = (logreg.intercept_ + predcoef * predusval + ispredval* ispredcoef +dockpred * dockpredcoef)*(-1)
+    predcoef = coefficients[1]
+    ispredcoef = coefficients[2]
+    dockpredcoef= coefficients[3]
+    val = (coefficients[0] + predcoef * predusval + ispredval* ispredcoef +dockpred * dockpredcoef)*(-1)
     # print(val)
     exponent = np.exp(val)
     # print(exponent)
@@ -109,13 +112,14 @@ def log_reg_bnch():
     # prediction value 
     nox= pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/noxdata.csv', header=None, names=col_names)
     protein= nox.residue
+    protein= nox.residue
     predusval = nox.predus
     ispredval = nox.ispred
     dockpred = nox.dockpred
-    predcoef = logreg.coef_[0,0]
-    ispredcoef = logreg.coef_[0,1]
-    dockpredcoef= logreg.coef_[0,2]
-    val = (logreg.intercept_ + predcoef * predusval + ispredval* ispredcoef +dockpred * dockpredcoef)*(-1)
+    predcoef = coefficients[1]
+    ispredcoef = coefficients[2]
+    dockpredcoef= coefficients[3]
+    val = (coefficients[0] + predcoef * predusval + ispredval* ispredcoef +dockpred * dockpredcoef)*(-1)
     exponent = np.exp(val)
     pval = (1/(1+exponent))
     results = pd.DataFrame({"residue": protein, "prediction value": pval})

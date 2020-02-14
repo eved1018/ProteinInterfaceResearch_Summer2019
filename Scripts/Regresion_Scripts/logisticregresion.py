@@ -46,7 +46,7 @@ def log_reg_nox():
     print(coefficients[2])
     print(coefficients[3])
     print(coefficients[0])
-    
+
     benchmark= pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/benchmarkdata.csv', header=None, names=col_names)
     protein= benchmark.residue
     predusval = benchmark.predus
@@ -108,7 +108,6 @@ def log_reg_bnch():
     print(logreg.intercept_)
     coefficients = result.params
     print(coefficients)
-    #prediction
     # prediction value 
     nox= pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/noxdata.csv', header=None, names=col_names)
     protein= nox.residue

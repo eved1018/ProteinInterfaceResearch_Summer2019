@@ -1,6 +1,6 @@
        
-
-not data set 
+All 3 prediction scores
+nox data set 
 
   Current function value: 0.227423
          Iterations 7

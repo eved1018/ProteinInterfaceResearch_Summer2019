@@ -26,7 +26,7 @@ def log_reg_nox():
     # print(df.head())
     df.isnull().any()
     data = df.fillna(method='ffill')
-    feature_cols = ['predus', 'ispred', 'dockpred']
+    feature_cols = ['predus','ispred','dockpred']
     protein = data.residue
     X = data[feature_cols] # Features
     y = data.annotated # Target variable
@@ -42,11 +42,6 @@ def log_reg_nox():
     # print(logreg.coef_)
     # print(logreg.intercept_)
     coefficients = result.params
-    print(coefficients[1])
-    print(coefficients[2])
-    print(coefficients[3])
-    print(coefficients[0])
-
     benchmark= pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/benchmarkdata.csv', header=None, names=col_names)
     protein= benchmark.residue
     predusval = benchmark.predus
@@ -55,7 +50,7 @@ def log_reg_nox():
     predcoef = coefficients[1]
     ispredcoef = coefficients[2]
     dockpredcoef= coefficients[3]
-    val = (coefficients[0] + predcoef * predusval + ispredval* ispredcoef +dockpred * dockpredcoef)*(-1)
+    val = (coefficients[0] + predcoef * predusval + ispredval* ispredcoef+dockpred * dockpredcoef)*(-1)
     # print(val)
     exponent = np.exp(val)
     # print(exponent)
@@ -72,22 +67,20 @@ def log_reg_bnch():
     df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/benchmarkdata.csv", header=None, names=col_names)
     df.isnull().any()
     data = df.fillna(method='ffill')
-    feature_cols = ['predus', 'ispred','dockpred']
+    feature_cols = ['predus','ispred','dockpred']
     protein = data.residue
     X = data[feature_cols] # Features
     y = data.annotated # Target variable
     # X_train,X_test,y_train,y_test=train_test_split(X,y)
     # instantiate the model (using the default parameters)
-    logreg = LogisticRegression()
+    # logreg = LogisticRegression()
     # fit the model with data
-    logreg.fit(X,y)
+    # logreg.fit(X,y)
     # import statsmodels.api as sm
     x = sm.add_constant(X)
     logit_model=sm.Logit(y,x)
     result=logit_model.fit()
     print(result.summary2())
-    print(logreg.coef_)
-    print(logreg.intercept_)
     coefficients = result.params
     print(coefficients)
     # prediction value 
@@ -100,7 +93,7 @@ def log_reg_bnch():
     predcoef = coefficients[1]
     ispredcoef = coefficients[2]
     dockpredcoef= coefficients[3]
-    val = (coefficients[0] + predcoef * predusval + ispredval* ispredcoef +dockpred * dockpredcoef)*(-1)
+    val = (coefficients[0] + predcoef * predusval +  ispredval* ispredcoef+dockpred * dockpredcoef )*(-1)
     exponent = np.exp(val)
     pval = (1/(1+exponent))
     results = pd.DataFrame({"residue": protein, "prediction value": pval})

@@ -2,14 +2,14 @@
 
 # imports
 import pandas as pd
-from sklearn.linear_model import LogisticRegression, LogisticRegressionCV 
-from sklearn.linear_model import LassoCV, LassoLarsCV, LassoLarsIC
-from sklearn import metrics
+# from sklearn.linear_model import LogisticRegression, LogisticRegressionCV 
+# from sklearn.linear_model import LassoCV, LassoLarsCV, LassoLarsIC
+# from sklearn import metrics
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import confusion_matrix
 from random import *
 import statsmodels.api as sm
 
@@ -63,24 +63,6 @@ def log_reg_nox():
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/benchmarkpredictionvalues.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-    
-
-    # #auc
-    # y_pred_proba = logreg.predict_proba(X_test)[::,1]
-    # print(y_pred_proba)
-    # fpr, tpr, threshold = metrics.roc_curve(y_test,  y_pred_proba)
-    # final = pd.DataFrame({"fpr": fpr, "tpr": tpr,"threshold": threshold})
-    # # print(final)
-    # auc = metrics.roc_auc_score(y_test, y_pred_proba)
-    # plt.plot(fpr,tpr,label="data 1, auc="+str(auc))
-    # plt.legend(loc=4)
-    # results = pd.DataFrame({"predicted": y_pred, "annotated": y)
-    # print(auc)
-    # path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/regresiondatanox.txt"
-    # results.to_csv(path,sep=",", index=False, header=True)
-    # plt.show()
-    # return auc
-
 log_reg_nox()
 
 

@@ -3,10 +3,11 @@
 # sorts based on nox or benchmark
 mkdir /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/Noxfiles
 
-file=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/PDB241/Nox_Raji_PDB/*
+file=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/PDB241/NOX_Annotated_Residues/*
 for f in $file
 do
-  protienID=`echo $f | awk -F/ '{print $10}'| awk -F. '{print $1}' | sed 's/\_/./g'| awk '{print toupper}'`
+  protienID=`echo $f | awk -F/ '{print $10}'| awk -F'_' '{print $1}' | awk '{print toupper}'`
+  echo $protienID
   echo $protienID >> /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/Noxfiles/noxpdbs.csv
 done
 csvfile=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv

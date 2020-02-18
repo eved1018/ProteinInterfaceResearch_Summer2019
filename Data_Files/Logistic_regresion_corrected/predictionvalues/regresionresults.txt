@@ -1,0 +1,47 @@
+NOX data test set       
+
+   Current function value: 0.230358
+         Iterations 7
+                         Results: Logit
+=================================================================
+Model:              Logit            Pseudo R-squared: 0.244
+Dependent Variable: annotated        AIC:              14343.6600
+Date:               2020-02-17 22:00 BIC:              14377.0419
+No. Observations:   31116            Log-Likelihood:   -7167.8
+Df Model:           3                LL-Null:          -9484.3
+Df Residuals:       31112            LLR p-value:      0.0000
+Converged:          1.0000           Scale:            1.0000
+No. Iterations:     7.0000
+------------------------------------------------------------------
+              Coef.   Std.Err.     z      P>|z|    [0.025   0.975]
+------------------------------------------------------------------
+const        -3.6469    0.0376  -97.0422  0.0000  -3.7206  -3.5733
+predus        1.2648    0.1130   11.1905  0.0000   1.0433   1.4863
+ispred        2.7244    0.0583   46.7493  0.0000   2.6101   2.8386
+dockpred      1.8486    0.1062   17.4094  0.0000   1.6405   2.0567
+=================================================================
+
+
+benchmark data test set 
+
+Optimization terminated successfully.
+         Current function value: 0.148264
+         Iterations 8
+                         Results: Logit
+================================================================
+Model:              Logit            Pseudo R-squared: 0.271
+Dependent Variable: annotated        AIC:              8526.0503
+Date:               2020-02-17 22:00 BIC:              8559.1126
+No. Observations:   28726            Log-Likelihood:   -4259.0
+Df Model:           3                LL-Null:          -5845.1
+Df Residuals:       28722            LLR p-value:      0.0000
+Converged:          1.0000           Scale:            1.0000
+No. Iterations:     8.0000
+-----------------------------------------------------------------
+             Coef.   Std.Err.     z      P>|z|    [0.025   0.975]
+-----------------------------------------------------------------
+const       -4.1347    0.0461  -89.6779  0.0000  -4.2251  -4.0443
+predus       1.8301    0.1379   13.2732  0.0000   1.5599   2.1004
+ispred       2.0963    0.0866   24.2068  0.0000   1.9266   2.2661
+dockpred     3.2181    0.1196   26.9027  0.0000   2.9836   3.4525
+================================================================

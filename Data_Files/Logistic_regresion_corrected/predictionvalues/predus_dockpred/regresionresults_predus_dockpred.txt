@@ -1,0 +1,47 @@
+Nox training set       
+   Current function value: 0.265911
+         Iterations 7
+                         Results: Logit
+=================================================================
+Model:              Logit            Pseudo R-squared: 0.128     
+Dependent Variable: annotated        AIC:              16554.1575
+Date:               2020-02-20 11:10 BIC:              16579.1939
+No. Observations:   31116            Log-Likelihood:   -8274.1   
+Df Model:           2                LL-Null:          -9484.3   
+Df Residuals:       31113            LLR p-value:      0.0000    
+Converged:          1.0000           Scale:            1.0000    
+No. Iterations:     7.0000                                       
+------------------------------------------------------------------
+             Coef.   Std.Err.      z      P>|z|    [0.025   0.975]
+------------------------------------------------------------------
+const       -2.9422    0.0274  -107.5008  0.0000  -2.9958  -2.8885
+predus       2.3414    0.1049    22.3224  0.0000   2.1358   2.5469
+dockpred     3.0268    0.0953    31.7554  0.0000   2.8400   3.2136
+=================================================================
+
+benchmark training set 
+
+Optimization terminated successfully.
+         Current function value: 0.157497
+         Iterations 8
+                         Results: Logit
+================================================================
+Model:              Logit            Pseudo R-squared: 0.226    
+Dependent Variable: annotated        AIC:              9054.4959
+Date:               2020-02-20 11:10 BIC:              9079.2926
+No. Observations:   28726            Log-Likelihood:   -4524.2  
+Df Model:           2                LL-Null:          -5845.1  
+Df Residuals:       28723            LLR p-value:      0.0000   
+Converged:          1.0000           Scale:            1.0000   
+No. Iterations:     8.0000                                      
+-----------------------------------------------------------------
+             Coef.   Std.Err.     z      P>|z|    [0.025   0.975]
+-----------------------------------------------------------------
+const       -3.8806    0.0417  -93.1246  0.0000  -3.9623  -3.7989
+predus       2.3497    0.1306   17.9944  0.0000   2.0938   2.6056
+dockpred     3.9739    0.1102   36.0513  0.0000   3.7579   4.1900
+================================================================
+
+const      -3.880594
+predus      2.349705
+dockpred    3.973916

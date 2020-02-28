@@ -1,12 +1,10 @@
-NOX data test set       
-
-   Current function value: 0.230358
+Current function value: 0.230358
          Iterations 7
                          Results: Logit
 =================================================================
 Model:              Logit            Pseudo R-squared: 0.244
 Dependent Variable: annotated        AIC:              14343.6600
-Date:               2020-02-17 22:00 BIC:              14377.0419
+Date:               2020-02-28 14:47 BIC:              14377.0419
 No. Observations:   31116            Log-Likelihood:   -7167.8
 Df Model:           3                LL-Null:          -9484.3
 Df Residuals:       31112            LLR p-value:      0.0000
@@ -21,18 +19,15 @@ ispred        2.7244    0.0583   46.7493  0.0000   2.6101   2.8386
 dockpred      1.8486    0.1062   17.4094  0.0000   1.6405   2.0567
 =================================================================
 
-
-benchmark data test set 
-
 Optimization terminated successfully.
-         Current function value: 0.148264
+         Current function value: 0.148233
          Iterations 8
                          Results: Logit
 ================================================================
-Model:              Logit            Pseudo R-squared: 0.271
-Dependent Variable: annotated        AIC:              8526.0503
-Date:               2020-02-17 22:00 BIC:              8559.1126
-No. Observations:   28726            Log-Likelihood:   -4259.0
+Model:              Logit            Pseudo R-squared: 0.272
+Dependent Variable: annotated        AIC:              8524.2539
+Date:               2020-02-28 14:47 BIC:              8557.3162
+No. Observations:   28726            Log-Likelihood:   -4258.1
 Df Model:           3                LL-Null:          -5845.1
 Df Residuals:       28722            LLR p-value:      0.0000
 Converged:          1.0000           Scale:            1.0000
@@ -40,8 +35,8 @@ No. Iterations:     8.0000
 -----------------------------------------------------------------
              Coef.   Std.Err.     z      P>|z|    [0.025   0.975]
 -----------------------------------------------------------------
-const       -4.1347    0.0461  -89.6779  0.0000  -4.2251  -4.0443
-predus       1.8301    0.1379   13.2732  0.0000   1.5599   2.1004
-ispred       2.0963    0.0866   24.2068  0.0000   1.9266   2.2661
-dockpred     3.2181    0.1196   26.9027  0.0000   2.9836   3.4525
-================================================================
+const       -4.1340    0.0461  -89.6717  0.0000  -4.2243  -4.0436
+predus       1.8402    0.1379   13.3447  0.0000   1.5699   2.1105
+ispred       2.0913    0.0867   24.1255  0.0000   1.9214   2.2612
+dockpred     3.2098    0.1199   26.7761  0.0000   2.9749   3.4448
+==================================

@@ -2,15 +2,7 @@
 
 # imports
 import pandas as pd
-# from sklearn.linear_model import LogisticRegression, LogisticRegressionCV 
-# from sklearn.linear_model import LassoCV, LassoLarsCV, LassoLarsIC
-# from sklearn import metrics
 import numpy as np
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# from sklearn.model_selection import train_test_split
-# from sklearn.metrics import confusion_matrix
-from random import *
 import statsmodels.api as sm
 
 # set table of data
@@ -56,7 +48,7 @@ def log_reg_nox():
     # print(exponent)
     pval = (1/(1+exponent))
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
-    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/benchmarkpredictionvalues.csv"
+    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/predus_ispred_dockpred/benchmarkpredictionvalues.csv"
     results.to_csv(path,sep=",", index=False, header=True)
 # log_reg_nox()
 
@@ -97,10 +89,9 @@ def log_reg_bnch():
     exponent = np.exp(val)
     pval = (1/(1+exponent))
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
-    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/noxpredictionvalues.csv"
+    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/predus_ispred_dockpred/noxpredictionvalues.csv"
     results.to_csv(path,sep=",", index=False, header=True)
 # log_reg_bnch()
-
 def log_reg_nox_2var():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset
@@ -137,9 +128,9 @@ def log_reg_nox_2var():
     # print(exponent)
     pval = (1/(1+exponent))
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
-    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/benchmarkpredictionvalues_ispred_dockpred.csv"
+    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/ispred_dockpred/benchmarkpredictionvalues_ispred_dockpred.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-# log_reg_nox_2var()
+log_reg_nox_2var()
 
 def log_reg_bnch_2var():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
@@ -176,6 +167,6 @@ def log_reg_bnch_2var():
     exponent = np.exp(val)
     pval = (1/(1+exponent))
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
-    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/noxpredictionvalues_ispred_dockpred.csv"
+    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/ispred_dockpred/noxpredictionvalues_ispred_dockpred.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-# log_reg_bnch_2var()
+log_reg_bnch_2var()

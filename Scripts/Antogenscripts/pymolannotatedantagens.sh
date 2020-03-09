@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+  #!/usr/bin/env bash
 
 ### input of file with name; protein id; and 4 col; predus ispred docking and annotated,
 ### find the intersect of each col and annotated then create mutilpe dif colored residue strings

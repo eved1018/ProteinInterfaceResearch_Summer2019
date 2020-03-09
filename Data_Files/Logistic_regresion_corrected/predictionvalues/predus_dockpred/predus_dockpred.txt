@@ -1,13 +1,11 @@
       
 
-NOX
-   Current function value: 0.265911
-         Iterations 7
-                         Results: Logit
+Predus Dockpred Nox 
+                 Results: Logit
 =================================================================
 Model:              Logit            Pseudo R-squared: 0.128
 Dependent Variable: annotated        AIC:              16554.1575
-Date:               2020-02-29 20:41 BIC:              16579.1939
+Date:               2020-03-09 13:35 BIC:              16579.1939
 No. Observations:   31116            Log-Likelihood:   -8274.1
 Df Model:           2                LL-Null:          -9484.3
 Df Residuals:       31113            LLR p-value:      0.0000
@@ -21,8 +19,7 @@ predus       2.3414    0.1049    22.3224  0.0000   2.1358   2.5469
 dockpred     3.0268    0.0953    31.7554  0.0000   2.8400   3.2136
 =================================================================
 
-
-BNCH
+Predus DOckpred Bnchmark
 
 Optimization terminated successfully.
          Current function value: 0.157400
@@ -31,7 +28,7 @@ Optimization terminated successfully.
 ================================================================
 Model:              Logit            Pseudo R-squared: 0.226
 Dependent Variable: annotated        AIC:              9048.9725
-Date:               2020-02-29 20:41 BIC:              9073.7691
+Date:               2020-03-09 13:35 BIC:              9073.7691
 No. Observations:   28726            Log-Likelihood:   -4521.5
 Df Model:           2                LL-Null:          -5845.1
 Df Residuals:       28723            LLR p-value:      0.0000
@@ -43,4 +40,8 @@ No. Iterations:     8.0000
 const       -3.8807    0.0417  -93.1188  0.0000  -3.9624  -3.7991
 predus       2.3678    0.1304   18.1547  0.0000   2.1122   2.6235
 dockpred     3.9572    0.1105   35.7984  0.0000   3.7405   4.1738
-==================
+================================================================
+
+const      -3.880748
+predus      2.367847
+dockpred    3.957174

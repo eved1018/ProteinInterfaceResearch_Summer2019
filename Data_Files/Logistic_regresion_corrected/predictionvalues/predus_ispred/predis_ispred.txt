@@ -1,0 +1,46 @@
+     
+predus ispred Nox 
+                    Results: Logit
+=================================================================
+Model:              Logit            Pseudo R-squared: 0.229
+Dependent Variable: annotated        AIC:              14634.8722
+Date:               2020-03-09 13:35 BIC:              14659.9086
+No. Observations:   31116            Log-Likelihood:   -7314.4
+Df Model:           2                LL-Null:          -9484.3
+Df Residuals:       31113            LLR p-value:      0.0000
+Converged:          1.0000           Scale:            1.0000
+No. Iterations:     7.0000
+-------------------------------------------------------------------
+          Coef.    Std.Err.      z       P>|z|     [0.025    0.975]
+-------------------------------------------------------------------
+const    -3.5108     0.0360   -97.6179   0.0000   -3.5813   -3.4404
+predus    1.9523     0.1042    18.7318   0.0000    1.7481    2.1566
+ispred    2.9606     0.0563    52.5648   0.0000    2.8502    3.0710
+=================================================================
+
+predus ispred Bnchmark 
+
+Optimization terminated successfully.
+         Current function value: 0.159721
+         Iterations 8
+                         Results: Logit
+================================================================
+Model:              Logit            Pseudo R-squared: 0.215
+Dependent Variable: annotated        AIC:              9182.2820
+Date:               2020-03-09 13:35 BIC:              9207.0787
+No. Observations:   28726            Log-Likelihood:   -4588.1
+Df Model:           2                LL-Null:          -5845.1
+Df Residuals:       28723            LLR p-value:      0.0000
+Converged:          1.0000           Scale:            1.0000
+No. Iterations:     8.0000
+-----------------------------------------------------------------
+             Coef.   Std.Err.     z      P>|z|    [0.025   0.975]
+-----------------------------------------------------------------
+const       -3.8052    0.0408  -93.1855  0.0000  -3.8852  -3.7252
+predus       3.2628    0.1215   26.8519  0.0000   3.0247   3.5010
+ispred       2.7288    0.0793   34.4045  0.0000   2.5733   2.8842
+================================================================
+
+const    -3.805204
+predus    3.262836
+ispred    2.728780

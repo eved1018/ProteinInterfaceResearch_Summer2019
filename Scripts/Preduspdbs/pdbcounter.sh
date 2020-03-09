@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# counts which predus files are downloaded and which arent 
+
 temppdbs=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/temppdbs.txt
 temppdbssorted=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/temppdbssorted.txt
 temppred=/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/temppred.txt
@@ -16,9 +18,9 @@ do
   echo $file | awk -F/ '{print toupper($10)}' | awk -F. '{print $1}'  >> $temppdbs
 done
 
-for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/Predus_241/*
+for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/Predus_241_for_real/*
 do
-  echo $file | awk -F/ '{print $9}' |awk -F. '{print $1}' | awk -F_ '{print $2 "_"$3}' >> $temppred
+  echo $file | awk -F/ '{print toupper($9)}' |awk -F. '{print toupper($1)}' | awk -F_ '{print $2 "_"$3}' >> $temppred
 done
 
 sort $temppdbs > $temppdbssorted

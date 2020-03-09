@@ -46,4 +46,11 @@ awk '!seen[$1]++'
   september: Goals
     1) predus 241
     2) combined ROC curves- go through and make sure it makes sense clean up maybe use perl
-    3) 
+    3)
+
+
+1) devide the files based on each data set, split betweeen nox and benchmrak, makecsv prediction file for each.
+2) train 2 regresions with 100 percent training on each, use logit funciton to obtain P value for protiens in otehr data set.
+3) save as csv send to mordichia
+4) muliple combintaions of predictions methods
+5) find p and aic value for each regresion

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-### change n to be cutoff of interface
+# Function 1 - takes in predus pdbs with prediction and filters out a list of predicted residues
 
 # rm ../../Data_Files/PymolPredus/Scripts/script.pml
 rm ../../Antogen/pymolscripts/script.pml # deletes the file if it already exists
@@ -59,6 +59,9 @@ do
   # printf "\n\n------------------------------------------------\n"
   # printf "FILE: $outputfile\n"
 
+# Function 2 - comparison of predicted and annnotated residues
+  #ispred_pred_comm
+  #dock_pred_comm=
   predus_residue_comm=`comm -23 $outputfile $interfaceoutput | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
   interface_residue_comm=`comm -13 $outputfile $interfaceoutput| awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
   correct_residue_comm=`comm -12 $outputfile $interfaceoutput | awk '{printf $1"+"}'| awk '{print substr($1,1,length($1)-1)}'`
@@ -82,7 +85,7 @@ do
   # done
   
 
-
+# Function 3- creation of pml script to image the proteins
   echo "
 delete all
 fetch $proteinname, async = 0
@@ -97,8 +100,10 @@ select color blue; show spheres, SEL
 select color red; show spheres, SEL
 $correct_res_sphere
 $correct_res_label
+set sphere_scale, 0.50, (all)
 remove resn hoh
 zoom complete=1
+<<<<<<< HEAD
 
 # blue
 orient resi $predus_residue_comm 
@@ -405,8 +410,13 @@ else
 fi
 
 # ../../Data_Files/PymolPredus/Scripts/script.pml
+=======
+png ~/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/Images/${proteinname}.png, width=900, height=900,ray=1, dpi=500
+delete all" >> ../../Data_Files/PymolPredus/Scripts/script.pml
+done
+>>>>>>> origin/E_Edelstein
 
-# /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/Scripts/script.pml
+open -a "Pymol" /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/PymolPredus/Scripts/script.pml
 
 # label resi $predus_residue_comm, ID
 # set label_position,(3,2,1)

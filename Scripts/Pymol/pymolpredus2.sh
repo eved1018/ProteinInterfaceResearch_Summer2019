@@ -13,7 +13,8 @@ find ../../Antogen/pymolimages/ -type f -name "*.png" -delete
 
 # old directory: ../../Data_Files/Predus/predus_outputfiles/*
 
-for file in ../../Antogen/Predus_antogens/*
+#for file in ../../Antogen/Predus_antogens/*
+for file in ../../Antogen/predictionvalue/Predus_antogens/*
 do
   proteinname=`echo $file | awk -F/ '{print $5}'| awk -F. '{print $2}' | sed 's/\_/./g'`
 
@@ -102,10 +103,9 @@ zoom complete=1
 
 # blue
 orient resi $predus_residue_comm 
-#unset opaque_background
 
 # removes the shadows that give the appearannce of depth
-set depth_cue, 0  
+set depth_cue, 0
 
 center $proteinname
 

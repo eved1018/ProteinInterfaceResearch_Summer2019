@@ -2,31 +2,37 @@ from pymol import cmd
 from pymol.cgo import *
 from pymol.vfont import plain
 
+from pathlib import Path
+import os
+
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 
 
 class Rotate:
-    def __init__(self, protein_name, correct_residue_comm, predus_residue_comm):
-            self.protein_name = protein_name
+    def __init__(self, method, protein_name, correctly_predicted, wrongly_predicted):
+        self.method= method
+        self.protein_name = protein_name
 
-            self.correct_residue_comm = correct_residue_comm
-            self.predus_residue_comm = predus_residue_comm
+        self.correctly_predicted = correctly_predicted
+        self.wrongly_predicted = wrongly_predicted
 
-            self.value_color_pairs = []
+        self.value_color_pairs = []
+
+        self.mainDir = Path("../../Antogen/pymolimages/")
 
 
-            """
-            Returns a list of the coords of all the residues as floats
-            so the return will look like this:
-            return = [
-            [x1, y1, z1],
-            [x2, y2, z2],
-            [x3, y3, z3],
-            [x4, y4, z4],
-            ]
-            Each nested list is a set of coordinates for a residue
+    """
+    Returns a list of the coords of all the residues as floats
+    so the return will look like this:
+    return = [
+    [x1, y1, z1],
+    [x2, y2, z2],
+    [x3, y3, z3],
+    [x4, y4, z4],
+    ]
+    Each nested list is a set of coordinates for a residue
 
-            """
+    """
     def get_xyz_coords_as_floats(self, resi_vals):
         
         # gets the coordinates of all the residues, and stores it in xyz_coords as a
@@ -152,15 +158,12 @@ class Rotate:
 
             
             # GIVES AN IMAGE FOR EACH ANGLE
-            file_name = ("../../Antogen/pymolimages/{}/{}_{}.png".format(
-                self.protein_name, self.protein_name, str(current_angle)))
-            
-            
-            # file_name = ("../../Antogen/pymolimages/${proteinname}/${proteinname}_" +
-            # str(current_angle) + ".png")
-            
-            print("File: " + file_name)
+            file_path = self.mainDir/self.method/self.protein_name
 
+            if not os.path.exists(str(file_path)):
+                os.makedirs(str(file_path))
+            
+            file_name = str(file_path/"{}_{}.png".format(self.protein_name, str(current_angle)))
             
             cmd.zoom(complete=1)
             cmd.png(file_name, width=900, height=900, dpi=500, ray=1, quiet=0)
@@ -172,12 +175,6 @@ class Rotate:
         cmd.rotate(rotation_axis, angle=best_angle)
         cmd.zoom(complete=1)
         
-        # file_name = ("../../Antogen/pymolimages/${proteinname}/${proteinname}_" +
-        #    str(best_angle) + coord_to_optimize + "-BEST-" + rotation_axis + ".png")
-
-        
-
-        # cmd.png(file_name, width=900, height=900, dpi=500, ray=1, quiet=0)
 
     
 
@@ -193,8 +190,8 @@ class Rotate:
         draw = ImageDraw.Draw(bg)
 
         
-
-        font1 = ImageFont.truetype("../../Antogen/pymolimages/Arial.ttf", size=24)
+        
+        font1 = ImageFont.truetype(str(self.mainDir/"Arial.ttf"), size=24)
         
 
         x, y = imgW-300, imgH-200
@@ -202,17 +199,19 @@ class Rotate:
         # Legend outline rectangle
         draw.rectangle([x, y, imgW-10, imgH-10], outline="#fff", width=5)
 
+        draw.text((x+20, y+20-3), self.method, font=font1)
+
         if len(self.value_color_pairs) >= 1:
-            draw.rectangle([x+20, y+30, x+20+20, y+30+20], fill=self.value_color_pairs[0][1], outline="#fff", width=2)
-            draw.text((x+50, y+30-3), self.value_color_pairs[0][0], font=font1)
+            draw.rectangle([x+20, y+60, x+20+20, y+60+20], fill=self.value_color_pairs[0][1], outline="#fff", width=2)
+            draw.text((x+50, y+60-3), self.value_color_pairs[0][0], font=font1)
         
         if len(self.value_color_pairs) >= 2:
-            draw.rectangle([x+20, y+80, x+20+20, y+80+20], fill=self.value_color_pairs[1][1], outline="#fff", width=2)
-            draw.text((x+50, y+80-3), self.value_color_pairs[1][0], font=font1)
+            draw.rectangle([x+20, y+100, x+20+20, y+100+20], fill=self.value_color_pairs[1][1], outline="#fff", width=2)
+            draw.text((x+50, y+100-3), self.value_color_pairs[1][0], font=font1)
 
         if len(self.value_color_pairs) >= 3:
-            draw.rectangle([x+20, y+130, x+20+20, y+130+20], fill=self.value_color_pairs[2][1], outline="#fff", width=2)
-            draw.text((x+50, y+130-3), self.value_color_pairs[2][0], font=font1)
+            draw.rectangle([x+20, y+140, x+20+20, y+140+20], fill=self.value_color_pairs[2][1], outline="#fff", width=2)
+            draw.text((x+50, y+140-3), self.value_color_pairs[2][0], font=font1)
 
 
         bg.save(file_name)
@@ -221,27 +220,21 @@ class Rotate:
         # protein = "$proteinname"
         protein = self.protein_name
 
-        green_resi = self.correct_residue_comm      # green residues
-        blue_resi = self.predus_residue_comm        # blue residues
+        green_resi = self.correctly_predicted      # green residues
+        blue_resi = self.wrongly_predicted        # blue residues
 
-        # green_resi = "$correct_residue_comm"   # green residues
-        # blue_resi =  "$predus_residue_comm"    # blue residues
+        # green_resi = "$correctly_predicted"   # green residues
+        # blue_resi =  "$wrongly_predicted"    # blue residues
 
         
-
-        self.value_color_pairs.append(("Predus", "#00f"))
         self.value_color_pairs.append(("Annotated", "#f00"))
+        self.value_color_pairs.append(("Incorrectly Predicted", "#00f"))
 
         if (green_resi == ""):
-            print("\n\nGREEN_NOT_HERE\n\n")
-            resi_vals = "resi " + blue_resi
+            resi_vals = blue_resi
         
         else:
-            print("\n\nGREEN_HERE\n\n")
-            print("Green: ", green_resi)
-            print("Blue: ", blue_resi)
-            print("\n\n")
-            resi_vals = "resi " + green_resi
+            resi_vals = green_resi
             self.value_color_pairs.append(("Correctly Predicted", "#0f0"))
 
 
@@ -261,14 +254,13 @@ class Rotate:
 
         cmd.zoom(complete=1)
 
-        print("AAA")
+        proteinPath = self.mainDir/self.method
+        proteinDir = str(proteinPath/"{}.png".format(self.protein_name))
 
-        "../../Antogen/pymolimages/{}.png".format(self.protein_name)
-
-        cmd.png("../../Antogen/pymolimages/{}.png".format(self.protein_name), width=900, height=900, dpi=500, ray=1)
+        cmd.png(proteinDir, width=900, height=900, dpi=500, ray=1)
 
         # Legend box START
 
-        self.drawLegend("../../Antogen/pymolimages/{}.png".format(self.protein_name))
+        self.drawLegend(proteinDir)
 
         # Legend box END

@@ -1,0 +1,15 @@
+kressel bib 
+
+https://www.ncbi.nlm.nih.gov/books/NBK26846/
+https://www.ncbi.nlm.nih.gov/pubmed/12820253
+https://www.ncbi.nlm.nih.gov/pubmed/23754530
+https://www.longdom.org/open-access/does-difference-exist-between-epitope-and-nonepitope-residues-1745-7580-7-053.pdf
+Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011.
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3316502/
+https://sci-hub.tw/https://www.ncbi.nlm.nih.gov/pubmed/17554779
+https://www.stat.berkeley.edu/~breiman/randomforest2001.pdf
+
+Kressel to do 
+
+go over machine learning and how it works 
+https://pytorch.org/tutorials/beginner/blitz/tensor_tutorial.html#sphx-glr-beginner-blitz-tensor-tutorial-py

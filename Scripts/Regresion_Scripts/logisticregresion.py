@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import statsmodels.api as sm
 
+
+
 # set table of data
 
 aucframe= pd.DataFrame({})
@@ -43,7 +45,7 @@ def log_reg_nox():
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/predus_ispred_dockpred/benchmarkpredictionvalues.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-log_reg_nox()
+# log_reg_nox()
 def log_reg_bnch():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset
@@ -82,7 +84,7 @@ def log_reg_bnch():
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/predus_ispred_dockpred/noxpredictionvalues.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-log_reg_bnch()
+# log_reg_bnch()
 def log_reg_nox_ispred_dockpred():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset
@@ -113,7 +115,7 @@ def log_reg_nox_ispred_dockpred():
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/ispred_dockpred/benchmarkpredictionvalues_ispred_dockpred.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-log_reg_nox_ispred_dockpred()
+# log_reg_nox_ispred_dockpred()
 def log_reg_bnch_ispred_dockpred():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset
@@ -144,7 +146,7 @@ def log_reg_bnch_ispred_dockpred():
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/ispred_dockpred/noxpredictionvalues_ispred_dockpred.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-log_reg_bnch_ispred_dockpred()
+# log_reg_bnch_ispred_dockpred()
 def log_reg_nox_predus_dockpred():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset
@@ -175,7 +177,7 @@ def log_reg_nox_predus_dockpred():
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/predus_dockpred/benchmarkpredictionvalues_predus_dockpred.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-log_reg_nox_predus_dockpred()
+# log_reg_nox_predus_dockpred()
 def log_reg_bnch__predus_dockpred():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset
@@ -206,7 +208,7 @@ def log_reg_bnch__predus_dockpred():
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/predus_dockpred/noxpredictionvalues_predus_dockpred.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-log_reg_bnch__predus_dockpred()
+# log_reg_bnch__predus_dockpred()
 def log_reg_nox_predus_ispred():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset
@@ -235,7 +237,7 @@ def log_reg_nox_predus_ispred():
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/predus_ispred/benchmarkpredictionvalues_predus_ispred.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-log_reg_nox_predus_ispred()
+# log_reg_nox_predus_ispred()
 def log_reg_bnch__predus_ispred():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset
@@ -266,4 +268,7 @@ def log_reg_bnch__predus_ispred():
     results = pd.DataFrame({"residue": protein, "prediction value": pval})
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/predictionvalues/predus_ispred/noxpredictionvalues_predus_ispred.csv"
     results.to_csv(path,sep=",", index=False, header=True)
-log_reg_bnch__predus_ispred()
+# log_reg_bnch__predus_ispred()
+
+
+    

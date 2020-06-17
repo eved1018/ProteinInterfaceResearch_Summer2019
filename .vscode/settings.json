@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/usr/local/bin/python3"
+    "python.pythonPath": "/Users/evanedelstein/.pyenv/versions/3.7.7/bin/python",
+    "git.ignoreLimitWarning": true
 }

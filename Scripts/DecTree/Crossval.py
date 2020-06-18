@@ -59,7 +59,22 @@ def RandomFor(test_frame, train_frame,time,cols):
         feature_cols = cols
         X = train_frame[feature_cols]
         y = train_frame.annotated
+        X_test = test_frame[feature_cols]
+        y_test = test_frame.annotated
+        protein = test_frame.index 
+        model = RandomForestClassifier(n_estimators = 10, random_state = 0, bootstrap=False)
+        model.fit(X, y)
+        y_prob = model.predict_proba(X_test)
+        y_prob_interface = [p[1] for p in y_prob]
+        # y_prob_intr_dec = [round(prob, 4) for prob in y_prob_interface]
+        results= pd.DataFrame({"residue": protein, "prediction score": y_prob_interface})
+        path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CV{}/RFval{}.csv".format(time,time)
+        results.to_csv(path,sep=",", index=False, header=True)
         
+        
+
+
+       
 
 
 def CrossVal():
@@ -108,7 +123,8 @@ def CrossVal():
             
         train_frame = train_frame.drop(test_frame.index)
         time = i+1
-        LogReg(test_frame,train_frame,time,feature_cols)
+        # LogReg(test_frame,train_frame,time,feature_cols)
+        RandomFor(test_frame,train_frame,time,feature_cols)
         
 
 

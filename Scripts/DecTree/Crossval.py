@@ -176,13 +176,89 @@ def CrossVal():
         # set variabel for iteration, to keep track of each test set, since i in range(0,k) includes zero, i is incresased by 1 for readabilty
         time = i+1
         # perfroms logistic regresion and random forest for each test and training set.
-        LogReg(test_frame,train_frame,time,feature_cols)
+        # LogReg(test_frame,train_frame,time,feature_cols)
         RandomFor(test_frame,train_frame,time,feature_cols)
         
 
 
    
-CrossVal()
+# CrossVal()
+
+def NoxRF():
+    # folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CVNOXBenchtest"
+    # os.mkdir(folder)
+    col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
+    # load dataset
+    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/noxdata.csv", header=None, names=col_names)
+    #remove null data 
+    df.isnull().any()
+    data = df.fillna(method='ffill')
+    # define dependent var columns 
+    feature_cols = ['predus','ispred','dockpred']
+    protein = data.residue
+    X = data[feature_cols] # Features
+    y = data.annotated # Target variable
+
+    # load benchmark data as test set 
+    benchmarkna= pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/benchmarkdata.csv', header=None, names=col_names)
+    benchmarkna.isnull().any()
+    benchmark = benchmarkna.fillna(method='ffill')
+    X_bench= benchmark[feature_cols]
+    y_bench= benchmark.annotated 
+    protienname_bench= benchmark.residue
+
+    # implement random forets 
+    model = RandomForestClassifier(n_estimators = 10, random_state = 0, bootstrap=False)
+    model.fit(X, y)
+    
+    # y_predict = model.predict(X_bench)
+    y_prob = model.predict_proba(X_bench)
+    # create a new variable with only the inetrface prediction for each residue 
+    y_prob_interface = [p[1] for p in y_prob]
+    # optional, set a decimal place cutoff, d, for the probability score 
+    # d = 4
+    # y_prob_intr_dec = [round(prob, d) for prob in y_prob_interface]
+    # save the residue and probabilty score of the test set to the same folder as the logistic regresion 
+    results= pd.DataFrame({"residue": protienname_bench, "prediction score": y_prob_interface})
+    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CVNOXBenchtest/RFvalBench.csv"
+    results.to_csv(path,sep=",", index=False, header=True)
+
+def BenchRF():
+    col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
+    # load dataset
+    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/benchmarkdata.csv", header=None, names=col_names)
+    df.isnull().any()
+    data = df.fillna(method='ffill')
+    feature_cols = ['predus','ispred','dockpred']
+    protein = data.residue
+    X = data[feature_cols] # Features
+    y = data.annotated # Target variable
+    nox= pd.read_csv('/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/noxdata.csv', header=None, names=col_names)
+    nox.isnull().any()
+    nox = nox.fillna(method='ffill')
+    X_nox= nox[feature_cols]
+    y_nox= nox.annotated 
+    protienname_nox= nox.residue
+     # implement random forets 
+    model = RandomForestClassifier(n_estimators = 10, random_state = 0, bootstrap=False)
+    model.fit(X, y)
+    # y_predict = model.predict(X_bench)
+    y_prob = model.predict_proba(X_nox)
+    # create a new variable with only the inetrface prediction for each residue 
+    y_prob_interface = [p[1] for p in y_prob]
+    # optional, set a decimal place cutoff, d, for the probability score 
+    # d = 4
+    # y_prob_intr_dec = [round(prob, d) for prob in y_prob_interface]
+    # save the residue and probabilty score of the test set to the same folder as the logistic regresion 
+    results= pd.DataFrame({"residue":  protienname_nox, "prediction score": y_prob_interface})
+    path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CVNOXBenchtest/RFvalNox.csv"
+    results.to_csv(path,sep=",", index=False, header=True)
+
+NoxRF()
+BenchRF()
+
+
+
 
 
 

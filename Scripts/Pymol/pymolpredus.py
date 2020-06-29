@@ -1,266 +1,165 @@
 from pymol import cmd
-from pymol.cgo import *
-from pymol.vfont import plain
+# from pymol.cgo import *
+# from pymol.vfont import plain
 
 from pathlib import Path
 import os
-
 from PIL import Image, ImageOps, ImageDraw, ImageFont
+import imageio
+import moviepy.editor as mp
+import cv2
 
+class LegendItem:
+    def __init__(self, label, color):
+        self.label = label
+        self.color = color
 
 class Rotate:
     def __init__(self, method, protein_name, correctly_predicted, wrongly_predicted):
-        self.method= method
-        self.protein_name = protein_name
+        self.method = method
+        self.protein = protein_name
 
         self.correctly_predicted = correctly_predicted
         self.wrongly_predicted = wrongly_predicted
 
-        self.value_color_pairs = []
+        # self.value_color_pairs = []
+        self.legend_items = []
 
-        self.mainDir = Path("../../Antogen/pymolimages/")
+        self.main_dir = Path("../../Antogen/pymolimages/")
+        # self.file_path = self.main_dir/self.method.dir/self.protein
+        self.file_path = self.main_dir/self.protein/self.method.dir
 
-
-    """
-    Returns a list of the coords of all the residues as floats
-    so the return will look like this:
-    return = [
-    [x1, y1, z1],
-    [x2, y2, z2],
-    [x3, y3, z3],
-    [x4, y4, z4],
-    ]
-    Each nested list is a set of coordinates for a residue
-
-    """
-    def get_xyz_coords_as_floats(self, resi_vals):
-        
-        # gets the coordinates of all the residues, and stores it in xyz_coords as a
-        # list of "numpy lists", which is then converted to a string and then split
-        # each set of xyz_coords will end up equalling something like ["[", "x.xxx", "x.xxx", "x.xxx]"]
-        # The opening and closing brackets in the list are not intended
-
-        all_resi_coords_numpy = cmd.get_coords(resi_vals, 1)
-
-        all_resi_coords = []
-
-        if all_resi_coords_numpy is None:
-            return [[0, 0, 0]]
-
-        for i in range(len(all_resi_coords_numpy)):
-            xyz_coords = str(all_resi_coords_numpy[i]).split()
-
-            if xyz_coords[0] == "[":
-                xyz_coords.pop(0)
-            if xyz_coords[-1] == "]":
-                xyz_coords.pop()
-
-            # gets the z_value, since in the xyz_coords list there are brackets,
-            # this adjusts for them
-            
-            z = (xyz_coords[2])[:-1]
-
-            y = (xyz_coords[1])
-
-            
-            x = xyz_coords[0]
-
-            if x[0] == '[':       # the first char of the value might be '['
-                x = x[1:]
-
-            all_resi_coords.append([float(x), float(y), float(z)])
-
-        return all_resi_coords
-
-
-    def get_avg_coord(self, all_coords):
-        avg_x = avg_y = avg_z = 0
-
-        for coord in all_coords:
-            avg_x += coord[0]
-            avg_y += coord[1]
-            avg_z += coord[2]
-
-        total_coords = len(all_coords)
-
-        avg_x /= total_coords
-        avg_y /= total_coords
-        avg_z /= total_coords
-
-        return [avg_x, avg_y, avg_z]
-
-
-    def get_coord_val(self, resi_vals, coord):
-        all_resi_coords = self.get_xyz_coords_as_floats(resi_vals)
-
-        avg_coord = self.get_avg_coord(all_resi_coords)
-
-        if coord == 'x':
-            return avg_coord[0]
-
-        if coord == 'y':
-            return avg_coord[1]
-
-        if coord == 'z':
-            return avg_coord[2]
-    
-    
-    # returns if val1 is better than val2
-    def isBetter(self, val1, val2, optimized_coord):
-        if (optimized_coord == 'z'):
-            return val1 < val2
-
-        elif optimized_coord == 'x':
-            center_x = float(cmd.get_position()[0])
-            return abs(val1-center_x) < abs(val2-center_x)
-
-        elif optimized_coord == 'y':
-            center_y = float(cmd.get_position()[1])
-            return abs(val1-center_y) < abs(val2-center_y)
-
-    def optimize_rotation2(self, axis, resi_vals, optimized_coord):
-    
-        increment = 20
+        self.images_for_gif = []
+        self.images_for_mp4 = []
 
 
     # finds the 'optimal' coordinate value for 'optimized_coord' by rotating about 'axis'
-    def optimize_rotation(self, rotation_axis, resi_vals, coord_to_optimize):
+    def rotate_and_capture(self, rotation_axis, increment, res_width, res_height):
+        self.images_for_gif = []
+        self.images_for_mp4 = []
 
-        skip = ["1d7p", "2hmg.A"]     # antigens to skip taking a picture of (for debugging)
-        skip = [""]
+        increment = 30    # how much to increment each time 
 
-        #if not "${proteinname}" in skip:
-        #   return
-
-        increment = 20    # how much to increment each time 
-
-        current_angle = 0
-
-        best_angle = 0    # default value
-        best_val = -100000  # sets it to a default value that will always change
-
-        # cycles through all possible angles (multiple of increment) and finds 
-        # the greatest z-value 
-        while current_angle < 360:
-
-            
-
+        # cycles through all possible angles (multiple of increment)
+        for current_angle in range(0, 360, increment):
             cmd.rotate(rotation_axis, angle=increment)
-            coord_val = self.get_coord_val(resi_vals, coord_to_optimize)
 
-            if self.isBetter(coord_val, best_val, coord_to_optimize):
-                best_val = coord_val
-                best_angle = current_angle
+            # creates the file folder if it doesn't exist
+            if not os.path.exists(str(self.file_path)):
+                os.makedirs(str(self.file_path))
             
-            current_angle += increment  
-
-            nearness = abs( coord_val - float(cmd.get_position()[0]) )
-
-            
-            # GIVES AN IMAGE FOR EACH ANGLE
-            file_path = self.mainDir/self.method/self.protein_name
-
-            if not os.path.exists(str(file_path)):
-                os.makedirs(str(file_path))
-            
-            file_name = str(file_path/"{}_{}.png".format(self.protein_name, str(current_angle)))
+            # file_name = str(self.file_path/"{}_{}.png".format(self.protein, str(current_angle)))
+            file_name = str(self.file_path/f"{self.method.name}_{str(current_angle)}.png")
             
             cmd.zoom(complete=1)
-            cmd.png(file_name, width=900, height=900, dpi=500, ray=1, quiet=0)
+            cmd.png(file_name, width=res_width, height=res_height, dpi=500, ray=1, quiet=0)
 
-            self.drawLegend(file_name)
+            self.drawLegend(file_name, res_width, res_height)
 
+            self.images_for_gif.append(imageio.imread(file_name))
+            self.images_for_mp4.append(cv2.imread(file_name))
 
-        
-        cmd.rotate(rotation_axis, angle=best_angle)
-        cmd.zoom(complete=1)
-        
+            current_angle += increment      
 
-    
-
-    def drawLegend(self, file_name):
+    def drawLegend(self, file_name, res_width, res_height):
         img = Image.open(file_name, 'r')
-        imgW = 1000
-        imgH = 950
+        imgW = res_width + 100
+        imgH = res_height + 50
 
         bg = Image.new("RGB", (imgW, imgH))
-
         bg.paste(img, (0, 0))
 
         draw = ImageDraw.Draw(bg)
-
         
+        font1 = ImageFont.truetype(str(self.main_dir/"Arial.ttf"), size=24)
         
-        font1 = ImageFont.truetype(str(self.mainDir/"Arial.ttf"), size=24)
+        # Draw protein name
+        draw.text((5, imgH-30), self.protein, font=font1)
         
-
-        x, y = imgW-300, imgH-200
-
         # Legend outline rectangle
+        x, y = imgW-300, imgH-200
         draw.rectangle([x, y, imgW-10, imgH-10], outline="#fff", width=5)
 
-        draw.text((x+20, y+20-3), self.method, font=font1)
+        draw.text((x+20, y+20-3), self.method.name.upper(), font=font1)
 
-        if len(self.value_color_pairs) >= 1:
-            draw.rectangle([x+20, y+60, x+20+20, y+60+20], fill=self.value_color_pairs[0][1], outline="#fff", width=2)
-            draw.text((x+50, y+60-3), self.value_color_pairs[0][0], font=font1)
+        for i, item in enumerate(self.legend_items):
+            offset = 60 + 40 * i
+
+            draw.rectangle([x+20, y+offset, x+20+20, y+offset+20], fill=item.color, outline="#fff", width=2)
+            draw.text((x+50, y+offset-3), item.label, font=font1)
+
+        # if len(self.value_color_pairs) >= 1:
+        # draw.rectangle([x+20, y+60, x+20+20, y+60+20], fill=self.value_color_pairs[0][1], outline="#fff", width=2)
+        # draw.text((x+50, y+60-3), self.value_color_pairs[0][0], font=font1)
         
-        if len(self.value_color_pairs) >= 2:
-            draw.rectangle([x+20, y+100, x+20+20, y+100+20], fill=self.value_color_pairs[1][1], outline="#fff", width=2)
-            draw.text((x+50, y+100-3), self.value_color_pairs[1][0], font=font1)
+        # # if len(self.value_color_pairs) >= 2:
+        # draw.rectangle([x+20, y+100, x+20+20, y+100+20], fill=self.value_color_pairs[1][1], outline="#fff", width=2)
+        # draw.text((x+50, y+100-3), self.value_color_pairs[1][0], font=font1)
 
-        if len(self.value_color_pairs) >= 3:
-            draw.rectangle([x+20, y+140, x+20+20, y+140+20], fill=self.value_color_pairs[2][1], outline="#fff", width=2)
-            draw.text((x+50, y+140-3), self.value_color_pairs[2][0], font=font1)
+        # # if len(self.value_color_pairs) >= 3:
+        # draw.rectangle([x+20, y+140, x+20+20, y+140+20], fill=self.value_color_pairs[2][1], outline="#fff", width=2)
+        # draw.text((x+50, y+140-3), self.value_color_pairs[2][0], font=font1)
 
 
         bg.save(file_name)
 
-    def take_pictures(self):
-        # protein = "$proteinname"
-        protein = self.protein_name
+    def image_to_video(self):
+        height, width, layer = self.images_for_mp4[0].shape
+        size = (int(width), int(height))
+        file_name = self.main_dir/self.method.dir/f"{self.protein}.mp4"
+        
+        # out = cv2.VideoWriter(file_name, cv2.VideoWriter_fourcc(*'DIVX'), 5, size)
+        # creates a video writer object
+        out = cv2.VideoWriter(str(file_name), cv2.VideoWriter_fourcc(*'DIVX'), 5, size)
+
+        for img in self.images_for_mp4:
+            out.write(img)  # adds the images to the video
+        out.release()       # saves the video
+
+    def generate_images(self, increment, width, height):
+        protein = self.protein
 
         green_resi = self.correctly_predicted      # green residues
         blue_resi = self.wrongly_predicted        # blue residues
 
-        # green_resi = "$correctly_predicted"   # green residues
-        # blue_resi =  "$wrongly_predicted"    # blue residues
+        self.legend_items.append(LegendItem("Annotated", "#00f"))
+        self.legend_items.append(LegendItem("True Positive", "#0f0"))
+        self.legend_items.append(LegendItem("False Postive", "#f00"))
+        
+        # self.value_color_pairs.append(("Annotated", "#00f"))
+        # self.value_color_pairs.append(("False Postive", "#f00"))
+            
+
+        self.rotate_and_capture('y', increment, width, height)    # rotate about the y axis
+
+        proteinPath = self.main_dir/self.method.dir
+        proteinDir = str(proteinPath/f"{self.protein}.png")
+
+
+        # UNDO
+        self.image_to_video()
+
+        gif_file_name = str(proteinPath/f"{self.protein}.gif")
+        imageio.mimsave(gif_file_name, self.images_for_gif, fps=5)
+
+        mp4_file_name = self.main_dir/self.method.dir/f"{self.protein}.mp4"
+        # UNDO END
+
+        # clip = (mp.VideoFileClip(str(mp4_file_name)))
+        # clip.write_gif(gif_file_name)
 
         
-        self.value_color_pairs.append(("Annotated", "#f00"))
-        self.value_color_pairs.append(("Incorrectly Predicted", "#00f"))
 
-        if (green_resi == ""):
-            resi_vals = blue_resi
-        
-        else:
-            resi_vals = green_resi
-            self.value_color_pairs.append(("Correctly Predicted", "#0f0"))
-
-
-        # optimize_rotation('z', resi_vals, 'x')
-        # optimize_rotation('y', resi_vals, 'x')
-        # cmd.zoom(complete=1)
-
-
-        # optimize_rotation('x', resi_vals, 'z')
-        self.optimize_rotation('y', resi_vals, 'x')
-        cmd.zoom(complete=1)
-
-
-        # optimize_rotation('x', resi_vals, 'y')
-        # optimize_rotation('z', resi_vals, 'y')
-        # cmd.zoom(complete=1)
-
-        cmd.zoom(complete=1)
-
-        proteinPath = self.mainDir/self.method
-        proteinDir = str(proteinPath/"{}.png".format(self.protein_name))
-
-        cmd.png(proteinDir, width=900, height=900, dpi=500, ray=1)
+        # mp4_file_name = str(proteinPath/f"{self.protein_name}.mp4")
+        # clip = mp.VideoFileClip(gif_file_name)
+        # clip.write_videofile(mp4_file_name)
 
         # Legend box START
 
-        self.drawLegend(proteinDir)
+        # self.drawLegend(proteinDir)
 
         # Legend box END
+
+
+
+# def stitch_photos(protein_path):

@@ -18,16 +18,26 @@ class PredictMethod:
         self.dir = directory
 
 class Residues:
-    def __init__(self, color):
+    def __init__(self, color, is_annotated=False):
         self.color = color
+        self.is_annotated = is_annotated
+
         self.residues = []
         self.selection_string = "none"
 
-def saveProteinImages(method, protein_name, annotated, correct, wrong):
-    global rotator
-    cmd.delete("all")
+    def gen_selection_string(self):
+        if len(self.residues) > 0:
+            self.selection_string = "resi " + "+".join(map(str, self.residues))
 
-    print(f"PROTEIN NAME: {protein_name}")
+    def clear(self):
+        if self.is_annotated:
+            return
+        self.residues = []
+        self.selection_string = "none"
+
+
+def beautify_images(protein_name, residue_sets):
+    cmd.delete("all")
 
     cmd.fetch(protein_name, async_=0)
     cmd.color("0xFFFFFF") # colors the entire protein white (so that the predictions can be colored)
@@ -35,31 +45,35 @@ def saveProteinImages(method, protein_name, annotated, correct, wrong):
     cmd.hide("lines")
     cmd.hide("spheres")
     cmd.show("cartoon")
-    
-    cmd.color(annotated.color, annotated.selection_string) # colors annotated blue
-    cmd.color(wrong.color, wrong.selection_string) # colors wrongly predicted red
-    cmd.color(correct.color, correct.selection_string) # colors correctly predicted green
 
-    cmd.show("spheres", annotated.selection_string)
-    cmd.show("spheres", correct.selection_string)
-    cmd.show("spheres", wrong.selection_string)
+    sphere_size = f"vdw={SPHERE_SIZE}"     # the size of the rendered sphere
 
-    sphere_size = f"vdw={SPHERE_SIZE}"     # the size of the rendered spheres
-    cmd.alter(wrong.selection_string, sphere_size)    # changes the sphere size
-    cmd.alter(correct.selection_string, sphere_size)
-    cmd.alter(annotated.selection_string, sphere_size)
+    for res_set in residue_sets:
+        cmd.color(res_set.color, res_set.selection_string) # colors annotated blue
+        cmd.show("spheres", res_set.selection_string)
+        cmd.alter(res_set.selection_string, sphere_size)    # changes the sphere size
+        
     cmd.rebuild() # rerenders the spheres to the new size
+    
+    # cmd.color(annotated.color, annotated.selection_string) # colors annotated blue
+    # cmd.color(wrong.color, wrong.selection_string) # colors wrongly predicted red
+    # cmd.color(correct.color, correct.selection_string) # colors correctly predicted green
+
+    # cmd.show("spheres", annotated.selection_string)
+    # cmd.show("spheres", correct.selection_string)
+    # cmd.show("spheres", wrong.selection_string)
+
+    # cmd.alter(wrong.selection_string, sphere_size)    # changes the sphere size
+    # cmd.alter(correct.selection_string, sphere_size)
+    # cmd.alter(annotated.selection_string, sphere_size)
+    # cmd.rebuild() # rerenders the spheres to the new size
 
     cmd.remove("resn hoh")  # removes the HOH's from image 
-    cmd.orient(annotated.selection_string)
+    cmd.orient(residue_sets[0].selection_string)
     cmd.zoom(complete=1)
     cmd.set("depth_cue", "0")       # removes shadows of depth
     cmd.center(protein_name)
 
-    rotator = pymolpredus.Rotate(
-        method, protein_name, correct.selection_string, wrong.selection_string)
-
-    rotator.generate_images(INCREMENT, WIDTH, HEIGHT)
 
 def read_method_predictions(proteinFileString):
     proteinFile = open(str(proteinFileString), 'r')
@@ -71,7 +85,7 @@ def read_method_predictions(proteinFileString):
 
     return predictions_list
 
-def classify_predictions(protein_name, method_predictions,annotated, wrong, correct):
+def classify_predictions(protein_name, method_predictions, wrong, correct):
     for residue in method_predictions:
         # checks if it was correctly predicted
         # residue[0] is the residue num, while residue[1] is it's score
@@ -80,39 +94,92 @@ def classify_predictions(protein_name, method_predictions,annotated, wrong, corr
         else:
             wrong.residues.append(residue[0])
 
+def non_duplicate_append(list1, list2):
+    list1.extend(list2)
+    remove_duplicates(list1)
 
-def gen_prediction_images(method):
+def remove_duplicates(list1):
+    aux = []
+    for item in list1:
+        if item not in aux:
+            aux.append(item)
+    list1 = aux
 
-    wrong = Residues("0xFF0000") # red
-    correct = Residues("0x00FF00") # green
-    annotated = Residues("0x0000FF") # blue
-    
-    for proteinFileString in (PREDICTION_DIR/method.dir).iterdir():
-        protein_name = (re.split(r"[./_]", str(proteinFileString))[11]).lower() # gets protein name
-        
-        if protein_name == '':
-            continue
-        if protein_name == "1tfh": # for some reason annotated is missing 1tfh so it is skipped for now
+def gen_prediction_images():
+
+    for protein in PROTEINS_TO_RUN:
+
+        if protein not in PROTEINS_TO_RUN:
+                continue
+        if protein == "1TFH": # for some reason annotated is missing 1tfh so it is skipped for now
             continue 
-        # if protein_name != "2vpf":
-        #     continue  
-        
-        annotated.residues = ANNOTATED_DICT[protein_name]
+        if protein != "8LYZ":
+            continue  
+
+        wrong = Residues("0xFF0000") # red
+        correct = Residues("0x00FF00") # green
+        annotated = Residues("0x0000FF", is_annotated=True) # blue
+
+        combined_correct = Residues("0x00FF00") # blue
+        combined_wrong = Residues("0xFF0000") # blue
+
+        residue_sets = [annotated, correct, wrong]
+        combined_sets = [annotated, combined_correct, combined_wrong]
+
+        annotated.residues = ANNOTATED_DICT[protein]
         CUTOFF = len(annotated.residues)
-        # takes the 'CUTOFF' number of highest scoring residues. E.g. if CUTOFF == 2, it takes the 2 highest 
 
-        method_predictions = read_method_predictions(proteinFileString)[0:CUTOFF]
+        combined_predictions = []
 
-        classify_predictions(protein_name, method_predictions, annotated, wrong, correct)
+        for method in PREDICTION_METHODS:
+            proteinFileString = PREDICTION_DIR/method.dir/f"{protein}_{method.dir}.csv"
 
-        annotated.selection_string = "resi " + "+".join(map(str, annotated.residues))
-        if len(correct.residues) > 0:
-            correct.selection_string = "resi " + "+".join(map(str, correct.residues))
-        if len(wrong.residues) > 0:
-            wrong.selection_string = "resi " + "+".join(map(str, wrong.residues))
+            for res_set in residue_sets:
+                res_set.clear()
+    
+            protein_name = protein
+
+            print(f"protein_name: {protein_name}")
+            
+            # takes the 'CUTOFF' number of highest scoring residues. E.g. if CUTOFF == 2, it takes the 2 highest 
+            method_predictions = read_method_predictions(proteinFileString)[0:CUTOFF]
+
+            non_duplicate_append(combined_predictions, method_predictions)
+
+            classify_predictions(protein_name, method_predictions, wrong, correct)
+
+            for res_set in residue_sets:
+                res_set.gen_selection_string()
+            
+            beautify_images(protein_name, residue_sets)
+
+            print(f"PROTEIN NAME: {protein_name}")
+
+            rotator = pymolpredus.Rotator(OUTPUT_DIR,
+                method, protein_name, correct.selection_string, wrong.selection_string)
+
+            rotator.generate_images(INCREMENT, WIDTH, HEIGHT)
+
+        combined_predictions.sort(key=(lambda x: x[1]), reverse=True) # sorts using highest score
+        combined_predictions = combined_predictions[0:CUTOFF]
+        print(f"COMBINEDDDDDDDD: {combined_predictions}")
         
-        
-        saveProteinImages(method, protein_name, annotated, correct, wrong)
+        for res_set in residue_sets:
+            res_set.clear()
+        classify_predictions(protein_name, combined_predictions, wrong, correct)
+
+        for res_set in residue_sets:
+            res_set.gen_selection_string()
+
+        beautify_images(protein_name, residue_sets)
+
+        combined = PredictMethod("Combined", "combined")
+
+        rotator = pymolpredus.Rotator(OUTPUT_DIR,
+                combined, protein_name, correct.selection_string, wrong.selection_string)
+
+        rotator.generate_images(INCREMENT, WIDTH, HEIGHT)
+
 
 # Deletes the images, gifs, and videos that were previously outputed
 def delete_previous():
@@ -124,7 +191,7 @@ def delete_previous():
 def create_annotated_dict():
     annotatedDict = {}
     for annotatedFileString in (PREDICTION_DIR/"annotated").iterdir():
-        protein_name = (re.split(r"[./_]", str(annotatedFileString))[11]).lower() # gets protein name
+        protein_name = (re.split(r"[./_]", str(annotatedFileString))[11]).upper() # gets protein name
 
         annotatedFile = open(str(annotatedFileString), 'r')
         annotatedResListTemp = list(csv.reader(annotatedFile))
@@ -144,8 +211,8 @@ def get_all_protein_names():
         if folder.is_file():
             continue
         for protein_file in folder.iterdir():
-            if protein_file.name[:4].lower() not in temp and protein_file.suffix == ".csv":
-                temp.append(protein_file.name[:4].lower())
+            if protein_file.name[:4].upper() not in temp and protein_file.suffix == ".csv":
+                temp.append(protein_file.name[:4].upper())
     return temp
 
 rotator = None
@@ -153,6 +220,7 @@ rotator = None
 # SETTINGS VARIABLES
 # where the predictions are stored
 PREDICTION_DIR = Path("../../Antogen/predictionvalue/res_pred")
+OUTPUT_DIR = Path("../../Antogen/pymolimages/")
 
 # Methods of prediction
 PREDICTION_METHODS = [
@@ -161,7 +229,7 @@ PREDICTION_METHODS = [
     PredictMethod("DockPred", "dockpred")
 ]
 WIDTH, HEIGHT = 700, 700
-INCREMENT = 30
+INCREMENT = 120
 SPHERE_SIZE = 1.2
 PROTEINS_TO_RUN = get_all_protein_names()
 
@@ -170,8 +238,8 @@ delete_previous()
 ANNOTATED_DICT = create_annotated_dict()
 
 
-for method in PREDICTION_METHODS:
-    gen_prediction_images(method)
+
+gen_prediction_images()
 
 
 # pymol -cq pymolimaging.py

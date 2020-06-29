@@ -14,8 +14,8 @@ class LegendItem:
         self.label = label
         self.color = color
 
-class Rotate:
-    def __init__(self, method, protein_name, correctly_predicted, wrongly_predicted):
+class Rotator:
+    def __init__(self, output_dir, method, protein_name, correctly_predicted, wrongly_predicted):
         self.method = method
         self.protein = protein_name
 
@@ -25,7 +25,7 @@ class Rotate:
         # self.value_color_pairs = []
         self.legend_items = []
 
-        self.main_dir = Path("../../Antogen/pymolimages/")
+        self.main_dir = output_dir
         # self.file_path = self.main_dir/self.method.dir/self.protein
         self.file_path = self.main_dir/self.protein/self.method.dir
 
@@ -37,8 +37,6 @@ class Rotate:
     def rotate_and_capture(self, rotation_axis, increment, res_width, res_height):
         self.images_for_gif = []
         self.images_for_mp4 = []
-
-        increment = 30    # how much to increment each time 
 
         # cycles through all possible angles (multiple of increment)
         for current_angle in range(0, 360, increment):
@@ -58,8 +56,7 @@ class Rotate:
 
             self.images_for_gif.append(imageio.imread(file_name))
             self.images_for_mp4.append(cv2.imread(file_name))
-
-            current_angle += increment      
+    
 
     def drawLegend(self, file_name, res_width, res_height):
         img = Image.open(file_name, 'r')
@@ -71,42 +68,31 @@ class Rotate:
 
         draw = ImageDraw.Draw(bg)
         
-        font1 = ImageFont.truetype(str(self.main_dir/"Arial.ttf"), size=24)
+        font1 = ImageFont.truetype(str(self.main_dir/"Arial.ttf"), size=imgH//40)
         
         # Draw protein name
-        draw.text((5, imgH-30), self.protein, font=font1)
+        draw.text((5, imgH-imgH/30), self.protein, font=font1)
         
         # Legend outline rectangle
-        x, y = imgW-300, imgH-200
-        draw.rectangle([x, y, imgW-10, imgH-10], outline="#fff", width=5)
+        legend_w, legend_h = imgW/3, imgH/4
+        x, y = imgW-legend_w-10, imgH-legend_h-10   # the -10 is for extra pixels for padding
+        draw.rectangle([x, y, x+legend_w, y+legend_h], outline="#fff", width=5)
 
         draw.text((x+20, y+20-3), self.method.name.upper(), font=font1)
 
         for i, item in enumerate(self.legend_items):
-            offset = 60 + 40 * i
+            offset = imgH//12 + imgH//20 * i
 
             draw.rectangle([x+20, y+offset, x+20+20, y+offset+20], fill=item.color, outline="#fff", width=2)
-            draw.text((x+50, y+offset-3), item.label, font=font1)
-
-        # if len(self.value_color_pairs) >= 1:
-        # draw.rectangle([x+20, y+60, x+20+20, y+60+20], fill=self.value_color_pairs[0][1], outline="#fff", width=2)
-        # draw.text((x+50, y+60-3), self.value_color_pairs[0][0], font=font1)
-        
-        # # if len(self.value_color_pairs) >= 2:
-        # draw.rectangle([x+20, y+100, x+20+20, y+100+20], fill=self.value_color_pairs[1][1], outline="#fff", width=2)
-        # draw.text((x+50, y+100-3), self.value_color_pairs[1][0], font=font1)
-
-        # # if len(self.value_color_pairs) >= 3:
-        # draw.rectangle([x+20, y+140, x+20+20, y+140+20], fill=self.value_color_pairs[2][1], outline="#fff", width=2)
-        # draw.text((x+50, y+140-3), self.value_color_pairs[2][0], font=font1)
-
+            draw.text((x+50, y+offset), item.label, font=font1)
 
         bg.save(file_name)
 
     def image_to_video(self):
         height, width, layer = self.images_for_mp4[0].shape
         size = (int(width), int(height))
-        file_name = self.main_dir/self.method.dir/f"{self.protein}.mp4"
+        # file_name = self.main_dir/self.method.dir/f"{self.protein}.mp4"
+        file_name = self.main_dir/f"{self.protein}"/f"{self.method.dir}.mp4"
         
         # out = cv2.VideoWriter(file_name, cv2.VideoWriter_fourcc(*'DIVX'), 5, size)
         # creates a video writer object
@@ -124,25 +110,22 @@ class Rotate:
 
         self.legend_items.append(LegendItem("Annotated", "#00f"))
         self.legend_items.append(LegendItem("True Positive", "#0f0"))
-        self.legend_items.append(LegendItem("False Postive", "#f00"))
-        
-        # self.value_color_pairs.append(("Annotated", "#00f"))
-        # self.value_color_pairs.append(("False Postive", "#f00"))
-            
+        self.legend_items.append(LegendItem("False Postive", "#f00"))        
 
         self.rotate_and_capture('y', increment, width, height)    # rotate about the y axis
 
-        proteinPath = self.main_dir/self.method.dir
-        proteinDir = str(proteinPath/f"{self.protein}.png")
+        # proteinPath = self.main_dir/self.method.dir
+        proteinPath = self.main_dir/self.protein
+        proteinDir = str(proteinPath/f"{self.method.dir}.png")
 
 
         # UNDO
         self.image_to_video()
 
-        gif_file_name = str(proteinPath/f"{self.protein}.gif")
+        gif_file_name = str(proteinPath/f"{self.method.dir}.gif")
         imageio.mimsave(gif_file_name, self.images_for_gif, fps=5)
 
-        mp4_file_name = self.main_dir/self.method.dir/f"{self.protein}.mp4"
+        mp4_file_name = self.main_dir/self.protein/f"{self.method.dir}.mp4"
         # UNDO END
 
         # clip = (mp.VideoFileClip(str(mp4_file_name)))

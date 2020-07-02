@@ -12,7 +12,7 @@ def natural_keys(text):
 
 def AUC_Calc():
     path= "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/Crossveltest1/results"
-    filelist =os.listdir(path)
+    filelist = os.listdir(path)
     filelist.sort(key=natural_keys)
     global_AUC = 0
     AUCs =[]

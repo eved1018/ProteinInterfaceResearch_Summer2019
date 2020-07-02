@@ -46,9 +46,9 @@ def LogReg(test_frame, train_frame,time,cols):
         result=logit_model.fit()
         coefficients = result.params
         # create folder for output data and save the coef in it 
-        folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CV{}" .format(time)
+        folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/Crossvaltest2/CV{}" .format(time)
         os.mkdir(folder)
-        file1 = open("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CV{}/cvcoef{}.txt" .format(time,time), "w")
+        file1 = open("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/Crossvaltest2/CV{}/cvcoef{}.txt" .format(time,time), "w")
         print(coefficients, file=file1 )
         file1.close()
         # prediction score calc. 
@@ -63,11 +63,13 @@ def LogReg(test_frame, train_frame,time,cols):
         exponent = np.exp(val)
         pval = (1/(1+exponent))
         # save prediction scores and training set to same folder as coefs 
-        results = pd.DataFrame({"residue": protein, "prediction value": pval})
-        path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CV{}/predval{}.csv".format(time,time)
-        results.to_csv(path,sep=",", index=False, header=True)
-        pathtest="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CV{}/testframe{}.csv".format(time,time)
-        train_frame.to_csv(pathtest,sep=",", index=True, header=True)
+        # results = pd.DataFrame({"residue": protein, "prediction value": pval})
+        results = test_frame.assign(logreg = pval)
+        path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/Crossvaltest2/CV{}/predval{}.csv".format(time,time)
+        results.to_csv(path,sep=",", index=True, header=True)
+        # pathtest="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/Crossvaltest2/CV{}/trainframe{}.csv".format(time,time)
+        # train_frame.to_csv(pathtest,sep=",", index=True, header=True)
+
 
 
 # Random Forest function 
@@ -104,9 +106,12 @@ def RandomFor(test_frame, train_frame,time,cols):
         # d = 4
         # y_prob_intr_dec = [round(prob, d) for prob in y_prob_interface]
         # save the residue and probabilty score of the test set to the same folder as the logistic regresion 
-        results= pd.DataFrame({"residue": protein, "prediction score": y_prob_interface})
-        path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CV{}/RFval{}.csv".format(time,time)
-        results.to_csv(path,sep=",", index=False, header=True)
+        # results= pd.DataFrame({"residue": protein, "prediction score": y_prob_interface})
+        # path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/Crossvaltest2/CV{}/RFval{}.csv".format(time,time)
+        # results.to_csv(path,sep=",", index=False, header=True)
+        df2 = test_frame.assign(rfscore = y_prob_interface )
+        path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/Crossvaltest2/CV{}/RFval{}.csv".format(time,time)
+        df2.to_csv(path,sep=",", index=True, header=True)
         
         
 
@@ -176,13 +181,13 @@ def CrossVal():
         # set variabel for iteration, to keep track of each test set, since i in range(0,k) includes zero, i is incresased by 1 for readabilty
         time = i+1
         # perfroms logistic regresion and random forest for each test and training set.
-        # LogReg(test_frame,train_frame,time,feature_cols)
+        LogReg(test_frame,train_frame,time,feature_cols)
         RandomFor(test_frame,train_frame,time,feature_cols)
         
 
 
    
-# CrossVal()
+CrossVal()
 
 def NoxRF():
     # folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CVNOXBenchtest"
@@ -254,8 +259,8 @@ def BenchRF():
     path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/CrossVal/CVNOXBenchtest/RFvalNox.csv"
     results.to_csv(path,sep=",", index=False, header=True)
 
-NoxRF()
-BenchRF()
+# NoxRF()
+# BenchRF()
 
 
 

@@ -25,6 +25,7 @@ from sklearn import tree
 from dtreeviz.trees import *
 
 
+
 #  StAR analysis preperation. fits the data in the correct format for StAR
 # params 
 #   frame is the pandas dataframe with columns residue, predus, ispred, dockpred, annotated, RFscore and MetaDPI(logreg) 
@@ -277,8 +278,32 @@ def RandomFor(test_frame, train_frame,time,cols,code,protein_in_cv,trees,depth,c
         df2.to_csv(path,sep=",", index=True, header=True)
         if time == 1:
                 tree = model.estimators_[0]
-                # viz_leaf_samples(tree)
-                
+                # path = tree.cost_complexity_pruning_path(X, y)
+                # ccp_alphas, impurities = path.ccp_alphas, path.impurities
+                # print(ccp_alphas)
+                # plt.figure(figsize=(10, 6))
+                # plt.plot(ccp_alphas, impurities)
+                # plt.xlabel("effective alpha")
+                # plt.ylabel("total impurity of leaves")
+                # plt.show()
+                # clfs = []
+                # for ccp_alpha in ccp_alphas:
+                #     clf = DecisionTreeClassifier(random_state=0, ccp_alpha=ccp_alpha)
+                #     clf.fit(X, y)
+                #     clfs.append(clf)
+
+                # from sklearn.metrics import accuracy_score
+                # acc_scores = [accuracy_score(y_test, tree.predict(X_test)) for tree in clfs]
+                # plt.figure(figsize=(10,  6))
+                # plt.grid()
+                # plt.plot(ccp_alphas[:-1], acc_scores[:-1])
+                # plt.xlabel("effective alpha")
+                # plt.ylabel("Accuracy scores")
+                # max_y = max(acc_scores[:-1])
+                # xpos = acc_scores[:-1].index(max_y)
+                # max_x = ccp_alphas[:-1][xpos]
+                # print(max_x, max_y)
+                # plt.show()
                 viz = dtreeviz(tree, 
                 X, 
                 y,
@@ -302,15 +327,9 @@ def RandomFor(test_frame, train_frame,time,cols,code,protein_in_cv,trees,depth,c
         # path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/totalframe{}.csv".format(time,time)
         # totalframe.to_csv(path,sep=",", index=True, header=True)
         sum_AUC = ROC_calc(totalframe,protein_in_cv,code,time)
-        ROC_Star(totalframe,code,time)
+        # ROC_Star(totalframe,code,time)
         return sum_AUC
 
-
-
-
-
-                    
-        
 
 
 # Cross validation function: 
@@ -322,16 +341,16 @@ def RandomFor(test_frame, train_frame,time,cols,code,protein_in_cv,trees,depth,c
 
 
 def CrossVal():
-    # params to edjuct RF
+    # params to adjust RF
     trees = 100
-    depth  = 10
-    ccp = 0
+    depth  = 10 
+    ccp = 0.0000415140415
     AUCS_CVS = []
     AUCs = []
     global_AUC= 0
     # test run code
-    code = 7
-    
+    code = 21
+
     folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}" .format(code)
     os.mkdir(folder)
     folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests" .format(code)
@@ -428,14 +447,6 @@ def CrossVal():
     stats = "STD:{}\nAVRG: {}".format(omega, avrg)
     file1.writelines(stats)
     file1.close()
-
-
-
-    
-        
-        
-        
-
 
    
 CrossVal()

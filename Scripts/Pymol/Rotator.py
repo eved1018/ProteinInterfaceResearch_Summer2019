@@ -15,22 +15,23 @@ class LegendItem:
         self.color = color
 
 class Rotator:
-    def __init__(self, output_dir, method, protein_name, correctly_predicted, wrongly_predicted):
+    def __init__(self, output_dir, method, protein_name, all_subsets, fps):
         self.method = method
         self.protein = protein_name
 
-        self.correctly_predicted = correctly_predicted
-        self.wrongly_predicted = wrongly_predicted
-
         # self.value_color_pairs = []
         self.legend_items = []
+        for subset in all_subsets:
+            if subset.set_type not in ["ANNOTATED", "SECONDARY"]:
+                self.legend_items.append(LegendItem(subset.name, subset.color))
 
         self.main_dir = output_dir
-        # self.file_path = self.main_dir/self.method.dir/self.protein
         self.file_path = self.main_dir/self.protein/self.method.dir
 
         self.images_for_gif = []
         self.images_for_mp4 = []
+
+        self.fps = fps
 
 
     # finds the 'optimal' coordinate value for 'optimized_coord' by rotating about 'axis'
@@ -83,7 +84,9 @@ class Rotator:
         for i, item in enumerate(self.legend_items):
             offset = imgH//12 + imgH//20 * i
 
-            draw.rectangle([x+20, y+offset, x+20+20, y+offset+20], fill=item.color, outline="#fff", width=2)
+            color = "#"+item.color.split("x")[1]
+
+            draw.rectangle([x+20, y+offset, x+20+20, y+offset+20], fill=color, outline="#fff", width=2)
             draw.text((x+50, y+offset), item.label, font=font1)
 
         bg.save(file_name)
@@ -96,7 +99,7 @@ class Rotator:
         
         # out = cv2.VideoWriter(file_name, cv2.VideoWriter_fourcc(*'DIVX'), 5, size)
         # creates a video writer object
-        out = cv2.VideoWriter(str(file_name), cv2.VideoWriter_fourcc(*'DIVX'), 5, size)
+        out = cv2.VideoWriter(str(file_name), cv2.VideoWriter_fourcc(*'DIVX'), self.fps, size)
 
         for img in self.images_for_mp4:
             out.write(img)  # adds the images to the video
@@ -104,13 +107,7 @@ class Rotator:
 
     def generate_images(self, increment, width, height):
         protein = self.protein
-
-        green_resi = self.correctly_predicted      # green residues
-        blue_resi = self.wrongly_predicted        # blue residues
-
-        self.legend_items.append(LegendItem("Annotated", "#00f"))
-        self.legend_items.append(LegendItem("True Positive", "#0f0"))
-        self.legend_items.append(LegendItem("False Postive", "#f00"))        
+      
 
         self.rotate_and_capture('y', increment, width, height)    # rotate about the y axis
 
@@ -123,7 +120,7 @@ class Rotator:
         self.image_to_video()
 
         gif_file_name = str(proteinPath/f"{self.method.dir}.gif")
-        imageio.mimsave(gif_file_name, self.images_for_gif, fps=5)
+        imageio.mimsave(gif_file_name, self.images_for_gif, fps=self.fps)
 
         mp4_file_name = self.main_dir/self.protein/f"{self.method.dir}.mp4"
         # UNDO END

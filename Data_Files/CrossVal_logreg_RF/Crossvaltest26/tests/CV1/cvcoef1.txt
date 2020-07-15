@@ -1,0 +1,5 @@
+const      -3.396846
+predus      0.911290
+ispred      0.710928
+dockpred    2.432039
+dtype: float64

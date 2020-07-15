@@ -57,7 +57,6 @@ def ROC_Star(data, code,time):
 
 
 
-
 # ROC calculation ONLY FOR RF NEED TO ADD FOR META-DPI
 # params: 
     # frame is the pandas dataframe with columns residue, predus, ispred, dockpred, annotated, RFscore and MetaDPI(logreg) score
@@ -73,6 +72,10 @@ def ROC_calc(frame,protein_in_cv,code,time):
     TPRS = []
     FPRS = []
     threshholds= []
+    log_threshholds = []
+    log_TPRS = []
+    log_FPRS = []
+    log_threshholds =[]
     for i in np.arange(0.00, 1.02, .01):
         threshhold = float(str(round(i,2)))    
         proteinname = frame.index 
@@ -81,7 +84,8 @@ def ROC_calc(frame,protein_in_cv,code,time):
         pred_sum = 0 #total over threshold 
         TP_Total_sum = 0 #sum of TP
         FP_Total_sum = 0 #sum of FP
-        Neg_Total_sum = 0 #sum of neg  
+        Neg_Total_sum = 0 #sum of neg 
+        log_TP_Total_sum, log_FP_Total_sum ,log_all_res_sum, log_N_sum ,log_pred_sum , log_Neg_Total_sum = logregroc(threshhold,frame,protein_in_cv,code,time)
         for protein in protein_in_cv:
             # col_names = [ 'residue','predus', 'ispred', 'dockpred', 'annotated','rfscore','logreg']
             # counterframe = pd.DataFrame(columns = col_names)
@@ -118,7 +122,9 @@ def ROC_calc(frame,protein_in_cv,code,time):
                 pred_res.append(res)
             
 
-            annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
+            # annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
+            annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/{}_sorted".format(protein)
+
             N = 0
             annotated_res =[]
             with open(annotatedfile) as AnnFile:
@@ -170,8 +176,255 @@ def ROC_calc(frame,protein_in_cv,code,time):
     AUC = (distance) * (midpoint)
     AUC = AUC/2
     sum_AUC = AUC.sum()
-    # print("AUC:{}".format(sum_AUC))
-    return sum_AUC
+    log_Global_TPR = log_TP_Total_sum / log_N_sum
+    log_TPRS.append(log_Global_TPR)
+    log_Global_FPR = log_FP_Total_sum / log_Neg_Total_sum
+    log_FPRS.append(log_Global_FPR)
+    log_threshholds.append(threshhold)
+    log_final_results = pd.DataFrame(
+    {'threshold': log_threshholds,
+     'TPR': log_TPRS,
+     'FPR': log_FPRS
+    })
+
+    distance = log_final_results["FPR"].diff()
+    midpoint  = log_final_results["TPR"].rolling(2).sum()
+    distance = distance * -1
+    log_AUC = (distance) * (midpoint)
+    log_AUC = AUC/2
+    log_sum_AUC = log_AUC.sum()
+    
+
+    return sum_AUC , log_sum_AUC
+
+
+def logregroc(threshhold,frame,protein_in_cv,code,time):
+    proteinname = frame.index 
+    log_all_res_sum = 0 # total res 
+    log_N_sum = 0 # total annotated 
+    log_pred_sum = 0 #total over threshold 
+    log_TP_Total_sum = 0 #sum of TP
+    log_FP_Total_sum = 0 #sum of FP
+    log_Neg_Total_sum = 0 #sum of neg 
+    for protein in protein_in_cv:
+            # col_names = [ 'residue','predus', 'ispred', 'dockpred', 'annotated','rfscore','logreg']
+            # counterframe = pd.DataFrame(columns = col_names)
+            rows = []
+            for protein_res in proteinname: 
+                if protein in protein_res:
+                    row = frame.loc[protein_res]
+                    rows.append(row)
+            
+            counterframe = pd.DataFrame(rows,columns = ['predus','ispred','dockpred','annotated', 'rfscore','logreg'])
+            # print(counterframe.head())
+            cols = ['residue', 'logreg']
+            counterframerf = pd.DataFrame(columns = cols)
+            # counterframerf = counterframe.index
+            counterframerf = counterframe[['logreg']] 
+            # counterframerf.reset_index(level=0, inplace=True)
+            # counterframerf.rename({"index": "residue", " rfscore": "rfscore"}, axis='columns', inplace=True)
+            # print(counterframerf.head())
+            # pred_res = counterframerf.index
+            seq_res = counterframerf.index.values.tolist()
+            seqnum = len(seq_res)
+            pred_score= counterframerf.logreg
+            predictedframesort = counterframerf.sort_values(by=['logreg'], inplace =False, ascending=False)
+            
+            thresholdframe= predictedframesort[predictedframesort.logreg >= threshhold] 
+            # print(thresholdframe.head())
+            
+            predicted_res = thresholdframe.index.values.tolist()
+            predicted_res = [str(i) for i in predicted_res]
+            pred_res = []
+            for i in predicted_res: 
+                res_prot = i.split("_")
+                res = res_prot[0]
+                pred_res.append(res)
+            
+
+            # annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
+            annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/{}_sorted".format(protein)
+
+            N = 0
+            annotated_res =[]
+            with open(annotatedfile) as AnnFile:
+                for line in AnnFile:
+                    line = line.strip("\n")
+                    N +=1
+                    line = line.split("_")
+                    line = line[0]
+                    annotated_res.append(line)
+            Truepos = []
+            for res in annotated_res:
+                if res in pred_res:
+                    Truepos.append(res)
+            pred = len(pred_res)
+            TP = len(Truepos)
+            TPR = TP/N 
+            FP = pred - TP
+            neg = seqnum - N
+            FPR = FP/neg
+            # print("protein {}".format(protein))
+            # print("threshold {}".format(threshhold))
+            # print("pred: {}".format(pred))
+            # print("annotated: {}".format(N))
+            # print("True pos: {}".format(TP))
+            # print("TPR: {}".format(TPR))
+            # print("FPR: {}".format(FPR))
+            log_TP_Total_sum += TP
+            log_FP_Total_sum += FP
+            log_all_res_sum += seqnum # total res 
+            log_N_sum  += N # total annotated 
+            log_pred_sum += pred #total over threshold 
+            log_Neg_Total_sum += neg
+    return log_TP_Total_sum, log_FP_Total_sum ,log_all_res_sum, log_N_sum ,log_pred_sum , log_Neg_Total_sum
+
+
+                
+
+# ROC calculation ONLY FOR RF NEED TO ADD FOR META-DPI
+# params: 
+    # frame is the pandas dataframe with columns residue, predus, ispred, dockpred, annotated, RFscore and MetaDPI(logreg) score
+    # protein_in_cv is a list of the proteins in the K-1 set 
+    # code is a number used to keep track of the test number, ie which params are used in what 
+    # time is the time of itteration, ie which K-1 set is being used 
+# returns:
+    # The AUC for that K-1 set, which is then returned to the CrossVal function to calculate the STD and Average  
+
+def ROC_calc(frame,protein_in_cv,code,time):
+    # final_cols = ["threshold","TPR","FPR" ]
+    # final_results = pd.DataFrame(columns= final_cols)
+    TPRS = []
+    FPRS = []
+    threshholds= []
+    log_threshholds = []
+    log_TPRS = []
+    log_FPRS = []
+    log_threshholds =[]
+    for i in np.arange(0.00, 1.02, .01):
+        threshhold = float(str(round(i,2)))    
+        proteinname = frame.index 
+        all_res_sum = 0 # total res 
+        N_sum = 0 # total annotated 
+        pred_sum = 0 #total over threshold 
+        TP_Total_sum = 0 #sum of TP
+        FP_Total_sum = 0 #sum of FP
+        Neg_Total_sum = 0 #sum of neg 
+        log_TP_Total_sum, log_FP_Total_sum ,log_all_res_sum, log_N_sum ,log_pred_sum , log_Neg_Total_sum = logregroc(threshhold,frame,protein_in_cv,code,time)
+        for protein in protein_in_cv:
+            # col_names = [ 'residue','predus', 'ispred', 'dockpred', 'annotated','rfscore','logreg']
+            # counterframe = pd.DataFrame(columns = col_names)
+            rows = []
+            for protein_res in proteinname: 
+                if protein in protein_res:
+                    row = frame.loc[protein_res]
+                    rows.append(row)
+            
+            counterframe = pd.DataFrame(rows,columns = ['predus','ispred','dockpred','annotated', 'rfscore','logreg'])
+            # print(counterframe.head())
+            cols = ['residue', 'rfscore']
+            counterframerf = pd.DataFrame(columns = cols)
+            # counterframerf = counterframe.index
+            counterframerf = counterframe[['rfscore']] 
+            # counterframerf.reset_index(level=0, inplace=True)
+            # counterframerf.rename({"index": "residue", " rfscore": "rfscore"}, axis='columns', inplace=True)
+            # print(counterframerf.head())
+            # pred_res = counterframerf.index
+            seq_res = counterframerf.index.values.tolist()
+            seqnum = len(seq_res)
+            pred_score= counterframerf.rfscore
+            predictedframesort = counterframerf.sort_values(by=['rfscore'], inplace =False, ascending=False)
+            
+            thresholdframe= predictedframesort[predictedframesort.rfscore >= threshhold] 
+            # print(thresholdframe.head())
+            
+            predicted_res = thresholdframe.index.values.tolist()
+            predicted_res = [str(i) for i in predicted_res]
+            pred_res = []
+            for i in predicted_res: 
+                res_prot = i.split("_")
+                res = res_prot[0]
+                pred_res.append(res)
+            
+
+            # annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
+            annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/{}_sorted".format(protein)
+
+            N = 0
+            annotated_res =[]
+            with open(annotatedfile) as AnnFile:
+                for line in AnnFile:
+                    line = line.strip("\n")
+                    N +=1
+                    line = line.split("_")
+                    line = line[0]
+                    annotated_res.append(line)
+            Truepos = []
+            for res in annotated_res:
+                if res in pred_res:
+                    Truepos.append(res)
+            pred = len(pred_res)
+            TP = len(Truepos)
+            TPR = TP/N 
+            FP = pred - TP
+            neg = seqnum - N
+            FPR = FP/neg
+            # print("protein {}".format(protein))
+            # print("threshold {}".format(threshhold))
+            # print("pred: {}".format(pred))
+            # print("annotated: {}".format(N))
+            # print("True pos: {}".format(TP))
+            # print("TPR: {}".format(TPR))
+            # print("FPR: {}".format(FPR))
+            TP_Total_sum += TP
+            FP_Total_sum += FP
+            all_res_sum += seqnum # total res 
+            N_sum  += N # total annotated 
+            pred_sum += pred #total over threshold 
+            Neg_Total_sum += neg
+            # print("in")
+            # print(all_res_sum , N_sum ,pred_sum,TP_Total_sum,FP_Total_sum,Neg_Total_sum,threshhold)
+
+        Global_TPR = TP_Total_sum / N_sum
+        TPRS.append(Global_TPR)
+        Global_FPR = FP_Total_sum / Neg_Total_sum
+        FPRS.append(Global_FPR)
+        threshholds.append(threshhold)
+        # print("out")
+        # print(all_res_sum , N_sum ,pred_sum,TP_Total_sum,FP_Total_sum,Neg_Total_sum,threshhold)
+
+    final_results = pd.DataFrame(
+    {'threshold': threshholds,
+     'TPR': TPRS,
+     'FPR': FPRS
+    })
+    # print(final_results.head)
+
+    distance = final_results["FPR"].diff()
+    midpoint  = final_results["TPR"].rolling(2).sum()
+    distance = distance * -1
+    AUC = (distance) * (midpoint)
+    AUC = AUC/2
+    sum_AUC = AUC.sum()
+
+    log_Global_TPR = log_TP_Total_sum / log_N_sum
+    log_TPRS.append(log_Global_TPR)
+    log_Global_FPR = log_FP_Total_sum / log_Neg_Total_sum
+    log_FPRS.append(log_Global_FPR)
+    log_threshholds.append(threshhold)
+    log_final_results = pd.DataFrame(
+    {'threshold': log_threshholds,
+     'TPR': log_TPRS,
+     'FPR': log_FPRS
+    })
+
+    distance = log_final_results["FPR"].diff()
+    midpoint  = log_final_results["TPR"].rolling(2).sum()
+    distance = distance * -1
+    log_AUC = (distance) * (midpoint)
+    log_AUC = AUC/2
+    log_sum_AUC = log_AUC.sum()
+    return sum_AUC , log_sum_AUC
 
 
          
@@ -277,6 +530,9 @@ def RandomFor(test_frame, train_frame,time,cols,code,protein_in_cv,trees,depth,c
         path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/RFval{}.csv".format(code,time,time)
         df2.to_csv(path,sep=",", index=True, header=True)
         if time == 1:
+                # for i in range(0,100):
+                #     tree = model.estimators_[i]
+                #     print(tree.get_depth())
                 tree = model.estimators_[0]
                 # path = tree.cost_complexity_pruning_path(X, y)
                 # ccp_alphas, impurities = path.ccp_alphas, path.impurities
@@ -326,9 +582,9 @@ def RandomFor(test_frame, train_frame,time,cols,code,protein_in_cv,trees,depth,c
         # print(totalframe.head())
         # path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/totalframe{}.csv".format(time,time)
         # totalframe.to_csv(path,sep=",", index=True, header=True)
-        sum_AUC = ROC_calc(totalframe,protein_in_cv,code,time)
+        sum_AUC, log_sum_AUC = ROC_calc(totalframe,protein_in_cv,code,time)
         # ROC_Star(totalframe,code,time)
-        return sum_AUC
+        return sum_AUC , log_sum_AUC
 
 
 
@@ -344,12 +600,15 @@ def CrossVal():
     # params to adjust RF
     trees = 100
     depth  = 10 
-    ccp = 0.0000415140415
+    ccp = 0.0000400902332
     AUCS_CVS = []
+    log_AUCS_CVS = []
     AUCs = []
+    log_AUCs = []
     global_AUC= 0
+    log_global_AUC = 0
     # test run code
-    code = 21
+    code = 32
 
     folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}" .format(code)
     os.mkdir(folder)
@@ -362,7 +621,8 @@ def CrossVal():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset which is a csv file containing all the residues in Nox and Benchmark as well as predus, ispred, and dockpred scores. 
     # The last column is a binary annotated classifier, 0 is noninetrface 1 is interface. 
-    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv", header=None, names=col_names)
+    # df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv", header=None, names=col_names)
+    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv", header=0)
     # set the residue_protein ID as the index of the DataFrame 
     df.set_index('residue', inplace= True )
     # remove any null or missing data from the dataset
@@ -371,6 +631,7 @@ def CrossVal():
     # set X as the three prediction scores and y as the true annotated value 
     feature_cols = ['predus','ispred','dockpred']
     proteinname = data.index
+    # print(proteinname)
     # Features, ie prediction scores from predus, ispred and dockpred 
     X = data[feature_cols] 
      # Target variable, noninterface or interface 
@@ -385,7 +646,7 @@ def CrossVal():
     # create sublist of sets conating 22 proteins in each set or "chunk"
     # n controls the number of proteins in each set
     lst = proteinids
-    n = 22
+    n = 1
     chunks = [lst[i:i + n] for i in range(0, len(lst), n)]
     # checks to make sure the last set contains n number of proteins in it, if not it will give one of its proteins to each previous set.
     # that is if teh last chunk contains 3 proteins, the last three chunks will conatin 23 instead of 22 proteins in them. 
@@ -398,7 +659,8 @@ def CrossVal():
             chunks[itt].extend(firstlist)
             chunks[-1].remove(pdbs[0])
     # the last set is now empty so it is removed. 
-    del chunks[-1]
+    if len(chunks[-1]) == 0:
+        del chunks[-1]
     # set teh column names for the new trainng and test sets, same as feature_cols but residue si removed bc it is already the index. 
     col_namestest = ['predus', 'ispred', 'dockpred', 'annotated']
     # each subset(or chunk) of proteins is used to create a training set containing the residues for the proteins in the subset as a test set with all other residues
@@ -418,18 +680,32 @@ def CrossVal():
         
         # perfroms logistic regresion and random forest for each test and training set.
         LogReg(test_frame,train_frame,time,feature_cols,code )
-        sum_AUC = RandomFor(test_frame,train_frame,time,feature_cols,code,protein_in_cv,trees,depth,ccp)
+        sum_AUC , log_sum_AUC = RandomFor(test_frame,train_frame,time,feature_cols,code,protein_in_cv,trees,depth,ccp)
         AUCs.append(sum_AUC)
+        print(sum_AUC)
         global_AUC += sum_AUC
         Cv = "CV{}".format(i)
         to_append = (Cv,sum_AUC)
         AUCS_CVS.append(to_append)
+        log_AUCs.append(log_sum_AUC)
+        log_global_AUC += log_sum_AUC
+        Cv = "CV{}".format(i)
+        to_append = (Cv,log_sum_AUC)
+        log_AUCS_CVS.append(to_append)
     avrg = global_AUC/ len(AUCs)
     omega = 0
     for i in AUCs:
         omega += (i - avrg) **2
     omega = omega/10
     omega = math.sqrt(omega)
+    # log
+    log_avrg = log_global_AUC/ len(log_AUCs)
+    log_omega = 0
+    for i in log_AUCs:
+        log_omega += (i - avrg) **2
+    log_omega = log_omega/10
+    log_omega = math.sqrt(log_omega)
+
     # print("params:") 
     # print("     number of trees:{}".format(trees))
     # print("     depth of trees:{}".format(depth))
@@ -441,12 +717,21 @@ def CrossVal():
     file1 = open("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/results.txt".format(code),"w")
     params = ["params: \n", "\t number of trees: {} \n".format(trees),"\t depth of trees: {}\n".format(depth),"\t pruning paramter: {} \n".format(ccp),"AUCs: \n"]
     file1.writelines(params)
+    file1.write("Random Forest\n")
     for i in AUCS_CVS:
         aucs = "set:{}  AUC:{} \n".format(i[0],i[1])
         file1.write(aucs)
     stats = "STD:{}\nAVRG: {}".format(omega, avrg)
     file1.writelines(stats)
+    file1.write("\nLogreg\n")
+    for i in log_AUCS_CVS:
+        aucs = "set:{}  AUC:{} \n".format(i[0],i[1])
+        file1.write(aucs)
+    stats = "STD:{}\nAVRG: {}".format(log_omega, log_avrg)
+    file1.writelines(stats)
     file1.close()
+    
+
 
    
 CrossVal()
@@ -523,7 +808,6 @@ def BenchRF():
 
 # NoxRF()
 # BenchRF()
-
 
 
 

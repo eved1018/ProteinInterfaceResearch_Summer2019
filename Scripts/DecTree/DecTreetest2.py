@@ -1,8 +1,10 @@
  #!/usr/bin/env python
 # imports
+# imports 
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
+import os 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
@@ -18,8 +20,10 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import plot_tree
 from sklearn.model_selection import RandomizedSearchCV
-
-
+import math 
+from sklearn.datasets import *
+from sklearn import tree
+from dtreeviz.trees import *
 
 
 # set table of data
@@ -179,9 +183,10 @@ def Ranfor():
     y_predict = rf_random.best_estimator_.predict(X_bench)
     print(accuracy_score(y_bench, y_predict))
 
-Ranfor()
+# Ranfor()
 
 def Alphatest():
+
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset
     df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/noxdata.csv", header=None, names=col_names)
@@ -249,9 +254,269 @@ def Alphatest():
     y_predict = model2.predict(X_bench)
     # Accurecy 
     print(accuracy_score(y_bench, y_predict))
-
-
 # Alphatest()
+def logregroc(threshhold,frame,proteinids):
+    proteinname = frame.index 
+    log_all_res_sum = 0 # total res 
+    log_N_sum = 0 # total annotated 
+    log_pred_sum = 0 #total over threshold 
+    log_TP_Total_sum = 0 #sum of TP
+    log_FP_Total_sum = 0 #sum of FP
+    log_Neg_Total_sum = 0 #sum of neg 
+    for protein in proteinids:
+        # col_names = [ 'residue','predus', 'ispred', 'dockpred', 'annotated','rfscore','logreg']
+        # counterframe = pd.DataFrame(columns = col_names)
+        rows = []
+        for protein_res in proteinname: 
+            if protein in protein_res:
+                row = frame.loc[protein_res]
+                rows.append(row)
+        
+        counterframe = pd.DataFrame(rows,columns = ['predus','ispred','dockpred','annotated', 'rfscore','logreg'])
+        # print(counterframe.head())
+        cols = ['residue', 'logreg']
+        counterframerf = pd.DataFrame(columns = cols)
+        counterframerf = counterframe[['logreg']] 
+        seq_res = counterframerf.index.values.tolist()
+        seqnum = len(seq_res)
+        pred_score= counterframerf.logreg
+        predictedframesort = counterframerf.sort_values(by=['logreg'], inplace =False, ascending=False)
+        
+        thresholdframe= predictedframesort[predictedframesort.logreg >= threshhold] 
+        # print(thresholdframe.head())
+        
+        predicted_res = thresholdframe.index.values.tolist()
+        predicted_res = [str(i) for i in predicted_res]
+        pred_res = []
+        for i in predicted_res: 
+            res_prot = i.split("_")
+            res = res_prot[0]
+            pred_res.append(res)
+        
+
+        # annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
+        annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/{}_sorted".format(protein)
+
+        N = 0
+        annotated_res =[]
+        with open(annotatedfile) as AnnFile:
+            for line in AnnFile:
+                line = line.strip("\n")
+                N +=1
+                line = line.split("_")
+                line = line[0]
+                annotated_res.append(line)
+        Truepos = []
+        for res in annotated_res:
+            if res in pred_res:
+                Truepos.append(res)
+        pred = len(pred_res)
+        TP = len(Truepos)
+        TPR = TP/N 
+        FP = pred - TP
+        neg = seqnum - N
+        FPR = FP/neg
+        # print("protein {}".format(protein))
+        # print("threshold {}".format(threshhold))
+        # print("pred: {}".format(pred))
+        # print("annotated: {}".format(N))
+        # print("True pos: {}".format(TP))
+        # print("TPR: {}".format(TPR))
+        # print("FPR: {}".format(FPR))
+        log_TP_Total_sum += TP
+        log_FP_Total_sum += FP
+        log_all_res_sum += seqnum # total res 
+        log_N_sum  += N # total annotated 
+        log_pred_sum += pred #total over threshold 
+        log_Neg_Total_sum += neg
+    return log_TP_Total_sum, log_FP_Total_sum ,log_all_res_sum, log_N_sum ,log_pred_sum , log_Neg_Total_sum
 
 
+def ROC_single(frame,proteinids):
+    print(proteinids)
+    TPRS = []
+    FPRS = []
+    threshholds= []
+    log_threshholds = []
+    log_TPRS = []
+    log_FPRS = []
+    log_threshholds =[]
+    for i in np.arange(0.00, 1.02, .01):
+        threshhold = float(str(round(i,2)))   
+        proteinname = frame.index 
+        all_res_sum = 0 # total res 
+        N_sum = 0 # total annotated 
+        pred_sum = 0 #total over threshold 
+        TP_Total_sum = 0 #sum of TP
+        FP_Total_sum = 0 #sum of FP
+        Neg_Total_sum = 0 #sum of neg 
+        log_TP_Total_sum, log_FP_Total_sum ,log_all_res_sum, log_N_sum ,log_pred_sum , log_Neg_Total_sum = logregroc(threshhold,frame,proteinids)
+        for protein in proteinids:
+            rows = []
+            for protein_res in proteinname: 
+                if protein in protein_res:
+                    row = frame.loc[protein_res]
+                    rows.append(row)
+            counterframe = pd.DataFrame(rows,columns = ['predus','ispred','dockpred','annotated', 'rfscore','logreg'])
+            cols = ['residue', 'rfscore']
+            counterframerf = pd.DataFrame(columns = cols)
+            # counterframerf = counterframe.index
+            counterframerf = counterframe[['rfscore']] 
+            seq_res = counterframerf.index.values.tolist()
+            seqnum = len(seq_res)
+            pred_score= counterframerf.rfscore
+            predictedframesort = counterframerf.sort_values(by=['rfscore'], inplace =False, ascending=False)
+            thresholdframe= predictedframesort[predictedframesort.rfscore >= threshhold] 
+            predicted_res = thresholdframe.index.values.tolist()
+            predicted_res = [str(i) for i in predicted_res]
+            pred_res = []
+            for i in predicted_res: 
+                res_prot = i.split("_")
+                res = res_prot[0]
+                pred_res.append(res)
+            
+            # annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
+            annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/{}_sorted".format(protein)
+            N = 0
+            annotated_res =[]
+            with open(annotatedfile) as AnnFile:
+                for line in AnnFile:
+                    line = line.strip("\n")
+                    N +=1
+                    line = line.split("_")
+                    line = line[0]
+                    annotated_res.append(line)
+            Truepos = []
+            for res in annotated_res:
+                if res in pred_res:
+                    Truepos.append(res)
+            pred = len(pred_res)
+            TP = len(Truepos)
+            TPR = TP/N 
+            FP = pred - TP
+            neg = seqnum - N
+            FPR = FP/neg
+            # print("protein {}".format(protein))
+            # print("threshold {}".format(threshhold))
+            # print("pred: {}".format(pred))
+            # print("annotated: {}".format(N))
+            # print("True pos: {}".format(TP))
+            # print("TPR: {}".format(TPR))
+            # print("FPR: {}".format(FPR))
+            TP_Total_sum += TP
+            FP_Total_sum += FP
+            all_res_sum += seqnum # total res 
+            N_sum  += N # total annotated 
+            pred_sum += pred #total over threshold 
+            Neg_Total_sum += neg
+        Global_TPR = TP_Total_sum / N_sum
+        TPRS.append(Global_TPR)
+        Global_FPR = FP_Total_sum / Neg_Total_sum
+        FPRS.append(Global_FPR)
+        threshholds.append(threshhold)
+        log_Global_TPR = log_TP_Total_sum / log_N_sum
+        log_TPRS.append(log_Global_TPR)
+        log_Global_FPR = log_FP_Total_sum / log_Neg_Total_sum
+        log_FPRS.append(log_Global_FPR)
+        log_threshholds.append(threshhold)
+    final_results = pd.DataFrame(
+    {'threshold': threshholds,
+     'TPR': TPRS,
+     'FPR': FPRS
+    })
+
+    distance = final_results["FPR"].diff()
+    midpoint  = final_results["TPR"].rolling(2).sum()
+    distance = distance * -1
+    AUC = (distance) * (midpoint)
+    AUC = AUC/2
+    sum_AUC = AUC.sum()
+        
+    log_final_results = pd.DataFrame(
+    {'threshold': log_threshholds,
+     'TPR': log_TPRS,
+     'FPR': log_FPRS
+    })
+
+    distance = log_final_results["FPR"].diff()
+    midpoint  = log_final_results["TPR"].rolling(2).sum()
+    distance = distance * -1
+    log_AUC = (distance) * (midpoint)
+    log_AUC = AUC/2
+    log_sum_AUC = log_AUC.sum()
     
+
+    return sum_AUC , log_sum_AUC
+
+
+
+
+def Main():
+    AUCS_CVS = []
+    log_AUCS_CVS = []
+    AUCs = []
+    log_AUCs = []
+    global_AUC= 0
+    log_global_AUC = 0
+    col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
+    # load dataset which is a csv file containing all the residues in Nox and Benchmark as well as predus, ispred, and dockpred scores. 
+    # The last column is a binary annotated classifier, 0 is noninetrface 1 is interface. 
+    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv", header=None, names=col_names)
+    # set the residue_protein ID as the index of the DataFrame 
+    df.set_index('residue', inplace= True )
+    # remove any null or missing data from the dataset
+    df.isnull().any()
+    data = df.fillna(method='ffill')
+    # set X as the three prediction scores and y as the true annotated value 
+    feature_cols = ['predus','ispred','dockpred']
+    proteinname = data.index
+    # print(proteinname)
+    # Features, ie prediction scores from predus, ispred and dockpred 
+    X = data[feature_cols] 
+     # Target variable, noninterface or interface 
+    y = data.annotated
+    # testing antigens 
+
+    df_ant = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv", header=0)
+    proteinname_ant = df_ant.residue
+    X_ant = df_ant[feature_cols]
+    y_ant = df_ant.annotated
+    proteinids = []
+    for resprot in proteinname_ant: 
+        res_prot = resprot.split("_")
+        proteinid = res_prot[1]
+        if proteinid not in proteinids:
+             proteinids.append(res_prot[1])
+    x_ant = sm.add_constant(X_ant)
+    logit_model=sm.Logit(y_ant,x_ant)
+    result=logit_model.fit()
+    coefficients = result.params
+    # prediction score calc. 
+    protein= df_ant.residue
+    predusval = df_ant.predus
+    ispredval = df_ant.ispred
+    dockpred = df_ant.dockpred
+    predcoef = coefficients[1]
+    ispredcoef = coefficients[2]
+    dockpredcoef= coefficients[3]
+    val = (coefficients[0] + predcoef * predusval + ispredval* ispredcoef+dockpred * dockpredcoef)*(-1)
+    exponent = np.exp(val)
+    pval = (1/(1+exponent))
+    # save prediction scores and training set to same folder as coefs 
+    # results = pd.DataFrame({"residue": protein, "prediction value": pval})
+    print(coefficients)
+    model = RandomForestClassifier(n_estimators = 100, max_depth =10, ccp_alpha = 0.0000400902332 , random_state = 0)
+    model.fit(X, y)
+    y_prob = model.predict_proba(X_ant)
+    y_prob_intr = [p[1] for p in y_prob]
+    df_ant = df_ant.assign(logreg = pval)
+    df2 = df_ant.assign(rfscore = y_prob_intr )
+    print(df2.head())
+    df2.set_index('residue', inplace= True )
+    sum_AUC,log_sum_AUC = ROC_single(df2,proteinids)
+    print (sum_AUC,log_sum_AUC)
+   
+    
+
+Main()
+

@@ -347,8 +347,8 @@ def ROC_calc(frame,protein_in_cv,code,time):
                 pred_res.append(res)
             
 
-            # annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
-            annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/{}_sorted".format(protein)
+            annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
+            
 
             N = 0
             annotated_res =[]
@@ -621,8 +621,7 @@ def CrossVal():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset which is a csv file containing all the residues in Nox and Benchmark as well as predus, ispred, and dockpred scores. 
     # The last column is a binary annotated classifier, 0 is noninetrface 1 is interface. 
-    # df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv", header=None, names=col_names)
-    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv", header=0)
+    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv", header=None, names=col_names)
     # set the residue_protein ID as the index of the DataFrame 
     df.set_index('residue', inplace= True )
     # remove any null or missing data from the dataset

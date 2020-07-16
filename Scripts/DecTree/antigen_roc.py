@@ -301,8 +301,7 @@ def ROC_calc(frame,protein_in_cv,code,time):
     
             
 
-            # print(predictor,threshhold,TPR, FPR)
-    # print(Dict2)
+        
     for i in predictors: 
         
         threshholds = Dict2[i]['threshholds']
@@ -481,10 +480,8 @@ def AUC_calc(results_list,key):
         omega += (i - avrg) **2
     omega = omega/11
     omega = math.sqrt(omega)
-    # print("avrg, stdev")
-    # print(avrg)
-    # print(omega)
-    return results_list,AUCS ,avrg,omega ,key
+    
+    return results_list, AUCS ,avrg,omega ,key
 
 
 def CrossVal():

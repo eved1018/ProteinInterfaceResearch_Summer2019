@@ -22,6 +22,8 @@ from sklearn.datasets import *
 from sklearn import tree
 from dtreeviz.trees import *
 import re 
+import time 
+import concurrent.futures
 
 def atoi(text):
     return int(text) if text.isdigit() else text
@@ -249,8 +251,8 @@ def ROC_calc(frame,protein_in_cv,code,timer):
                     pred_res.append(res)
                 
 
-                # annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
-                annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/{}_sorted".format(protein)
+                annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
+                # annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/{}_sorted".format(protein)
 
                 N = 0
                 annotated_res =[]
@@ -379,7 +381,7 @@ def LogReg(test_frame, train_frame,timer,cols,code):
 #     The results frame is redirected to the Star function 
 #     The AUC results for each run is retruned to the CrossVal function to determine the standard of deviation and avarage. 
     
-def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,ccp): 
+def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,ccp,viz): 
         # set columns 
         feature_cols = cols
         # split traing and test data into the depednent and indepdent variables 
@@ -410,7 +412,7 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
         df2 = test_frame.assign(rfscore = y_prob_interface )
         path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/RFval{}.csv".format(code,timer,timer)
         df2.to_csv(path,sep=",", index=True, header=True)
-        if timer == 1:
+        if timer == 1 and viz is True:
                 # for i in range(0,100):
                 #     tree = model.estimators_[i]
                 #     print(tree.get_depth())
@@ -471,7 +473,7 @@ def Run(params):
     (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz) =  params
     LogReg(test_frame,train_frame,timer,feature_cols,code )
     results_dic = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz)
-    return results_dic timer
+    return results_dic,timer
     
 
 def AUC_calc(results_list,key,sets):
@@ -490,14 +492,8 @@ def AUC_calc(results_list,key,sets):
     return results_list, AUCS ,avrg,omega ,key
 
 
-def CrossVal():
+def CrossVal(viz, code, trees, depth, ccp,size, start):
     # params to adjust RF
-    trees = 100
-    depth  = 10 
-    ccp = 0.0000400902332
-    # test run code
-    code = 32
-
     predus = []
     ispred = []
     dockpred =[]
@@ -515,8 +511,8 @@ def CrossVal():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset which is a csv file containing all the residues in Nox and Benchmark as well as predus, ispred, and dockpred scores. 
     # The last column is a binary annotated classifier, 0 is noninetrface 1 is interface. 
-    # df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv", header=None, names=col_names)
-    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv", header=0)
+    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv", header=None, names=col_names)
+    # df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv", header=0)
     # set the residue_protein ID as the index of the DataFrame 
     df.set_index('residue', inplace= True )
     # remove any null or missing data from the dataset
@@ -540,7 +536,7 @@ def CrossVal():
     # create sublist of sets conating 22 proteins in each set or "chunk"
     # n controls the number of proteins in each set
     lst = proteinids
-    n = 1
+    n = size
     chunks = [lst[i:i + n] for i in range(0, len(lst), n)]
     # checks to make sure the last set contains n number of proteins in it, if not it will give one of its proteins to each previous set.
     # that is if teh last chunk contains 3 proteins, the last three chunks will conatin 23 instead of 22 proteins in them. 
@@ -560,6 +556,7 @@ def CrossVal():
     # set teh column names for the new trainng and test sets, same as feature_cols but residue si removed bc it is already the index. 
     col_namestest = ['predus', 'ispred', 'dockpred', 'annotated']
     # each subset(or chunk) of proteins is used to create a training set containing the residues for the proteins in the subset as a test set with all other residues
+    train_test_frames= []
     for i in range(0,len(chunks)):
         test_frame = pd.DataFrame(columns = col_namestest)
         train_frame = pd.DataFrame(columns = col_namestest)
@@ -571,15 +568,17 @@ def CrossVal():
                     rows.append(protein_res)
         test_frame = data[data.index.isin(rows)]
         protein_in_cv = chunks[i]
-        train_frame = train_frame.drop(test_frame.index)
-        # set variabel for iteration, to keep track of each test set, since i in range(0,k) includes zero, i is incresased by 1 for readabilty
         timer = i+1
+        train_frame = train_frame.drop(test_frame.index)
+        toappend = (train_frame,test_frame,timer,protein_in_cv)
+        train_test_frames.append(toappend)
+        # set variabel for iteration, to keep track of each test set, since i in range(0,k) includes zero, i is incresased by 1 for readabilty
         sets = timer
     param_list = []
     print("starting parellel")
     for t in train_test_frames:
-        (train_frame, test_frame,timerr,protein_in_cv) = t
-        params = (test_frame,train_frame,timerr,feature_cols,code,protein_in_cv,trees,depth,ccp,viz)
+        (train_frame, test_frame,timer,protein_in_cv) = t
+        params = (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz)
         # print(params)
         param_list.append(params)
     # print(param_list[0])
@@ -591,10 +590,11 @@ def CrossVal():
         
         for i in results:
             (results_dic,timer) = i 
-            AUC = results_dic[key]
-            Cv = "CV{}".format(timer)
-            to_append = (Cv,AUC)
-            locals()[key].append(to_append)
+            for key in results_dic:
+                AUC = results_dic[key]
+                Cv = "CV{}".format(timer)
+                to_append = (Cv,AUC)
+                locals()[key].append(to_append)
         # perfroms logistic regresion and random forest for each test and training set.
         # results_dic = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp)
     file1 = open("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/results.txt".format(code),"w")
@@ -612,12 +612,23 @@ def CrossVal():
 
         
     
-    
+def Main():
+    start = time.perf_counter()
+    code = 46
+    trees = 100
+    depth  = 10 
+    ccp = 0.0000400902332
+    size = 44
+    viz = False 
+    CrossVal(viz, code, trees, depth, ccp,size, start )
+    finish = time.perf_counter()
+    print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
+
+Main()
+
     
 
             
 
         
 
-
-CrossVal()

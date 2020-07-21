@@ -468,7 +468,7 @@ def RandomFor(test_frame, train_frame,time,cols,code,protein_in_cv,trees,depth,c
         # ROC_Star(totalframe,code,time)
         return results_dic
 
-def AUC_calc(results_list,key):
+def AUC_calc(results_list,key,sets):
     AUCS = []
     for i in results_list: 
         Cv = i[0]
@@ -478,7 +478,7 @@ def AUC_calc(results_list,key):
     omega = 0
     for i in AUCS:
         omega += (i - avrg) **2
-    omega = omega/11
+    omega = omega/sets
     omega = math.sqrt(omega)
     
     return results_list, AUCS ,avrg,omega ,key
@@ -538,6 +538,8 @@ def CrossVal():
     chunks = [lst[i:i + n] for i in range(0, len(lst), n)]
     # checks to make sure the last set contains n number of proteins in it, if not it will give one of its proteins to each previous set.
     # that is if teh last chunk contains 3 proteins, the last three chunks will conatin 23 instead of 22 proteins in them. 
+    sets = 0 
+
     for i in range(0,len(chunks[-1])):
         if len(chunks[-1]) != n:
             pdbs = chunks[-1]
@@ -565,7 +567,7 @@ def CrossVal():
         train_frame = train_frame.drop(test_frame.index)
         # set variabel for iteration, to keep track of each test set, since i in range(0,k) includes zero, i is incresased by 1 for readabilty
         time = i+1
-        
+        sets = time
         # perfroms logistic regresion and random forest for each test and training set.
         LogReg(test_frame,train_frame,time,feature_cols,code )
         results_dic = RandomFor(test_frame,train_frame,time,feature_cols,code,protein_in_cv,trees,depth,ccp)
@@ -578,7 +580,7 @@ def CrossVal():
     params = ["params: \n", "\t number of trees: {} \n".format(trees),"\t depth of trees: {}\n".format(depth),"\t pruning paramter: {} \n".format(ccp)]
     file1.writelines(params)
     for key in results_dic:
-        results_list, AUCs, avrg, omega ,key= AUC_calc(locals()[key],key)
+        results_list, AUCs, avrg, omega ,key= AUC_calc(locals()[key],key,sets)
         file1.write("\n{}\n".format(key))
         for i in results_list:
             aucs = "\nset:{}  AUC:{}".format(i[0],i[1])

@@ -442,7 +442,7 @@ def ROC_single(frame,proteinids):
     midpoint  = log_final_results["TPR"].rolling(2).sum()
     distance = distance * -1
     log_AUC = (distance) * (midpoint)
-    log_AUC = AUC/2
+    log_AUC = log_AUC/2
     log_sum_AUC = log_AUC.sum()
     
 

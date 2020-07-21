@@ -1,4 +1,12 @@
 {
     "python.pythonPath": "/Users/evanedelstein/.virtualenvs/rajiresearch/bin/python",
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#25252528",
+        "activityBar.background": "#25252528",
+        "activityBar.border": "#0202029f",
+        
+        
+    
+    }
 }

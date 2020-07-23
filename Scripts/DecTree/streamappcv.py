@@ -680,13 +680,6 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
 @st.cache  
 def Main(code,trees,depth,ccp,size,viz,Antigen):
     start = time.perf_counter()
-    code = 55
-    trees = 100
-    depth  = 10 
-    ccp = 0.0000400902332
-    size = 22
-    viz = False 
-    Antigen = False
     results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/"
     data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv"
     if Antigen is True:
@@ -699,7 +692,7 @@ def Main(code,trees,depth,ccp,size,viz,Antigen):
     print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
     st.write(f"finished in {round((finish - start)/60,2 )} minutes(s)")
 
-Main(48,100,10,0.0000400902332,22,False,False)
+Main(55,100,10,0.0000400902332,22,False,False)
 
     
 

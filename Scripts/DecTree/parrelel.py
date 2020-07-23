@@ -27,7 +27,21 @@ from itertools import repeat
 import time
  
 
-
+def ROC_Star(data, code,timer):
+    # print("star set up")
+    # print(data.head())
+    data = data.round({'predus': 3, 'ispred': 3, 'dockpred': 3, 'rfscore': 3,"logreg":3})
+    Star_interface = data[data.annotated == 1] 
+    Star_non_interface = data[data.annotated == 0]
+    Star_interface = Star_interface.drop(columns="annotated")
+    Star_non_interface = Star_non_interface.drop(columns="annotated")
+    Star_interface = Star_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
+    Star_non_interface =Star_non_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
+    os.mkdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}".format(code,timer))
+    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}/StarinterfaceCV{}.txt".format(code,timer,timer)
+    Star_interface.to_csv(path,sep="\t", index=False, header=True)
+    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}/StarnoninterfaceCV{}.txt".format(code,timer,timer)
+    Star_non_interface.to_csv(path,sep="\t", index=False, header=True)
 
 
 
@@ -160,7 +174,7 @@ def ROC_calc(frame,protein_in_cv,code,timer):
     log_AUC = log_AUC/2
     log_sum_AUC = log_AUC.sum()
     
-
+    
     return sum_AUC , log_sum_AUC
 
 
@@ -404,7 +418,7 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
         # path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/totalframe{}.csv".format(timer,timer)
         # totalframe.to_csv(path,sep=",", index=True, header=True)
         sum_AUC, log_sum_AUC = ROC_calc(totalframe,protein_in_cv,code,timer)
-        # ROC_Star(totalframe,code,timer)
+        ROC_Star(totalframe,code,timer)
         return sum_AUC , log_sum_AUC
 
 
@@ -474,7 +488,7 @@ def CrossVal(viz,code, trees, depth, ccp,size,start ):
     # create sublist of sets conating 22 proteins in each set or "chunk"
     # n controls the number of proteins in each set
     lst = proteinids
-    print(len(proteinids))
+    # print(len(proteinids))
     n = size
     chunks = [lst[i:i + n] for i in range(0, len(lst), n)]
     
@@ -496,7 +510,7 @@ def CrossVal(viz,code, trees, depth, ccp,size,start ):
     # each subset(or chunk) of proteins is used to create a training set containing the residues for the proteins in the subset as a test set with all other residues
     sets = 0 
     train_test_frames = []
-    print("making frames")
+    # print("making frames")
     for i in range(0,len(chunks)):
         test_frame = pd.DataFrame(columns = col_namestest)
         train_frame = pd.DataFrame(columns = col_namestest)
@@ -519,7 +533,7 @@ def CrossVal(viz,code, trees, depth, ccp,size,start ):
         
         # perfroms logistic regresion and random forest for each test and training set.
     param_list = []
-    print("starting parellel")
+    # print("starting parellel")
     for t in train_test_frames:
         (train_frame, test_frame,timer,protein_in_cv) = t
         params = (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz)
@@ -533,7 +547,7 @@ def CrossVal(viz,code, trees, depth, ccp,size,start ):
         results = executor.map( Run, param_list)
         
         for i in results:
-            print(i)
+            # print(i)
             sum_AUC = i[0]
             log_sum_AUC = i[1]
             timer = i[2]
@@ -551,7 +565,7 @@ def CrossVal(viz,code, trees, depth, ccp,size,start ):
             log_AUCS_CVS.append(to_append)
             sets = timer 
 
-    print("parellel over")
+    # print("parellel over")
     # print(sets)
     avrg = global_AUC/ len(AUCs)
     omega = 0
@@ -571,10 +585,10 @@ def CrossVal(viz,code, trees, depth, ccp,size,start ):
     # print("     number of trees:{}".format(trees))
     # print("     depth of trees:{}".format(depth))
     # print("     Pruning paramter:{}".format(ccp))
-    for i in AUCS_CVS:
-        print("set:{}  AUC:{}".format(i[0],i[1]))
-    print("STDD: {}".format(omega))
-    print("avrg: {}".format(avrg))
+    # for i in AUCS_CVS:
+    #     print("set:{}  AUC:{}".format(i[0],i[1]))
+    # print("STDD: {}".format(omega))
+    # print("avrg: {}".format(avrg))
     file1 = open("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/results.txt".format(code),"w")
     params = ["params: \n", "\t number of trees: {} \n".format(trees),"\t depth of trees: {}\n".format(depth),"\t pruning paramter: {} \n".format(ccp),"AUCs: \n"]
     file1.writelines(params)
@@ -598,7 +612,7 @@ def Main():
     trees = 100
     depth  = 10 
     ccp = 0.0000400902332
-    size = 22
+    size = 44
     viz = False 
     CrossVal(viz, code, trees, depth, ccp,size, start )
     finish = time.perf_counter()

@@ -24,6 +24,8 @@ from dtreeviz.trees import *
 import re 
 import time 
 import concurrent.futures
+import subprocess
+import streamlit as st
 
 def atoi(text):
     return int(text) if text.isdigit() else text
@@ -184,7 +186,67 @@ def antigen_prep():
 
 # antigen_prep()
 
-def ROC_calc(frame,protein_in_cv,code,timer):
+def ROC_Star(data, code,timer,results_path):
+    # print("star set up")
+    # print(data.head())
+    data = data.round({'predus': 3, 'ispred': 3, 'dockpred': 3, 'rfscore': 3,"logreg":3})
+    Star_interface = data[data.annotated == 1] 
+    Star_non_interface = data[data.annotated == 0]
+    Star_interface = Star_interface.drop(columns="annotated")
+    Star_non_interface = Star_non_interface.drop(columns="annotated")
+    Star_interface = Star_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
+    Star_non_interface =Star_non_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
+    os.mkdir("{}Crossvaltest{}/Star/CV{}".format(results_path,code,timer))
+    path = "{}Crossvaltest{}/Star/CV{}/StarinterfaceCV.txt".format(results_path,code,timer)
+    Star_interface.to_csv(path,sep="\t", index=False, header=True)
+    path = "{}Crossvaltest{}/Star/CV{}/StarnoninterfaceCV.txt".format(results_path, code,timer)
+    Star_non_interface.to_csv(path,sep="\t", index=False, header=True)
+
+
+def color(val,lower_range):
+    if val in lower_range: 
+        if val <= 0.05:
+            color = 'green'
+        else:
+            color = 'red'
+    else:
+        color = "black"
+    return 'color: %s' % color
+
+
+
+def Star(results_path,code):
+    path = "{}Crossvaltest{}/Star".format(results_path, code)
+    pathlist = os.listdir(path)
+    pathlist.sort(key=natural_keys)
+    for filename in pathlist:
+        if filename.startswith("CV"):
+            interface = f"{path}/{filename}/StarinterfaceCV.txt"
+            non_int = f"{path}/{filename}/StarnoninterfaceCV.txt" 
+            cmd ='./star --sort StarinterfaceCV.txt StarnoninterfaceCV.txt 0.05'
+            subprocess.call(["cp",interface,"/Users/evanedelstein/Desktop/star-v.1.0/"])
+            subprocess.call(["cp",non_int,"/Users/evanedelstein/Desktop/star-v.1.0/"])
+            os.chdir("/Users/evanedelstein/Desktop/star-v.1.0/")
+            subprocess.run(cmd, shell= True)
+            data = pd.read_csv("/Users/evanedelstein/Desktop/star-v.1.0/results_sorted.txt",header =1,engine='python',index_col = 0 , sep = '\t')
+            pd.set_option('display.float_format', lambda x: '%.5f' % x)
+            for col in data.columns:
+                data[col] = pd.to_numeric(data[col], errors='coerce')
+                data[col] = data[col].replace(np.nan, col , regex=True)
+                # data[col] = data[col].round(3)
+            values = data.values
+            lower_triangular = values[np.tril_indices(values.shape[0], -1)]
+            st.write(f"{filename}")
+            st.dataframe(data.style.applymap(color,lower_range =lower_triangular))
+            
+            # html = data.style.applymap(color,lower_range =lower_triangular)
+            # html = html.render()
+            # text_file = open(f"{path}/{filename}/data.html", "w")
+            # text_file.write(html)
+            # text_file.close()
+
+
+def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path):
     proteinname = frame.index 
     predictors = frame.columns.tolist()
     predictors.remove('annotated')
@@ -250,9 +312,11 @@ def ROC_calc(frame,protein_in_cv,code,timer):
                     res = res_prot[0]
                     pred_res.append(res)
                 
-
-                annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/{}_Interface_Residues".format(protein)
-                # annotatedfile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/{}_sorted".format(protein)
+                if Antigen is True:
+                    annotatedfile = "{}{}_sorted".format(annotated_path,protein)
+                else: 
+                    annotatedfile = "{}{}_Interface_Residues".format(annotated_path,protein)
+                
 
                 N = 0
                 annotated_res =[]
@@ -324,7 +388,7 @@ def ROC_calc(frame,protein_in_cv,code,timer):
     # print(Dict3)    
     return Dict3
 
-def LogReg(test_frame, train_frame,timer,cols,code):
+def LogReg(test_frame, train_frame,timer,cols,code,results_path):
         # set columns 
         feature_cols = cols
         # split traing data into the depednent and indepdent variables 
@@ -338,9 +402,9 @@ def LogReg(test_frame, train_frame,timer,cols,code):
         result=logit_model.fit()
         coefficients = result.params
         # create folder for output data and save the coef in it 
-        folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}" .format(code,timer)
+        folder = "{}Crossvaltest{}/tests/CV{}" .format(results_path,code,timer)
         os.mkdir(folder)
-        file1 = open("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/cvcoef{}.txt" .format(code,timer,timer), "w")
+        file1 = open("{}Crossvaltest{}/tests/CV{}/cvcoef{}.txt" .format(results_path,code,timer,timer), "w")
         print(coefficients, file=file1 )
         file1.close()
         # prediction score calc. 
@@ -357,7 +421,7 @@ def LogReg(test_frame, train_frame,timer,cols,code):
         # save prediction scores and training set to same folder as coefs 
         # results = pd.DataFrame({"residue": protein, "prediction value": pval})
         results = test_frame.assign(logreg = pval)
-        path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/predval{}.csv".format(code,timer,timer)
+        path="{}Crossvaltest{}/tests/CV{}/predval{}.csv".format(results_path,code,timer,timer)
         results.to_csv(path,sep=",", index=True, header=True)
         # pathtest="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest2/CV{}/trainframe{}.csv".format(timer,timer)
         # train_frame.to_csv(pathtest,sep=",", index=True, header=True)
@@ -381,7 +445,7 @@ def LogReg(test_frame, train_frame,timer,cols,code):
 #     The results frame is redirected to the Star function 
 #     The AUC results for each run is retruned to the CrossVal function to determine the standard of deviation and avarage. 
     
-def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,ccp,viz): 
+def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path): 
         # set columns 
         feature_cols = cols
         # split traing and test data into the depednent and indepdent variables 
@@ -410,7 +474,7 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
         # path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest2/CV{}/RFval{}.csv".format(timer,timer)
         # results.to_csv(path,sep=",", index=False, header=True)
         df2 = test_frame.assign(rfscore = y_prob_interface )
-        path="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/RFval{}.csv".format(code,timer,timer)
+        path="{}Crossvaltest{}/tests/CV{}/RFval{}.csv".format(results_path,code,timer,timer)
         df2.to_csv(path,sep=",", index=True, header=True)
         if timer == 1 and viz is True:
                 # for i in range(0,100):
@@ -452,12 +516,12 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
                 show_node_labels= True, 
                 fancy=False 
                 )  
-                savefile = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Trees/Rftree_CV{}.svg".format(code,timer)
+                savefile = "{}Crossvaltest{}/Trees/Rftree_CV{}.svg".format(results_path,code,timer)
                 viz.save(savefile)
 
         
         totalframe = df2.copy()
-        logpath = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/predval{}.csv".format(code,timer,timer)
+        logpath = "{}Crossvaltest{}/tests/CV{}/predval{}.csv".format(results_path,code,timer,timer)
         log_cols = ['predus', 'ispred', 'dockpred', 'annotated','logreg']
         logframe = pd.read_csv(logpath, header =0 , names =log_cols)
         logs = logframe["logreg"]
@@ -465,14 +529,14 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
         # print(totalframe.head())
         # path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/totalframe{}.csv".format(timer,timer)
         # totalframe.to_csv(path,sep=",", index=True, header=True)
-        results_dic = ROC_calc(totalframe,protein_in_cv,code,timer)
-        # ROC_Star(totalframe,code,timer)
+        results_dic = ROC_calc(totalframe,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path)
+        ROC_Star(totalframe,code,timer,results_path)
         return results_dic
 
 def Run(params):
-    (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz) =  params
-    LogReg(test_frame,train_frame,timer,feature_cols,code )
-    results_dic = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz)
+    (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path) =  params
+    LogReg(test_frame,train_frame,timer,feature_cols,code,results_path )
+    results_dic = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path)
     return results_dic,timer
     
 
@@ -492,7 +556,7 @@ def AUC_calc(results_list,key,sets):
     return results_list, AUCS ,avrg,omega ,key
 
 
-def CrossVal(viz, code, trees, depth, ccp,size, start):
+def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, Antigen, annotated_path):
     # params to adjust RF
     predus = []
     ispred = []
@@ -500,18 +564,18 @@ def CrossVal(viz, code, trees, depth, ccp,size, start):
     logreg = []
     rfscore = []
 
-    folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}" .format(code)
+    folder = "{}Crossvaltest{}" .format(results_path,code)
     os.mkdir(folder)
-    folder = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests" .format(code)
+    folder = "{}/Crossvaltest{}/tests" .format(results_path,code)
     os.mkdir(folder)
-    os.mkdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star".format(code))
-    os.mkdir( "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Trees".format(code))
+    os.mkdir("{}Crossvaltest{}/Star".format(results_path,code))
+    os.mkdir( "{}Crossvaltest{}/Trees".format(results_path,code))
     # set up DataFrame 
     aucframe= pd.DataFrame({})
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset which is a csv file containing all the residues in Nox and Benchmark as well as predus, ispred, and dockpred scores. 
     # The last column is a binary annotated classifier, 0 is noninetrface 1 is interface. 
-    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv", header=None, names=col_names)
+    df = pd.read_csv("{}".format(data_path), header=None, names=col_names)
     # df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv", header=0)
     # set the residue_protein ID as the index of the DataFrame 
     df.set_index('residue', inplace= True )
@@ -578,12 +642,10 @@ def CrossVal(viz, code, trees, depth, ccp,size, start):
     print("starting parellel")
     for t in train_test_frames:
         (train_frame, test_frame,timer,protein_in_cv) = t
-        params = (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz)
-        # print(params)
+        params = (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path)
+        
         param_list.append(params)
-    # print(param_list[0])
-    # print(len(param_list))
-    # print((*param_list))
+
     with concurrent.futures.ProcessPoolExecutor() as executor:
         param_list = param_list
         results = executor.map( Run, param_list)
@@ -596,33 +658,46 @@ def CrossVal(viz, code, trees, depth, ccp,size, start):
                 to_append = (Cv,AUC)
                 locals()[key].append(to_append)
         # perfroms logistic regresion and random forest for each test and training set.
-        # results_dic = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp)
-    file1 = open("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/results.txt".format(code),"w")
+
+    file1 = open(f"{results_path}Crossvaltest{code}/results.txt","w")
     params = ["params: \n", "\t number of trees: {} \n".format(trees),"\t depth of trees: {}\n".format(depth),"\t pruning paramter: {} \n".format(ccp)]
+    st.write(params)
     file1.writelines(params)
     for key in results_dic:
         results_list, AUCs, avrg, omega ,key= AUC_calc(locals()[key],key,sets)
         file1.write("\n{}\n".format(key))
+        st.write("\n{}\n".format(key))
         for i in results_list:
             aucs = "\nset:{}  AUC:{}".format(i[0],i[1])
             file1.write(aucs)
+            st.write(aucs)
         stats = "\nSTDEV:{}\nAVRG: {}\n".format(omega, avrg)
         file1.writelines(stats)
+        st.write(stats)
     file1.close()
 
         
-    
+@st.cache  
 def Main():
     start = time.perf_counter()
-    code = 46
+    code = 48
     trees = 100
     depth  = 10 
     ccp = 0.0000400902332
-    size = 44
+    size = 22
     viz = False 
-    CrossVal(viz, code, trees, depth, ccp,size, start )
+    Antigen = False
+    results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/"
+    data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv"
+    if Antigen is True:
+        annotated_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/"
+    else:
+        annotated_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/"
+    CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,Antigen,annotated_path )
+    Star(results_path,code)
     finish = time.perf_counter()
     print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
+    st.write(f"finished in {round((finish - start)/60,2 )} minutes(s)")
 
 Main()
 
@@ -631,4 +706,3 @@ Main()
             
 
         
-

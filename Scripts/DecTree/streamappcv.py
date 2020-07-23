@@ -224,11 +224,11 @@ def Star(results_path,code):
             interface = f"{path}/{filename}/StarinterfaceCV.txt"
             non_int = f"{path}/{filename}/StarnoninterfaceCV.txt" 
             cmd ='./star --sort StarinterfaceCV.txt StarnoninterfaceCV.txt 0.05'
-            subprocess.call(["cp",interface,"/Users/evanedelstein/Desktop/star-v.1.0/"])
-            subprocess.call(["cp",non_int,"/Users/evanedelstein/Desktop/star-v.1.0/"])
-            os.chdir("/Users/evanedelstein/Desktop/star-v.1.0/")
+            subprocess.call(["cp",interface,"/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/"])
+            subprocess.call(["cp",non_int,"/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/"])
+            os.chdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/")
             subprocess.run(cmd, shell= True)
-            data = pd.read_csv("/Users/evanedelstein/Desktop/star-v.1.0/results_sorted.txt",header =1,engine='python',index_col = 0 , sep = '\t')
+            data = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/results_sorted.txt",header =1,engine='python',index_col = 0 , sep = '\t')
             pd.set_option('display.float_format', lambda x: '%.5f' % x)
             for col in data.columns:
                 data[col] = pd.to_numeric(data[col], errors='coerce')
@@ -678,7 +678,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
 
         
 @st.cache  
-def Main():
+def Main(code,trees,depth,ccp,size,viz,Antigen):
     start = time.perf_counter()
     code = 48
     trees = 100
@@ -699,7 +699,7 @@ def Main():
     print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
     st.write(f"finished in {round((finish - start)/60,2 )} minutes(s)")
 
-Main()
+Main(48,100,10,0.0000400902332,22,False,False)
 
     
 

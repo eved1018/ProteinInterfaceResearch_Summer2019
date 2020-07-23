@@ -333,7 +333,7 @@ def logregroc(threshhold,frame,proteinids):
 
 
 def ROC_single(frame,proteinids):
-    print(proteinids)
+    # print(proteinids)
     TPRS = []
     FPRS = []
     threshholds= []
@@ -449,7 +449,26 @@ def ROC_single(frame,proteinids):
     return sum_AUC , log_sum_AUC
 
 
+def ROC_Star(data):
+    timer = 1 
+    code = 1 
+    print("star set up")
+    # print(data.head())
+    data = data.round({'predus': 3, 'ispred': 3, 'dockpred': 3, 'logreg': 3,"rfscore":3})
+    Star_interface = data[data.annotated == 1] 
+    Star_non_interface = data[data.annotated == 0]
+    Star_interface = Star_interface.drop(columns="annotated")
+    Star_non_interface = Star_non_interface.drop(columns="annotated")
+    Star_interface = Star_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'logreg':"T4",'rfscore': 'T5'})
+    Star_non_interface =Star_non_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
+    os.mkdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}".format(code))
+    os.mkdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star".format(code))
+    os.mkdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}".format(code,timer))
 
+    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}/StarinterfaceCV{}.txt".format(code,timer,timer)
+    Star_interface.to_csv(path,sep="\t", index=False, header=True)
+    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}/StarnoninterfaceCV{}.txt".format(code,timer,timer)
+    Star_non_interface.to_csv(path,sep="\t", index=False, header=True)
 
 def Main():
     AUCS_CVS = []
@@ -504,7 +523,7 @@ def Main():
     pval = (1/(1+exponent))
     # save prediction scores and training set to same folder as coefs 
     # results = pd.DataFrame({"residue": protein, "prediction value": pval})
-    print(coefficients)
+    # print(coefficients)
     model = RandomForestClassifier(n_estimators = 100, max_depth =10, ccp_alpha = 0.0000400902332 , random_state = 0)
     model.fit(X, y)
     y_prob = model.predict_proba(X_ant)
@@ -513,8 +532,11 @@ def Main():
     df2 = df_ant.assign(rfscore = y_prob_intr )
     print(df2.head())
     df2.set_index('residue', inplace= True )
+
     sum_AUC,log_sum_AUC = ROC_single(df2,proteinids)
-    print (sum_AUC,log_sum_AUC)
+    ROC_Star(df2)
+    # print (sum_AUC,log_sum_AUC)
+
    
     
 

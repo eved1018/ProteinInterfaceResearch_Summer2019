@@ -459,15 +459,15 @@ def ROC_Star(data):
     Star_non_interface = data[data.annotated == 0]
     Star_interface = Star_interface.drop(columns="annotated")
     Star_non_interface = Star_non_interface.drop(columns="annotated")
-    Star_interface = Star_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'logreg':"T4",'rfscore': 'T5'})
+    Star_interface = Star_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
     Star_non_interface =Star_non_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
     os.mkdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}".format(code))
     os.mkdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star".format(code))
     os.mkdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}".format(code,timer))
 
-    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}/StarinterfaceCV{}.txt".format(code,timer,timer)
+    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}/StarinterfaceCV.txt".format(code,timer)
     Star_interface.to_csv(path,sep="\t", index=False, header=True)
-    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}/StarnoninterfaceCV{}.txt".format(code,timer,timer)
+    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/Star/CV{}/StarnoninterfaceCV.txt".format(code,timer)
     Star_non_interface.to_csv(path,sep="\t", index=False, header=True)
 
 def Main():

@@ -24,8 +24,8 @@ def color(val,lower_range):
 
 
 
-def Star():
-    path  = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/5foldCV/Crossvaltest46/Star"
+def Star(path):
+    # path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/22train_ant_test/Crossvaltest1/Star"
     pathlist = os.listdir(path)
     pathlist.sort(key=natural_keys)
     for filename in pathlist:
@@ -57,4 +57,4 @@ def Star():
             # text_file.close()
 
         
-Star()
+Star("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/22train_ant_test/Crossvaltest1/Star")

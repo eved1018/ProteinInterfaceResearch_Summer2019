@@ -530,7 +530,7 @@ def Main():
     y_prob_intr = [p[1] for p in y_prob]
     df_ant = df_ant.assign(logreg = pval)
     df2 = df_ant.assign(rfscore = y_prob_intr )
-    print(df2.head())
+    # print(df2.head())
     df2.set_index('residue', inplace= True )
 
     sum_AUC,log_sum_AUC = ROC_single(df2,proteinids)

@@ -677,7 +677,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
     file1.close()
 
         
-@st.cache  
+@st.cache(suppress_st_warning=True)
 def Main(code,trees,depth,ccp,size,viz,Antigen):
     start = time.perf_counter()
     results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/"

@@ -8,5 +8,6 @@
         
         
     
-    }
+    },
+    "editor.minimap.maxColumn": 60
 }

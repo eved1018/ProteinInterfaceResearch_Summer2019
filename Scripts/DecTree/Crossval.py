@@ -24,6 +24,8 @@ from sklearn.datasets import *
 from sklearn import tree
 from dtreeviz.trees import *
 import time 
+import matplotlib.pyplot as plt
+
 
 
 #  StAR analysis preperation. fits the data in the correct format for StAR
@@ -171,13 +173,14 @@ def ROC_calc(frame,protein_in_cv,code,timer):
      'TPR': TPRS,
      'FPR': FPRS
     })
-
+    
     distance = final_results["FPR"].diff()
     midpoint  = final_results["TPR"].rolling(2).sum()
     distance = distance * -1
     AUC = (distance) * (midpoint)
     AUC = AUC/2
     sum_AUC = AUC.sum()
+    
     
     log_final_results = pd.DataFrame(
     {'threshold': log_threshholds,
@@ -192,6 +195,19 @@ def ROC_calc(frame,protein_in_cv,code,timer):
     log_AUC = log_AUC/2
     log_sum_AUC = log_AUC.sum()
     
+    colors = ["#0000FF","#800000","#008000","#FFFF00","#800080","#00FF00","#808000","#00FFFF","#FF0000","#008080","#000080","#FF00FF",]
+    color_index = 0
+    plt.title('Receiver Operating Characteristic')
+    plt.plot(FPRS, TPRS, c=colors[color_index], label = 'AUC = %0.2f' % sum_AUC)
+    color_index += 1
+    plt.plot(log_FPRS, log_TPRS, c=colors[color_index], label = 'AUC = %0.2f' % log_sum_AUC)
+    plt.legend(loc = 'lower right')
+    plt.plot([0, 1], [0, 1],'r--')
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.savefig( "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/ROC.png" .format(code,timer))
 
     return sum_AUC , log_sum_AUC
 

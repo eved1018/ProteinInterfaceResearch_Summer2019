@@ -46,15 +46,14 @@ def Star(path):
             values = data.values
         
             lower_triangular = values[np.tril_indices(values.shape[0], -1)]
-            st.write(f"{filename}")
-            st.dataframe(data.style.applymap(color,lower_range =lower_triangular))
-            
-            # html = data.style.applymap(color,lower_range =lower_triangular)
+            # st.write(f"{filename}")
+            # st.dataframe(data.style.applymap(color,lower_range =lower_triangular))
+            html = data.style.applymap(color,lower_range =lower_triangular)
             # st.write()
-            # html = html.render()
-            # text_file = open(f"{path}/{filename}/data.html", "w")
-            # text_file.write(html)
-            # text_file.close()
+            html = html.render()
+            text_file = open(f"{path}/{filename}/data.html", "w")
+            text_file.write(html)
+            text_file.close()
 
         
 Star("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/22train_ant_test/Crossvaltest1/Star")

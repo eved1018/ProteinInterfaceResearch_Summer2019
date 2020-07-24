@@ -27,6 +27,8 @@ import concurrent.futures
 import subprocess
 import re
 import streamlit as st
+import imgkit
+import matplotlib.pyplot as plt
 
 
 def atoi(text):
@@ -35,7 +37,15 @@ def atoi(text):
 def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 
-
+def color(val,lower_range):
+    if val in lower_range: 
+        if val <= 0.05:
+            color = 'green'
+        else:
+            color = 'red'
+    else:
+        color = "black"
+    return 'color: %s' % color
 
 def antigen_prep():
     predus_path= "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/predus/"
@@ -205,17 +215,6 @@ def ROC_Star(data, code,timer,results_path):
     Star_non_interface.to_csv(path,sep="\t", index=False, header=True)
 
 
-def color(val,lower_range):
-    if val in lower_range: 
-        if val <= 0.05:
-            color = 'green'
-        else:
-            color = 'red'
-    else:
-        color = "black"
-    return 'color: %s' % color
-
-
 
 def Star(results_path,code):
     path = "{}Crossvaltest{}/Star".format(results_path, code)
@@ -226,23 +225,26 @@ def Star(results_path,code):
             interface = f"{path}/{filename}/StarinterfaceCV.txt"
             non_int = f"{path}/{filename}/StarnoninterfaceCV.txt" 
             cmd ='./star --sort StarinterfaceCV.txt StarnoninterfaceCV.txt 0.05'
-            subprocess.call(["cp",interface,"/Users/evanedelstein/Desktop/star-v.1.0/"])
-            subprocess.call(["cp",non_int,"/Users/evanedelstein/Desktop/star-v.1.0/"])
-            os.chdir("/Users/evanedelstein/Desktop/star-v.1.0/")
+            subprocess.call(["cp",interface,"/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/"])
+            subprocess.call(["cp",non_int,"/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/"])
+            os.chdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/")
             subprocess.run(cmd, shell= True)
-            data = pd.read_csv("/Users/evanedelstein/Desktop/star-v.1.0/results_sorted.txt",header =1,engine='python',index_col = 0 , sep = '\t')
+            data = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/results_sorted.txt",header =1,engine='python',index_col = 0 , sep = '\t')
             pd.set_option('display.float_format', lambda x: '%.5f' % x)
             for col in data.columns:
                 data[col] = pd.to_numeric(data[col], errors='coerce')
                 data[col] = data[col].replace(np.nan, col , regex=True)
                 # data[col] = data[col].round(3)
+            data = data.rename(columns={'T1':"predus", 'T2': "ispred", 'T3':"dockpred", 'T4':"rfscore",'T5': 'logreg'})
+            data = data.rename({'T1':"predus", 'T2': "ispred", 'T3':"dockpred", 'T4':"rfscore",'T5': 'logreg'},axis = 'index')
             values = data.values
             lower_triangular = values[np.tril_indices(values.shape[0], -1)]
             html = data.style.applymap(color,lower_range =lower_triangular)
             html = html.render()
-            text_file = open(f"{path}/{filename}/data.html", "w")
-            text_file.write(html)
-            text_file.close()
+            imgkit.from_string(html, '{}/{}/{}.jpg'.format(path,filename,filename))
+            # text_file = open(f"{path}/{filename}/data.html", "w")
+            # text_file.write(html)
+            # text_file.close()
 
 
 def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path):
@@ -362,10 +364,6 @@ def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path,Antigen,annot
             Dict2[predictor]['threshholds'].append(threshhold)
             Dict2[predictor]['TPR'].append(TPR)
             Dict2[predictor]['FPR'].append(FPR)
-    
-            
-
-        
     for i in predictors: 
         
         threshholds = Dict2[i]['threshholds']
@@ -383,9 +381,8 @@ def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path,Antigen,annot
         AUC = (distance) * (midpoint)
         AUC = AUC/2
         sum_AUC = AUC.sum()
-        Dict3[i] = sum_AUC
-    # print(Dict3)    
-    return Dict3
+        Dict3[i] = sum_AUC 
+    return Dict3 , Dict2
 
 def LogReg(test_frame, train_frame,timer,cols,code,results_path):
         # set columns 
@@ -476,49 +473,13 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
         path="{}Crossvaltest{}/tests/CV{}/RFval{}.csv".format(results_path,code,timer,timer)
         df2.to_csv(path,sep=",", index=True, header=True)
         if timer == 1 and viz is True:
-                # for i in range(0,100):
-                #     tree = model.estimators_[i]
-                #     print(tree.get_depth())
-                tree = model.estimators_[0]
-                # path = tree.cost_complexity_pruning_path(X, y)
-                # ccp_alphas, impurities = path.ccp_alphas, path.impurities
-                # print(ccp_alphas)
-                # plt.figure(figsize=(10, 6))
-                # plt.plot(ccp_alphas, impurities)
-                # plt.xlabel("effective alpha")
-                # plt.ylabel("total impurity of leaves")
-                # plt.show()
-                # clfs = []
-                # for ccp_alpha in ccp_alphas:
-                #     clf = DecisionTreeClassifier(random_state=0, ccp_alpha=ccp_alpha)
-                #     clf.fit(X, y)
-                #     clfs.append(clf)
-
-                # from sklearn.metrics import accuracy_score
-                # acc_scores = [accuracy_score(y_test, tree.predict(X_test)) for tree in clfs]
-                # plt.figure(figsize=(10,  6))
-                # plt.grid()
-                # plt.plot(ccp_alphas[:-1], acc_scores[:-1])
-                # plt.xlabel("effective alpha")
-                # plt.ylabel("Accuracy scores")
-                # max_y = max(acc_scores[:-1])
-                # xpos = acc_scores[:-1].index(max_y)
-                # max_x = ccp_alphas[:-1][xpos]
-                # print(max_x, max_y)
-                # plt.show()
-                viz = dtreeviz(tree, 
-                X, 
-                y,
-                target_name='Interface',
-                feature_names= ['predus','ispred','dockpred'], 
-                class_names= ["non_interface", "interface"], 
-                show_node_labels= True, 
-                fancy=False 
-                )  
-                savefile = "{}Crossvaltest{}/Trees/Rftree_CV{}.svg".format(results_path,code,timer)
-                viz.save(savefile)
-
-        
+            # for i in range(0,100):
+            #     tree = model.estimators_[i]
+            #     print(tree.get_depth())
+            tree = model.estimators_[0]
+        else:
+            tree = False  
+        treeparams = (X, y, tree)
         totalframe = df2.copy()
         logpath = "{}Crossvaltest{}/tests/CV{}/predval{}.csv".format(results_path,code,timer,timer)
         log_cols = ['predus', 'ispred', 'dockpred', 'annotated','logreg']
@@ -528,15 +489,15 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
         # print(totalframe.head())
         # path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/totalframe{}.csv".format(timer,timer)
         # totalframe.to_csv(path,sep=",", index=True, header=True)
-        results_dic = ROC_calc(totalframe,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path)
+        results_dic ,Dict2 = ROC_calc(totalframe,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path)
         ROC_Star(totalframe,code,timer,results_path)
-        return results_dic
+        return results_dic ,treeparams ,Dict2
 
 def Run(params):
     (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path) =  params
     LogReg(test_frame,train_frame,timer,feature_cols,code,results_path )
-    results_dic = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path)
-    return results_dic,timer
+    results_dic, treeparams, Dict2 = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path)
+    return results_dic, timer ,treeparams ,Dict2
     
 
 def AUC_calc(results_list,key,sets):
@@ -551,10 +512,52 @@ def AUC_calc(results_list,key,sets):
         omega += (i - avrg) **2
     omega = omega/sets
     omega = math.sqrt(omega)
-    
     return results_list, AUCS ,avrg,omega ,key
 
+def treeviz(treeparams, params):
+    (X, y, tree) = treeparams
+    (results_path,code,timer) = params
+    # path = tree.cost_complexity_pruning_path(X, y)
+    # ccp_alphas, impurities = path.ccp_alphas, path.impurities
+    # print(ccp_alphas)
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(ccp_alphas, impurities)
+    # plt.xlabel("effective alpha")
+    # plt.ylabel("total impurity of leaves")
+    # plt.show()
+    # clfs = []
+    # for ccp_alpha in ccp_alphas:
+    #     clf = DecisionTreeClassifier(random_state=0, ccp_alpha=ccp_alpha)
+    #     clf.fit(X, y)
+    #     clfs.append(clf)
 
+    # from sklearn.metrics import accuracy_score
+    # acc_scores = [accuracy_score(y_test, tree.predict(X_test)) for tree in clfs]
+    # plt.figure(figsize=(10,  6))
+    # plt.grid()
+    # plt.plot(ccp_alphas[:-1], acc_scores[:-1])
+    # plt.xlabel("effective alpha")
+    # plt.ylabel("Accuracy scores")
+    # max_y = max(acc_scores[:-1])
+    # xpos = acc_scores[:-1].index(max_y)
+    # max_x = ccp_alphas[:-1][xpos]
+    # print(max_x, max_y)
+    # plt.show()
+    
+    viz = dtreeviz(tree, 
+        X, 
+        y,
+        target_name='Interface',
+        feature_names= ['predus','ispred','dockpred'], 
+        class_names= ["non_interface", "interface"], 
+        show_node_labels= True, 
+        fancy=False 
+        )  
+    savefile = "{}Crossvaltest{}/Trees/Rftree_CV{}.svg".format(results_path,code,timer)
+    viz.save(savefile)
+
+
+    
 def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, Antigen, annotated_path):
     # params to adjust RF
     predus = []
@@ -574,7 +577,10 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset which is a csv file containing all the residues in Nox and Benchmark as well as predus, ispred, and dockpred scores. 
     # The last column is a binary annotated classifier, 0 is noninetrface 1 is interface. 
-    df = pd.read_csv("{}".format(data_path), header=None, names=col_names)
+    if Antigen is True: 
+        df = pd.read_csv("{}".format(data_path), header=0)
+    else:
+        df = pd.read_csv("{}".format(data_path), header=None, names=col_names)
     # df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv", header=0)
     # set the residue_protein ID as the index of the DataFrame 
     df.set_index('residue', inplace= True )
@@ -650,12 +656,39 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
         results = executor.map( Run, param_list)
         
         for i in results:
-            (results_dic,timer) = i 
+            (results_dic,timer, treeparams,Dict2) = i 
+            (X, y , tree) = treeparams
+            
+            params = (results_path,code,timer)
+
+            color_index = 0    
+            colors = ["#0000FF","#800000","#008000","#FFFF00","#800080","#00FF00","#808000","#00FFFF","#FF0000","#008080","#000080","#FF00FF"]
+            
+            plt.title('Receiver Operating Characteristic')
+            plt.title('Receiver Operating Characteristic')
             for key in results_dic:
                 AUC = results_dic[key]
                 Cv = "CV{}".format(timer)
                 to_append = (Cv,AUC)
                 locals()[key].append(to_append)
+                TPRS = Dict2[key]['TPR']
+                FPRS = Dict2[key]['FPR']
+                plt.plot(FPRS, TPRS, c=colors[color_index], label = '{}: AUC = {}'.format(key,AUC))
+                color_index += 1
+            plt.legend(loc = 'lower right')
+            plt.plot([0, 1], [0, 1],'r--')
+            plt.xlim([0, 1])
+            plt.ylim([0, 1])
+            plt.ylabel('True Positive Rate')
+            plt.xlabel('False Positive Rate')
+            plt.savefig( "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/ROC.png" .format(code,timer))
+            if tree == False :
+                pass
+            else:
+                treeviz(treeparams,params) 
+            
+
+
         # perfroms logistic regresion and random forest for each test and training set.
 
     file1 = open(f"{results_path}Crossvaltest{code}/results.txt","w")
@@ -673,27 +706,31 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
 
         
     
-def Main():
+def main():
     start = time.perf_counter()
     code = 47
     trees = 100
     depth  = 10 
     ccp = 0.0000400902332
     size = 22
-    viz = False 
-    Antigen = False
+    viz = True 
+    Antigen = False 
     results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/"
-    data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv"
+    
     if Antigen is True:
+        data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv"
         annotated_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/"
     else:
+        data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv"
         annotated_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/"
     CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,Antigen,annotated_path )
     Star(results_path,code)
     finish = time.perf_counter()
     print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
 
-Main()
+if __name__ == '__main__':
+    main()
+
 
     
 

@@ -24,6 +24,7 @@ import math
 from sklearn.datasets import *
 from sklearn import tree
 from dtreeviz.trees import *
+import matplotlib.pyplot as plt
 
 
 # set table of data
@@ -355,9 +356,9 @@ def ROC_single(frame,proteinids):
             rows = []
             for protein_res in proteinname: 
                 if protein in protein_res:
-                    row = frame.loc[protein_res]
-                    rows.append(row)
-            counterframe = pd.DataFrame(rows,columns = ['predus','ispred','dockpred','annotated', 'rfscore','logreg'])
+                    rows.append(protein_res)
+        
+            counterframe = frame[frame.index.isin(rows)]
             cols = ['residue', 'rfscore']
             counterframerf = pd.DataFrame(columns = cols)
             # counterframerf = counterframe.index
@@ -424,7 +425,7 @@ def ROC_single(frame,proteinids):
      'TPR': TPRS,
      'FPR': FPRS
     })
-
+    final_results.plot()
     distance = final_results["FPR"].diff()
     midpoint  = final_results["TPR"].rolling(2).sum()
     distance = distance * -1

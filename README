@@ -1,0 +1,164 @@
+NAME
+
+Supersites: A program that identifies the binding supersites of proteins.
+
+
+SYNOPSIS
+
+The program identifies binding supersites in proteins.  It uses a docking software
+followed by CSU to identify the interacting residues on a protein and uses the
+frequency of occurrence of each residue in the docking poses to identify the 
+binding supersite.
+
+PRE-REQUISITES
+
+1. Perl v5.10.1 is required. Supersites was tested in Centos 7 and 6.
+2. ZDOCK is required. Zdock can be downloaded from http://zdock.umassmed.edu/
+   or any other docking program.
+3. CSU program is required. To get CSU please refer to 
+   Automated analysis of interatomic contacts in proteins.
+   Sobolev V1, Sorokine A, Prilusky J, Abola EE, Edelman 
+   Bioinformatics. 1999 Apr;15(4):327-32. 
+   (https://www.ncbi.nlm.nih.gov/pubmed/10320401)
+
+
+=== SUPERSITES DOWNLOAD AND INSTALLATION ===
+
+1. Clone SuperSites from gitlab then modify the following variables, as needed 
+   to run on your computer, in the RIF_ranking_avg.sh and RIF_ranking.sh shell 
+scripts.
+
+   set interfaceResidueDir="$HOME/SuperSites/residues"
+   set pdbDir="$HOME/SuperSites/pdbs"
+   set scriptDir="$HOME/SuperSites/script"
+   
+   $ cd ~
+   $ git clone https://gitlab.com/fiserlab.org/SuperSites.git
+   $ cd SuperSites
+   # run a test-case
+   $ ./RIF_ranking.shRIF_ranking.sh
+
+
+RIF_ranking.sh shell scripts.
+
+The script RIF_ranking determines the binding supersite based on the residue 
+frequencies at the interface based on docking for a series of query (receptor) 
+proteins docked onto one ligand probe.
+
+The script RIF_ranking_avg determines the ranking after averaging over all the
+ligand probes.
+
+Before running either scripts, two things must be completed.
+
+1. The query protein should be docked onto the ligand probe using ZDOCK or other
+ docking program and generate many docking poses. We have used 2000 poses per 
+receptor-ligand pair. 
+
+2. The docked poses are analyzed using CSU to determine the residues on the 
+receptor that are at the interface.  The interface residues are stored as a zipped
+file in the folders "queryProbeName"/results/models/res_models.  
+Sample files are included here.
+
+CONFIGURATION
+
+After completing the above two tasks, one can use the RIF_ranking script 
+This script requires the following:
+
+1. A file called queryProbeNames containing query (receptor) names and ligand 
+probe names in the format
+"receptorname.receptorChain"_"ligandname.ligandChain"
+sample file: queryProbeNames is provided
+
+2. The residues at the interface of the receptor found using CSU should be 
+stored in a folder. This is in a folder "queryProbeNames"/results/models/res_models.  
+sample file: 1cnz.A_1I85.D/results/models/res_models is provided.
+
+3. A file containing all the annotated residues -- This is currently in 
+residues/. 
+Sample file: residues/1cnz.A is provided
+
+4. A file containig the pdb files of all receptors -- This is currently in databasename/pdbs.
+Sample file: 1cnz.A.pdb is provided
+
+5. A perl program to read the residues created by CSU and write it in a different format.
+makeModel_allresTable -- This is uploaded in the script folder.
+
+6. A perl program to determine the random average and random standard deviation.
+calculateBackgroundSuccess --This is also uploaded in the script folder.
+
+7. A joinFiles perl script is also required --This is also uploaded in the script folder. 
+
+OUTPUT
+
+This script creates an output file named rank_docking_allres.  This output file
+contains the following in each line for each protein listed in queryName: 
+Total number of residues, number of annotated residues, number of residues
+found in the top-15 using the RIF method, number of residues found by random
+sampling and the random standard deviation.  A zscore can be calulated using 
+the data in the last three columns of the output.
+
+Other files are created in each of the folders for each query-probe pair
+as listed in the file "queryProbeNames".  
+These files are named allresidue_rank_docking (rank of every residue)
+and rankings_allres_docking (rank of every annotated residue).  
+
+
+=== HOW TO AVERAGE OVER MANY LIGAND PROBES === 
+
+RIF_ranking_avg:
+This script can be used to average over many ligand probes and calculate the 
+zscore and fscore.
+This needs all the same files as RIF_ranking. It also needs a file called 
+queryNames which lists "queryname.queryChain". It also needs a file called 
+probeNames which lists "probeName.probechain". A Sample file is provided for 
+queryNames and probeNames. 
+
+OUTPUT
+
+This script creates a folder called stats and writes
+the follwing four output files in that folder.
+
+1. found_avgprobes_allres: 
+Each line of this file contains name of the query, number of annotated 
+interface residues, number of interface residues sampled by docking, 
+number of interface residues found by docking to 1 ptobe, 2probes, 
+3 probes .... 13 probes, number of interface residues found by random 
+sampling, random standard deviation, zscore (for average over 13 probes),
+and F-score (average over 13 probes).
+
+2. zscore_allres:  
+Each line of this file contains the name of the query, zscore based on probe 1,
+probe 2 .... probe 13.
+
+3. Fscore_allres:
+Each line of this file contains the name of the query, Fscore based on 
+probe 1, probe 2,....probe 13.
+
+4. found_eachprobe_allres:
+Each line of this file contains the name of the query, numer of annotated
+interface residues, interface residues sampled using probe 1, interface 
+residues sampled using probe 6, number of interface residues found in the top-15
+using probe 1, probe 2, ....probe 13, number of top-15 residues found by 
+random sampling, random standard deviation.
+
+This script also creates a folder for each name in the file "queryNames".
+In this folder it writes files interfaceResidues (these are the annotated 
+interface residues)
+rankings_allres_docking_avg1, rankingis_allres_docking_avg2........
+rankingallres_dokcing_avg13 -- these are the ranks of the interface
+residues averaged over 1, 2, .... 13 probes.
+A similar set of files are created for each of the 13 probes.  These are 
+named rankings_allres_docking_each_1, rankings_allres_docking_each_2 ......
+rankings_allres_docking_each_13.
+ 
+
+
+
+
+REFERENCE
+Protein-Protein Binding Supersites
+
+AUTHORS
+Raji Viswanathan raji@yu.edu
+Andras Fiser     andras@fiserlab.org, andras.fiser@einstein.yu.edu
+Eduardo Fajardo  eduardo@fiserlab.org  

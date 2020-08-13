@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+
+# performs a join operation on two files, given 
+# a common colum. 
+# Sends the result to the STDOUT
+
+($#ARGV > 2) or die "usage: $0<first file><column number in 1st file to be used for the join (this is the longer file)><second file (shorter file)><column number in 2nd file><optional: separator (default: tab)>";
+
+use strict;
+
+my %lineOf; # keeps line in first file that corresponds to the key in that line
+my $separator = "\t";
+my $printSeparator ="	";
+my $nullLine; # to be used when there is no line in the first file that corresponds to a given line in the second file
+my $matchingLine; # line in first file that matches line in second file
+
+if($ARGV[4]){ 
+  $separator = $ARGV[4];
+  $printSeparator = $ARGV[4];
+  if($printSeparator =~ /^\\s/){ $printSeparator = " "; }
+  if($printSeparator =~ /^\\t/){ $printSeparator = "	"; }
+}
+my $column1 = $ARGV[1] -1; # change from column number to array index
+my $column2 = $ARGV[3] -1; # change from column number to array index
+
+readFirstFile();
+
+if($ARGV[2] =~ /\.gz$/){
+  open IN, "gzip -dc $ARGV[2] |" or die "can't open $ARGV[2]";
+}
+else{
+  open IN, $ARGV[2] or die "can't open $ARGV[2]";
+}
+
+my $line;
+my @fields;
+my $key;
+
+while($line = <IN>){
+  chomp($line);
+  @fields = split(/$separator/, $line);
+  $key = $fields[$column2];
+  $key =~ s/^\s*//g;
+  $key =~ s/\s*$//g;
+  $key =~ tr/a-z/A-Z/;
+  $matchingLine = $lineOf{$key};
+  if(!$matchingLine || $matchingLine =~ /^\s*$/){ $matchingLine = $nullLine; }
+  print "$matchingLine$printSeparator$line\n";
+  #print "$lineOf{$key}$printSeparator$line\n";
+  #print "$line$printSeparator$lineOf{$fields[$column2]}\n";
+}
+
+
+sub readFirstFile{
+  if($ARGV[0] =~ /\.gz$/){
+    open IN, "gzip -dc $ARGV[0] |" or die "can't open $ARGV[0]";
+  }
+  else{
+    open IN, $ARGV[0] or die "can't open $ARGV[0]";
+  }
+  my $line;
+  my @fields;
+  my $key;
+  while($line = <IN>){
+    chomp($line);
+    @fields = split(/$separator/, $line);
+    if(!$nullLine){
+      foreach my $field(@fields){
+        $nullLine .= "-$separator";
+      }
+    }
+    $key = $fields[$column1];
+    $key =~ s/^\s*//g;
+    $key =~ s/\s*$//g;
+    $key =~ tr/a-z/A-Z/;
+    $lineOf{$key} = $line;
+  }
+  $nullLine =~ s/$separator$//;
+  if(!$nullLine){ $nullLine = "-";}; # file is empty
+
+  close IN;
+}
+

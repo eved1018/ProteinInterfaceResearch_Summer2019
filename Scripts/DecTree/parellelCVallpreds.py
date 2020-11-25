@@ -24,6 +24,7 @@ from dtreeviz.trees import *
 import re 
 import time 
 import concurrent.futures
+import multiprocessing
 import subprocess
 import re
 import streamlit as st
@@ -37,7 +38,7 @@ def atoi(text):
 def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 
-def color(val,lower_range):
+def Color(val,lower_range):
     if val in lower_range: 
         if val <= 0.05:
             color = 'green'
@@ -216,7 +217,7 @@ def ROC_Star(data, code,timer,results_path):
     Star_non_interface.to_csv(path,sep="\t", index=False, header=True)
 
 
-def Star(results_path,code):
+def Star(results_path,code,Star_path):
     path = "{}Crossvaltest{}/Star".format(results_path, code)
     pathlist = os.listdir(path)
     pathlist.sort(key=natural_keys)
@@ -225,11 +226,11 @@ def Star(results_path,code):
             interface = f"{path}/{filename}/StarinterfaceCV.txt"
             non_int = f"{path}/{filename}/StarnoninterfaceCV.txt" 
             cmd ='./star --sort StarinterfaceCV.txt StarnoninterfaceCV.txt 0.05'
-            subprocess.call(["cp",interface,"/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/"])
-            subprocess.call(["cp",non_int,"/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/"])
-            os.chdir("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/")
+            subprocess.call(["cp",interface,Star_path])
+            subprocess.call(["cp",non_int,Star_path])
+            os.chdir(Star_path)
             subprocess.run(cmd, shell= True)
-            data = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/results_sorted.txt",header =1,engine='python',index_col = 0 , sep = '\t')
+            data = pd.read_csv("{}results_sorted.txt".format(Star_path),header =1,engine='python',index_col = 0 , sep = '\t')
             pd.set_option('display.float_format', lambda x: '%.5f' % x)
             data = data.rename(columns={'T1':"predus", 'T2': "ispred", 'T3':"dockpred", 'T4':"rfscore",'T5': 'logreg'})
             for col in data.columns:
@@ -238,7 +239,7 @@ def Star(results_path,code):
             data = data.rename({'T1':"predus", 'T2': "ispred", 'T3':"dockpred", 'T4':"rfscore",'T5': 'logreg'},axis = 'index')
             values = data.values
             lower_triangular = values[np.tril_indices(values.shape[0], -1)]
-            html = data.style.applymap(color,lower_range =lower_triangular)
+            html = data.style.applymap(Color,lower_range =lower_triangular)
             html = html.render()
             imgkit.from_string(html,'{}Crossvaltest{}/tests/{}/{}.jpg'.format(results_path,code,filename,filename))
             
@@ -531,21 +532,21 @@ def Run(params):
     return results_dic, timer ,treeparams ,Dict2 ,coefficients ,Dict4
     
 
-def AUC_calc(results_list,key,sets):
-    AUCS = []
-    for i in results_list: 
-        Cv = i[0]
-        AUCS.append(i[1])
-    sum_auc = sum(AUCS)
-    avrg = sum_auc/len(AUCS)
-    omega = 0
-    for i in AUCS:
-        omega += (i - avrg) **2
-    omega = omega/sets
-    omega = math.sqrt(omega)
-    return results_list, AUCS ,avrg,omega ,key
+# def AUC_calc(results_list,key,sets):
+#     AUCS = []
+#     for i in results_list: 
+#         Cv = i[0]
+#         AUCS.append(i[1])
+#     sum_auc = sum(AUCS)
+#     avrg = sum_auc/len(AUCS)
+#     omega = 0
+#     for i in AUCS:
+#         omega += (i - avrg) **2
+#     omega = omega/sets
+#     omega = math.sqrt(omega)
+#     return results_list, AUCS ,avrg,omega ,key
 
-def treeviz(treeparams, params):
+# def treeviz(treeparams, params):
     (X, y, tree) = treeparams
     (results_path,code,timer) = params
     # path = tree.cost_complexity_pruning_path(X, y)
@@ -739,14 +740,16 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
         # set variabel for iteration, to keep track of each test set, since i in range(0,k) includes zero, i is incresased by 1 for readabilty
         sets = timer
     param_list = []
-    print("starting parellel")
+    cpus = multiprocessing.cpu_count()
+    print("starting parellel \n number of cpus {}".format(cpus))
+    
     for t in train_test_frames:
         (train_frame, test_frame,timer,protein_in_cv) = t
         params = (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path)
         param_list.append(params)
     coefs = {}
     rfscore_ROC = []
-    print(param_list)
+    # print(param_list)
     
     with concurrent.futures.ProcessPoolExecutor() as executor:
         param_list = param_list
@@ -819,90 +822,37 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
 
     
     ROC_Plt(predus, ispred,dockpred,logreg,rfscore, code)
-
-
-            # (X, y , tree) = treeparams
-            # Cv = "CV{}".format(timer)
-            # coefs[Cv] = coefficients
-            # params = (results_path,code,timer)
-
-            # color_index = 0    
-            # colors = ["#0000FF","#ff8333","#008000","#FFFF00","#800080","#00FF00","#808000","#00FFFF","#FF0000","#008080","#000080","#FF00FF"]
-            
-            # plt.title('Receiver Operating Characteristic')
-            # plt.title('Receiver Operating Characteristic')
-            # for key in results_dic:
-            #     AUC = results_dic[key]
-            #     AUC = AUC.round(3)
-            #     Cv = "CV{}".format(timer)
-            #     to_append = (Cv,AUC)
-            #     locals()[key].append(to_append)
-            #     TPRS = Dict2[key]['TPR']
-            #     FPRS = Dict2[key]['FPR']
-            #     plt.plot(FPRS, TPRS, c=colors[color_index], label = '{}: AUC = {}'.format(key,AUC))
-            #     color_index += 1
-            # plt.legend(loc = 'lower right')
-            # plt.plot([0, 1], [0, 1],'r--')
-            # plt.xlim([0, 1])
-            # plt.ylim([0, 1])
-            # plt.ylabel('True Positive Rate')
-            # plt.xlabel('False Positive Rate')
-            # plt.savefig( "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest{}/tests/CV{}/ROC.png" .format(code,timer))
-            # plt.clf()
-            # if tree == False :
-            #     pass
-            # else:
-            #     treeviz(treeparams,params) 
-            
-
-
-
-                
-
-    # file1 = open(f"{results_path}Crossvaltest{code}/results.txt","w")
-
-    # for key in results_dic:
-    #     results_list, AUCs, avrg, omega ,key= AUC_calc(locals()[key],key,sets)
-    #     file1.write("\n{}\n".format(key))
-    #     if key == "rfscore":
-    #         params = ["params: \n", "\t number of trees: {} \n".format(trees),"\t depth of trees: {}\n".format(depth),"\t pruning paramter: {} \n".format(ccp)]
-    #         file1.writelines(params)
-    #     for i in results_list:
-    #         aucs = "\nset: {}   AUC:{}".format(i[0],i[1])
-    #         file1.write(aucs)
-            
-    #         if key == "logreg":
-    #             coef_at_cv = coefs[i[0]]
-    #             coef_at_cv= np.array(coef_at_cv).tolist()
-    #             # print(coef_at_cv)
-    #             coef = f"\ncoefficients:\n\tconstant:{coef_at_cv[0]}\n\tpredus:{coef_at_cv[1]}\n\tispred:{coef_at_cv[2]}\n\tdockpred:{coef_at_cv[3]}"
-    #             file1.write(coef)
-    #     stats = "\nSTDEV:{}\nAVRG: {}\n".format(omega, avrg)
-    #     file1.writelines(stats)
-    # file1.close()
+    # if tree == False :
+    #     pass
+    # else:
+    #     treeviz(treeparams,params) 
+    
    
 def main():
     start = time.perf_counter()
-    code = 102
+    code = 105
     trees = 100
     depth  = 10 
     ccp = 0.0000400902332
-    # for 5 fold use 44 for 10 use 22
+    # for 5 fold use 44 for 10 use 22 ant =1 
     size = 22
     viz = False 
-    Antigen = True 
-   
+    Antigen = False  
+    # change to where u need it to to go 
     results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/"
-    
+    # path to star, get it here http://melolab.org/star/download.php
+    Star_path= "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Scripts/star-v.1.0/"
+
     if Antigen is True:
         size=1
         data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv"
         annotated_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/"
     else:
+        # change based on where the files are the first should be the final_sort.csv and second should be teh annoatted 
         data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv"
         annotated_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/"
     CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,Antigen,annotated_path )
-    Star(results_path,code)
+    Star(results_path,code,Star_path)
     finish = time.perf_counter()
     print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
 

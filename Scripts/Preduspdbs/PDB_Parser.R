@@ -3,5 +3,7 @@
 # make sure system taeks in path to testquery and path for output
 #ids must be splt but _ not . 
 library(bio3d)
-id <- "2hmg_pdb"
-pdbsplit( get.pdb( c(id), URLonly=TRUE , path = "~/Desktop") )
+my_txt <- readLines("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/Antigen_300/proteins.txt")
+ids <- c(my_txt)
+raw.files <- get.pdb( ids , URLonly=TRUE)
+chain.files <- pdbsplit(raw.files, ids, path= "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/Antigen_300/Antigen_300_pdbs/")

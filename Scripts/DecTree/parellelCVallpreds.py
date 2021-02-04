@@ -529,6 +529,7 @@ def Run(params):
     (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path) =  params
     log_results , coefficients = LogReg(test_frame,train_frame,timer,feature_cols,code,results_path )
     results_dic, treeparams, Dict2 ,Dict4 = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path,log_results)
+    # move roc and star here
     return results_dic, timer ,treeparams ,Dict2 ,coefficients ,Dict4
     
 
@@ -661,8 +662,11 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
     "ns" : [],
     "AUC": []}
 
-
+    
     folder = "{}Crossvaltest{}" .format(results_path,code)
+    if os.path.isdir(folder) is True:
+            code = code + 1
+            folder = "{}Crossvaltest{}" .format(results_path,code)
     os.mkdir(folder)
     folder = "{}/Crossvaltest{}/tests" .format(results_path,code)
     os.mkdir(folder)
@@ -831,6 +835,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
 def main():
     start = time.perf_counter()
     code = 105
+    # add error message
     trees = 100
     depth  = 10 
     ccp = 0.0000400902332

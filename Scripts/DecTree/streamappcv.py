@@ -532,7 +532,7 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
         results_dic = ROC_calc(totalframe,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path)
         ROC_Star(totalframe,code,timer,results_path)
         return results_dic
-
+@st.cache
 def Run(params):
     (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path) =  params
     LogReg(test_frame,train_frame,timer,feature_cols,code,results_path )

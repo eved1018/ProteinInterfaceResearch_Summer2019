@@ -53,6 +53,9 @@ def main():
     Antigen = True  
     # set col names
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
+    # which columns to look at (ie which dependent variables to use)
+    # var_col_names =['predus', 'ispred', 'dockpred']
+    var_col_names = ['predus',"ispred"]
     # change to where u need it to to go 
     results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/"
     # path to star, get it here http://melolab.org/star/download.php
@@ -73,7 +76,7 @@ def main():
         folder = "{}Crossvaltest{}" .format(results_path,code)
 
 
-    CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,Antigen,annotated_path,col_names )
+    CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,Antigen,annotated_path,col_names,var_col_names )
     try:
         Star(results_path,code,Star_path)
     except:
@@ -84,7 +87,7 @@ def main():
 # core of the program, creates the chunks of proteins and runs programs in parrelel
 # then unpacks data and computes AUC and ROC image
 
-def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, Antigen, annotated_path,col_names):
+def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, Antigen, annotated_path,col_names,var_col_names):
     # params to adjust RF
     Master= {}
 
@@ -109,9 +112,12 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
     # remove any null or missing data from the dataset
     df.isnull().any()
     data = df.fillna(method='ffill')
+    col_namestest = var_col_names + ["annotated"]
+    data = data[col_namestest]
     # set X as the three prediction scores and y as the true annotated value 
     # feature_cols = ['predus','ispred','dockpred']
-    feature_cols = data.columns[0:-1]
+    # feature_cols = data.columns[0:-1]
+    feature_cols = var_col_names
     proteinname = data.index
     # print(proteinname)
     # Features, ie prediction scores from predus, ispred and dockpred 
@@ -147,7 +153,8 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
         del chunks[-1]
     # set teh column names for the new trainng and test sets, same as feature_cols but residue si removed bc it is already the index. 
     # col_namestest = ['predus', 'ispred', 'dockpred', 'annotated']
-    col_namestest = col_names[1:]
+    
+    
     # each subset(or chunk) of proteins is used to create a training set containing the residues for the proteins in the subset as a test set with all other residues
     train_test_frames= []
     for i in range(0,len(chunks)):
@@ -160,6 +167,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
                 if pdbid in protein_res:
                     rows.append(protein_res)
         test_frame = data[data.index.isin(rows)]
+        print("test 1:", test_frame.columns.tolist())
         protein_in_cv = chunks[i]
         timer = i+1
         train_frame = train_frame.drop(test_frame.index)
@@ -295,7 +303,7 @@ def Run(params):
     return results_dic, timer ,treeparams ,Dict2 ,coefficients ,Dict4
 
 
-# Logistic rregression
+# Logistic regression
 def LogReg(test_frame, train_frame,timer,cols,code,results_path):
         # set columns 
         feature_cols = cols
@@ -317,13 +325,26 @@ def LogReg(test_frame, train_frame,timer,cols,code,results_path):
         # file1.close()
         # prediction score calc. 
         protein= test_frame.index
-        predusval = test_frame.predus
-        ispredval = test_frame.ispred
-        dockpred = test_frame.dockpred
-        predcoef = coefficients[1]
-        ispredcoef = coefficients[2]
-        dockpredcoef= coefficients[3]
-        val = (coefficients[0] + predcoef * predusval + ispredval* ispredcoef+dockpred * dockpredcoef)*(-1)
+        # predusval = test_frame.predus
+        # ispredval = test_frame.ispred
+        # dockpred = test_frame.dockpred
+        # predcoef = coefficients[1]
+        # ispredcoef = coefficients[2]
+        # dockpredcoef= coefficients[3]
+        vals = []
+        num = 1
+        for pred in cols:
+            v1 = test_frame[pred]
+            v2 = coefficients[num]
+            num += 1
+            v3 = v1 * v2
+            vals.append(v3)
+
+        sum_pred = sum(vals)
+        val = -1 *(coefficients[0] + sum_pred)
+        # val = (coefficients[0] + predcoef * predusval + ispredval* ispredcoef)*(-1)
+        # val = (coefficients[0] + predcoef * predusval + ispredval* ispredcoef+dockpred * dockpredcoef)*(-1)
+
         exponent = np.exp(val)
         pval = (1/(1+exponent))
         # save prediction scores and training set to same folder as coefs 
@@ -353,11 +374,14 @@ def LogReg(test_frame, train_frame,timer,cols,code,results_path):
     
 def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path,log_results): 
         # set columns 
+        print("test frame:", test_frame.columns.tolist())
         feature_cols = cols
+        print("f cols:",feature_cols)
         # split traing and test data into the depednent and indepdent variables 
         # X includes the predus, ispred and dockpred score 
         # y is a binary classifier, 0 is non interface 1 is interface 
         X = train_frame[feature_cols]
+        
         y = train_frame.annotated
         X_test = test_frame[feature_cols]
         y_test = test_frame.annotated
@@ -378,6 +402,7 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
         # save the residue and probabilty score of the test set to the same folder as the logistic regresion 
 
         df2 = test_frame.assign(rfscore = y_prob_interface )
+        
         
         if timer == 1 and viz is True:
             # for i in range(0,100):
@@ -403,6 +428,7 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
 def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path):
     proteinname = frame.index 
     predictors = frame.columns.tolist()
+    print("pred:", predictors)
     annotated_frame = frame[frame['annotated'] ==1]
     annotated_res_prot = annotated_frame.index.tolist()
     predictors.remove('annotated')
@@ -601,6 +627,7 @@ def Star(results_path,code,Star_path):
             html = data.style.applymap(Color,lower_range =lower_triangular)
             html = html.render()
             imgkit.from_string(html,'{}Crossvaltest{}/tests/{}/{}.jpg'.format(results_path,code,filename,filename))
+            
 def Color(val,lower_range):
     if val in lower_range: 
         if val <= 0.05:

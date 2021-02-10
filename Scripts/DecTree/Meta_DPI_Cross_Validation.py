@@ -50,12 +50,13 @@ def main():
     # for 5 fold use 44 for 10 use 22  
     size = 22
     viz = False 
-    Antigen = True  
+    Antigen = False  
     # set col names
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
+    # col_names = ['residue', "meta-ppisp", 'annotated']
     # which columns to look at (ie which dependent variables to use)
     # var_col_names =['predus', 'ispred', 'dockpred']
-    var_col_names = ['predus',"ispred"]
+    var_col_names = ["predus"]
     # change to where u need it to to go 
     results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/"
     # path to star, get it here http://melolab.org/star/download.php
@@ -64,6 +65,7 @@ def main():
     if Antigen is True:
         size = 1 
         data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv"
+        # data_path ='/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/meta-ppisp/meta-ppisp-results-comma.csv'
         annotated_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/InterfaceResidues/"
     else:
         # change based on where the files are the first should be the final_sort.csv and second should be teh annoatted 
@@ -112,6 +114,8 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
     # remove any null or missing data from the dataset
     df.isnull().any()
     data = df.fillna(method='ffill')
+    # data = data[data['annotated'] != "ERROR"]
+    # data["annotated"] = pd.to_numeric(data["annotated"])
     col_namestest = var_col_names + ["annotated"]
     data = data[col_namestest]
     # set X as the three prediction scores and y as the true annotated value 
@@ -167,7 +171,6 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
                 if pdbid in protein_res:
                     rows.append(protein_res)
         test_frame = data[data.index.isin(rows)]
-        print("test 1:", test_frame.columns.tolist())
         protein_in_cv = chunks[i]
         timer = i+1
         train_frame = train_frame.drop(test_frame.index)
@@ -374,9 +377,7 @@ def LogReg(test_frame, train_frame,timer,cols,code,results_path):
     
 def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path,log_results): 
         # set columns 
-        print("test frame:", test_frame.columns.tolist())
         feature_cols = cols
-        print("f cols:",feature_cols)
         # split traing and test data into the depednent and indepdent variables 
         # X includes the predus, ispred and dockpred score 
         # y is a binary classifier, 0 is non interface 1 is interface 
@@ -428,7 +429,6 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
 def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path):
     proteinname = frame.index 
     predictors = frame.columns.tolist()
-    print("pred:", predictors)
     annotated_frame = frame[frame['annotated'] ==1]
     annotated_res_prot = annotated_frame.index.tolist()
     predictors.remove('annotated')

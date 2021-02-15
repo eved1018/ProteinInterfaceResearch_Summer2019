@@ -1,3 +1,8 @@
+appdirs==1.4.4
+distlib==0.3.1
+filelock==3.0.12
+six==1.15.0
+virtualenv==20.4.2
 altair==4.1.0
 appdirs==1.4.4
 appnope==0.1.0
@@ -53,7 +58,6 @@ nbformat==5.0.7
 notebook==6.0.3
 numpy==1.18.5
 packaging==20.4
-pandas==1.0.4
 pandocfilters==1.4.2
 parso==0.7.0
 pathtools==0.1.2
@@ -66,7 +70,6 @@ prompt-toolkit==3.0.5
 protobuf==3.12.2
 psutil==5.7.0
 ptyprocess==0.6.0
-pyarrow==0.17.1
 pydeck==0.4.0b2
 pydot==1.4.1
 Pygments==2.6.1
@@ -95,7 +98,6 @@ traitlets==4.3.3
 tzlocal==2.1
 urllib3==1.25.10
 validators==0.16.0
-virtualenv==20.0.27
 watchdog==0.10.3
 wcwidth==0.2.5
 webencodings==0.5.1

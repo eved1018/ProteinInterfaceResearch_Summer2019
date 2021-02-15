@@ -362,7 +362,7 @@ def LogReg(test_frame, train_frame,timer,cols,code,results_path):
 # Random Forest function 
 # params:
 #   test_frame is the pandas dataframe that the regresion predicts interface scores for 
-#     train_frame is the andas dataframe that the regresion fits to 
+#     train_frame is the pandas dataframe that the regresion fits to 
 #     timer is an iterirator used to keep track of each implementation of the regresion 
 #     cols is the feature columns of the dataframe, ie what each column is data for 
 #     code is the interer code to deisgnate the test run 

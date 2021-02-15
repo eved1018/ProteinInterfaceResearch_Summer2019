@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/Users/evanedelstein/.virtualenvs/rajiresearch/bin/python",
+    "python.pythonPath": "/Users/evanedelstein/.pyenv/versions/RajiResearch3.9.1/bin/python",
     "git.ignoreLimitWarning": true,
     "workbench.colorCustomizations": {
         "statusBar.background": "#25252528",

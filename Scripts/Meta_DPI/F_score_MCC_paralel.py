@@ -1,8 +1,9 @@
-from numpy import sqrt
+import numpy as np
 import pandas as pd 
 import os 
 import concurrent.futures
 import multiprocessing
+from numpy import sqrt
 
 def Main():
     predictors = ['predus', 'ispred', 'dockpred', 'rfscore','logreg']
@@ -42,12 +43,12 @@ def Main():
             recall = TP_sum/Ns_sum
             precision = TP_sum/threshold_sum
             f_score = (2 * recall *precision)/(recall + precision)
-            print("{} fscore: {}".format(predictor,f_score))
+            print("{} fscore: {}".format(predictor,np.round(f_score,3)))
 
             MCC_num = (TP_sum * TN_sum) -(FP_sum * FN_sum)
             mcc_denom = sqrt((TP_sum + FN_sum) * (TP_sum + FP_sum) * (TN_sum + FP_sum) * (TN_sum + FN_sum))
             mcc = MCC_num / mcc_denom
-            print("{} MCC: {}".format(predictor,mcc)) 
+            print("{} MCC: {}".format(predictor,np.round(mcc,3)) ) 
 
 
 def Run(params): 

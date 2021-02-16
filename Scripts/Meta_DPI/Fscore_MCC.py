@@ -37,8 +37,6 @@ def F_score(predictors,path,cutoff_path):
             threshold_sum += threshhold
             predictedframesort = frame.sort_values(by=[predictor], inplace =False, ascending=False)
             thresholdframe = predictedframesort.head(threshhold) 
-            
-            # print(thresholdframe)
             predicted_res = thresholdframe.index.values.tolist()
             predicted_res = [str(i) for i in predicted_res]
             pred_res = []

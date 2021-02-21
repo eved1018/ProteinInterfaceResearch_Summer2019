@@ -8,12 +8,20 @@ from numpy import sqrt
 def Main():
     predictors = ['predus', 'ispred', 'dockpred', 'rfscore','logreg']
     path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS2/Meta_DPi_result.csv"
+    result_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/results/"
     cutoff_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/All_protein_cutoffs.csv"
     # F_score(predictors,path,cutoff_path)
     cutoff_csv = pd.read_csv(cutoff_path)
     df = pd.read_csv(path)
     df["protein"] = [x.split('_')[1] for x in df['residue']]
     proteins = df["protein"].unique()
+    cols = ["protein"] + predictors 
+    f_score_per_protein = pd.DataFrame(columns = cols)
+    f_score_per_protein["protein"] = proteins
+    f_score_per_protein.set_index('protein', inplace=True)
+    mcc_score_per_protein = pd.DataFrame(columns = cols)
+    mcc_score_per_protein["protein"] = proteins
+    mcc_score_per_protein.set_index('protein', inplace=True)
     for predictor in predictors:
             # print(predictor)
             TP_sum = 0
@@ -31,13 +39,26 @@ def Main():
                 params_list = params_list
                 results = executor.map( Run, params_list)
                 for i in results:
-                    (TP, TN, FP, FN, threshhold, N) = i
+                    (TP, TN, FP, FN, threshhold, N,predictor, protein) = i
                     TP_sum += TP
                     FP_sum += FP
                     Ns_sum += N
                     FN_sum += FN
                     TN_sum += TN
                     threshold_sum += threshhold
+                    recall_p = TP/N
+                    precision_p = TP/threshhold
+                    f_score = (2 * recall_p *precision_p)/(recall_p + precision_p)
+                    # print("{} fscore: {}".format(predictor,np.round(f_score,3)))
+                    # df.loc[row_indexer,column_indexer]=value
+                    f_score_per_protein.loc[protein,predictor] = f_score
+
+                    MCC_num = (TP * TN) - (FP * FN)
+                    mcc_denom = sqrt((TP + FN) * (TP + FP) * (TN + FP) * (TN + FN))
+                    mcc = MCC_num / mcc_denom
+                    # print("mcc", mcc, protein, predictor)
+                    # print("{} MCC: {}".format(predictor,np.round(mcc,3)) )
+                    mcc_score_per_protein.loc[protein,predictor] = mcc 
 
 
             recall = TP_sum/Ns_sum
@@ -50,6 +71,8 @@ def Main():
             mcc = MCC_num / mcc_denom
             print("{} MCC: {}".format(predictor,np.round(mcc,3)) ) 
 
+            f_score_per_protein.to_csv("{}fscore.csv".format(result_path))
+            mcc_score_per_protein.to_csv("{}mcc.csv".format(result_path))
 
 def Run(params): 
     (predictor,protein,cutoff_csv,frame) = params
@@ -81,7 +104,7 @@ def Run(params):
     neg = total_res - threshhold
     FN = N - TP
     TN = neg - FN
-    return TP, TN, FP, FN, threshhold, N
+    return TP, TN, FP, FN, threshhold, N ,predictor, protein
     
            
 

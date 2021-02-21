@@ -47,7 +47,7 @@ def main():
     depth  = 10 
     ccp = 0.0000400902332
     # for 5 fold use 44 for 10 use 22  
-    size = 22
+    size = 44
     viz = False 
     Antigen = False  
     # set col names

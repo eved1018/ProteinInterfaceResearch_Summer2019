@@ -2,13 +2,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score
-
-
-def ROC():
-    predictor = "meta-ppisp"
-    path = '/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/meta-ppisp/meta-ppisp-results-comma.csv'
-    # path = '/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/meta-ppisp/meta-pisp-test.csv'
+def Main():
+    predictor = "rfscore"
+    ROC(predictor)
+    path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPI_result.csv"
     frame = pd.read_csv(path)
+
+def ROC(predictor,frame):
+    # predictor = "rfscore"
+    # path = '/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/meta-ppisp/meta-ppisp-results-comma.csv'
+    # path = '/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/meta-ppisp/meta-pisp-test.csv'
+    
     frame.set_index('residue', inplace= True )
     # print(frame.head())
     frame = frame[frame['annotated'] != "ERROR"]    
@@ -112,7 +116,7 @@ def ROC():
     plt.show()
     # plt.clf()
     
-ROC()
+
 
 
 

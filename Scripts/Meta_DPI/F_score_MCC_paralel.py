@@ -7,7 +7,7 @@ from numpy import sqrt
 
 def Main():
     predictors = ['predus', 'ispred', 'dockpred', 'rfscore','logreg']
-    path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS2/Meta_DPi_result.csv"
+    path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPi_result.csv"
     result_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/results/"
     cutoff_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/All_protein_cutoffs.csv"
     # F_score(predictors,path,cutoff_path)
@@ -22,6 +22,7 @@ def Main():
     mcc_score_per_protein = pd.DataFrame(columns = cols)
     mcc_score_per_protein["protein"] = proteins
     mcc_score_per_protein.set_index('protein', inplace=True)
+    np.seterr(all='raise')
     for predictor in predictors:
             # print(predictor)
             TP_sum = 0
@@ -48,16 +49,17 @@ def Main():
                     threshold_sum += threshhold
                     recall_p = TP/N
                     precision_p = TP/threshhold
-                    f_score = (2 * recall_p *precision_p)/(recall_p + precision_p)
-                    # print("{} fscore: {}".format(predictor,np.round(f_score,3)))
-                    # df.loc[row_indexer,column_indexer]=value
+
+                    if TP != 0:
+                        f_score = (2 * recall_p *precision_p)/(recall_p + precision_p)
+                    else:
+                        f_score = 0
+                    
                     f_score_per_protein.loc[protein,predictor] = f_score
 
                     MCC_num = (TP * TN) - (FP * FN)
                     mcc_denom = sqrt((TP + FN) * (TP + FP) * (TN + FP) * (TN + FN))
                     mcc = MCC_num / mcc_denom
-                    # print("mcc", mcc, protein, predictor)
-                    # print("{} MCC: {}".format(predictor,np.round(mcc,3)) )
                     mcc_score_per_protein.loc[protein,predictor] = mcc 
 
 

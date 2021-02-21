@@ -82,7 +82,7 @@ def Meta_DPI(data_path,viz, code, trees, depth, ccp, start,results_path,col_name
                 (totalframe ,treeparams,coefficients) = i
                 frames.append(totalframe)
     result_frame = pd.concat(frames)
-    result_frame.to_csv("{}/META_DPI_RESULTS{}/Meta_DPI_result.csv" .format(results_path,code))
+    result_frame.to_csv("{}/META_DPI_RESULTS{}/Meta_DPI_result.csv" .format(results_path,code), float_format='{:f}'.format)
 
                 
 

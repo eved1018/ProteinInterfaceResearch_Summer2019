@@ -1,27 +1,6 @@
-from numpy import sqrt
-import pandas as pd 
-import os 
-
-
-def Main():
-    predictors = ['predus', 'ispred', 'dockpred', 'rfscore','logreg']
-    # path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS2/Meta_DPi_result.csv"
-    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS1/Meta_DPi_result.csv"
-    cutoff_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/All_protein_cutoffs.csv"
-    cutoff_csv = pd.read_csv(cutoff_path)
-    df = pd.read_csv(path)
-    dict = F_score(predictors,df,cutoff_csv)
-    for i in dict: 
-        f_score, mcc = dict[i]
-        print("{} fscore: {}".format(i,f_score))
-        print("{} MCC: {}".format(i,mcc))
-
-
 def F_score(predictors,df,cutoff_csv):
-    df.set_index('residue', inplace= True )
-    df["protein"] = [x.split('_')[1] for x in df.index]
+    df["protein"] = [x.split('_')[1] for x in df['residue']]
     proteins = df["protein"].unique()
-    # print(df)
     dict = {}
     
     for predictor in predictors:
@@ -37,8 +16,6 @@ def F_score(predictors,df,cutoff_csv):
             frame = df[df["protein"] == protein] 
             annotated_frame = frame[frame['annotated'] == 1]
             annotated_res_prot = annotated_frame.index.tolist()
-            annotated_res = [x.split('_')[0] for x in annotated_res_prot]
-            print(annotated_res)
             total_res = len(frame.index)
             cutoff_row = cutoff_csv[cutoff_csv["Protein"] == protein]
             threshhold = cutoff_row["cutoff res"].values[0]
@@ -52,12 +29,11 @@ def F_score(predictors,df,cutoff_csv):
             for i in predicted_res: 
                 res_prot = i.split("_")
                 res = res_prot[0]
-                pred_res.append(res)
-            print("pred res",pred_res)
+                pred_res.append(int(res))
         
             
             Truepos = []
-            for res in annotated_res:
+            for res in annotated_res_prot:
                 if res in pred_res:
                     Truepos.append(res)
 
@@ -83,9 +59,5 @@ def F_score(predictors,df,cutoff_csv):
         # print("{} fscore: {}".format(predictor,f_score))
         # print("{} MCC: {}".format(predictor,mcc))
         dict[predictor] = [f_score,mcc]
-    # print(dict)
-    return dict       
-
-
-if __name__ == '__main__':
-    Main()
+    print(dict)
+    return dict 

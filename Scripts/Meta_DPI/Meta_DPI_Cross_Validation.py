@@ -28,7 +28,6 @@ import concurrent.futures
 import multiprocessing
 import subprocess
 import re
-import streamlit as st
 import imgkit
 import matplotlib.pyplot as plt
 
@@ -56,7 +55,7 @@ def main():
     # col_names = ['residue', "meta-ppisp", 'annotated']
     # which columns to look at (ie which dependent variables to use)
     # var_col_names =['predus', 'ispred', 'dockpred']
-    var_col_names = ["predus"]
+    var_col_names = ['predus', 'ispred', 'dockpred']
     # change to where u need it to to go 
     results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/"
     # path to star, get it here http://melolab.org/star/download.php
@@ -70,6 +69,7 @@ def main():
     else:
         # change based on where the files are the first should be the final_sort.csv and second should be teh annoatted 
         data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv"
+        # data_path = "/Users/evanedelstein/Desktop/PDBtest.csv"
         annotated_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Annotated_Residues/AnnotatedTotal/"
 
     folder = "{}Crossvaltest{}" .format(results_path,code)
@@ -92,7 +92,7 @@ def main():
 def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, Antigen, annotated_path,col_names,var_col_names):
     # params to adjust RF
     Master= {}
-
+    auc_per_cv ={}
     folder = "{}Crossvaltest{}" .format(results_path,code)
     os.mkdir(folder)
     folder = "{}/Crossvaltest{}/tests" .format(results_path,code)
@@ -187,14 +187,33 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
         params = (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path)
         param_list.append(params)
     coefs = {}
-    rfscore_ROC = []
+    
     # print(param_list)
     dict_timer = 0
+    fscore_dict_total = {}
+    mcc_dict_total = {}
     with concurrent.futures.ProcessPoolExecutor() as executor:
         param_list = param_list
         results = executor.map( Run, param_list)
         for i in results:
-            (results_dic,timer, treeparams,Dict2,coefficients , Dict4) = i 
+            (timer ,treeparams ,coefficients,Dict2 ,Dict3,Dict4,predictors,totalframe,protein_in_cv) = i 
+            name = f"cv{timer}"
+            auc_per_cv[name] = Dict3
+
+            fscore_mcc_percv_dict = f_score_mcc_wrapper(predictors,totalframe,timer,protein_in_cv)
+            fscore_dict = {}
+            mcc_dict = {}
+            for i in fscore_mcc_percv_dict: 
+                f_score, mcc = fscore_mcc_percv_dict[i]
+                print(name)
+                print("{} fscore: {}".format(i,f_score))
+                print("{} MCC: {}".format(i,mcc))
+                fscore_dict[i] = f_score
+                mcc_dict[i] = mcc
+            fscore_dict_total[name]= fscore_dict
+            mcc_dict_total[name] =mcc_dict
+
+                
             
             for key in Dict4:
                 # print(key)
@@ -236,9 +255,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
         tps = Master[key]["tps"] 
         fps = Master[key]["fps"] 
         ns = Master[key]["ns"] 
-        negs = Master[key]["negs"] 
-        negs_2 = Master[key]["negs"]
-        
+        negs = Master[key]["negs"]         
         globaltps = []
         globalfps = []
         globalnegs = []
@@ -284,6 +301,24 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
         Master[key]["TPRS"].append(TPRS)
         Master[key]["FPRS"].append(FPRS)
 
+    frame_auc_per_cv = pd.DataFrame.from_dict(auc_per_cv,orient= 'index')
+    folder = "{}Crossvaltest{}" .format(results_path,code)
+    frame_auc_per_cv.to_csv("{}/auc_per_cv.csv".format(folder))
+
+    
+
+    frame_fscore_per_cv = pd.DataFrame.from_dict(fscore_dict_total,orient= 'index')
+    folder = "{}Crossvaltest{}" .format(results_path,code)
+    frame_fscore_per_cv.to_csv("{}/fscore_per_cv.csv".format(folder))
+
+    frame_mcc_per_cv = pd.DataFrame.from_dict(mcc_dict_total,orient= 'index')
+    folder = "{}Crossvaltest{}" .format(results_path,code)
+    frame_mcc_per_cv.to_csv("{}/mcc_per_cv.csv".format(folder))
+
+
+    
+    
+    
     # ROC plot
     ROC_Plt(Master,code,results_path)
 
@@ -299,11 +334,11 @@ def Run(params):
     (test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path) =  params
     log_results , coefficients = LogReg(test_frame,train_frame,timer,feature_cols,code,results_path )
     totalframe, treeparams = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,Antigen,annotated_path,log_results)
-    results_dic ,Dict2 , Dict4 = ROC_calc(totalframe,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path)
+    Dict2 ,Dict3, Dict4,predictors = ROC_calc(totalframe,protein_in_cv,code,timer,results_path,data_path,Antigen,annotated_path)
     ROC_Star(totalframe,code,timer,results_path)
 
     # move roc and star here
-    return results_dic, timer ,treeparams ,Dict2 ,coefficients ,Dict4
+    return timer ,treeparams ,coefficients,Dict2 ,Dict3,Dict4,predictors,totalframe,protein_in_cv
 
 
 # Logistic regression
@@ -432,10 +467,8 @@ def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path,Antigen,annot
     annotated_frame = frame[frame['annotated'] ==1]
     annotated_res_prot = annotated_frame.index.tolist()
     predictors.remove('annotated')
-    ROC_total_dic = {}
     vals = [ 0 , 0 ,0,0,0,0,0]
     ROC_dic = {key: vals for key in predictors}  
-    Rates_dic = {}
     Dict = {}
     Dict2 = {}
     Dict3 = {}
@@ -540,7 +573,31 @@ def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path,Antigen,annot
             Dict4[predictor]['FP_Total_sum'].append(FP_Total_sum)
             Dict4[predictor]['N_sum'].append(N_sum)
             Dict4[predictor]['TP_Total_sum'].append(TP_Total_sum)
-    return Dict3 , Dict2 , Dict4
+        
+        
+
+    
+    for i in predictors: 
+        threshholds = Dict2[i]['threshholds']
+        TPRS = Dict2[i]['TPR']
+        FPRS = Dict2[i]['FPR']
+        final_results = pd.DataFrame(
+        {'threshold': threshholds,
+        'TPR': TPRS,
+        'FPR': FPRS
+        })
+        distance = final_results["FPR"].diff()
+        midpoint  = final_results["TPR"].rolling(2).sum()
+        distance = distance * -1
+        AUC = (distance) * (midpoint)
+        AUC = AUC/2
+        sum_AUC = AUC.sum()
+        # dict3_list = [sum_AUC,TP,FP,]
+        Dict3[i] = sum_AUC 
+    
+    return Dict2 ,Dict3, Dict4,predictors
+
+
 def atoi(text):
     return int(text) if text.isdigit() else text
 
@@ -641,6 +698,84 @@ def Color(val,lower_range):
 # used to sort by natural language for paths and directories 
 def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
+
+def f_score_mcc_wrapper(predictors,df,timer,protein_in_cv):
+    cutoff_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/All_protein_cutoffs.csv"
+    cutoff_csv = pd.read_csv(cutoff_path) 
+    dict = F_score(predictors,df,cutoff_csv,protein_in_cv)
+    return dict
+    
+        
+def F_score(predictors,df,cutoff_csv,protein_in_cv):
+    # df.set_index('residue', inplace= True )
+    df["protein"] = [x.split('_')[1] for x in df.index]
+    # print("df: \n",df)
+    
+    proteins = df["protein"].unique()
+    dict = {}
+    
+    
+    for predictor in predictors:
+        TP_sum = 0
+        FP_sum =0
+        negs_sum = 0
+        Ns_sum = 0
+        threshold_sum = 0
+        FN_sum = 0
+        TN_sum = 0 
+        for protein in proteins:
+            frame = df[df["protein"] == protein] 
+            annotated_frame = frame[frame['annotated'] == 1]
+            annotated_res_prot = annotated_frame.index.tolist()
+            annotated_res = [x.split('_')[0] for x in annotated_res_prot]
+            total_res = len(frame.index)
+            cutoff_row = cutoff_csv[cutoff_csv["Protein"] == protein]
+            threshhold = cutoff_row["cutoff res"].values[0]
+            N = cutoff_row["annotated res"].values[0]
+            threshold_sum += threshhold
+            predictedframesort = frame.sort_values(by=[predictor], inplace =False, ascending=False)
+            thresholdframe = predictedframesort.head(threshhold) 
+            predicted_res = thresholdframe.index.values.tolist()
+            predicted_res = [str(i) for i in predicted_res]
+            pred_res = []
+            for i in predicted_res: 
+                res_prot = i.split("_")
+                res = res_prot[0]
+                pred_res.append(res)
+        
+            
+            Truepos = []
+            for res in annotated_res:
+                if res in pred_res:
+                    Truepos.append(res)
+
+            pred = len(pred_res)
+            TP = len(Truepos)
+            FP = pred - TP
+            neg = total_res - threshhold
+            FN = N - TP
+            TN = neg - FN
+            TP_sum += TP
+            FP_sum += FP
+            negs_sum += neg
+            Ns_sum += N
+            FN_sum += FN
+            TN_sum += TN
+
+        
+        recall = TP_sum/Ns_sum
+        precision = TP_sum/threshold_sum
+        if TP_sum != 0:
+            f_score = (2 * recall *precision)/(recall + precision)
+        else:
+            f_score = 0
+        MCC_num = (TP_sum * TN_sum) -(FP_sum * FN_sum)
+        mcc_denom = np.sqrt((TP_sum + FN_sum) * (TP_sum + FP_sum) * (TN_sum + FP_sum) * (TN_sum + FN_sum))
+        mcc = MCC_num / mcc_denom
+        
+        dict[predictor] = [f_score,mcc]
+    return dict 
+
 
 
 if __name__ == '__main__':

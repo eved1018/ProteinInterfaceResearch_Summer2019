@@ -93,8 +93,7 @@ def Run(params):
         res_prot = i.split("_")
         res = res_prot[0]
         pred_res.append(int(res))
-
-    
+       
     Truepos = []
     for res in annotated_res_prot:
         if res in pred_res:

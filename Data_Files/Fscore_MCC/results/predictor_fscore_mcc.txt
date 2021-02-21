@@ -1,0 +1,10 @@
+predus fscore: 0.347
+predus MCC: 0.292
+ispred fscore: 0.377
+ispred MCC: 0.326
+dockpred fscore: 0.367
+dockpred MCC: 0.314
+rfscore fscore: 0.426
+rfscore MCC: 0.381
+logreg fscore: 0.486
+logreg MCC: 0.449

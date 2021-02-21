@@ -192,6 +192,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
     dict_timer = 0
     fscore_dict_total = {}
     mcc_dict_total = {}
+    
     with concurrent.futures.ProcessPoolExecutor() as executor:
         param_list = param_list
         results = executor.map( Run, param_list)
@@ -205,9 +206,9 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path, An
             mcc_dict = {}
             for i in fscore_mcc_percv_dict: 
                 f_score, mcc = fscore_mcc_percv_dict[i]
-                print(name)
-                print("{} fscore: {}".format(i,f_score))
-                print("{} MCC: {}".format(i,mcc))
+                # print(name)
+                # print("{} fscore: {}".format(i,f_score))
+                # print("{} MCC: {}".format(i,mcc))
                 fscore_dict[i] = f_score
                 mcc_dict[i] = mcc
             fscore_dict_total[name]= fscore_dict

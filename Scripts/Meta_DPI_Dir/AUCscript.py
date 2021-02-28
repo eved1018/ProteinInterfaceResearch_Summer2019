@@ -8,7 +8,7 @@ def Main():
     predictors = ['predus', 'ispred', 'dockpred',"rfscore","logreg"]
     # predictors = ["rfscore"]
     # path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPI_result.csv"
-    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/testdata.csv"
+    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
     frame = pd.read_csv(path)
     frame.set_index('residue', inplace= True )
     param_list = []

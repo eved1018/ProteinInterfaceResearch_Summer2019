@@ -51,7 +51,7 @@ def main():
     depth  = 10 
     ccp = 0.0000400902332
     # for 5 fold use 44 for 10 use 22  
-    size = 22
+    size = 44
     viz = False 
     Leave_one_Out = False  
     if Leave_one_Out is True:
@@ -63,7 +63,7 @@ def main():
     var_col_names = ['predus', 'ispred', 'dockpred']
     # file containing predictor data and annotated data 
     data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv"
-    # data_path = "/Users/evanedelstein/Desktop/PDBtest.csv"
+    # data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
     # change to where u need it to to go 
     results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/"
     # path to star, get it here http://melolab.org/star/download.php
@@ -206,6 +206,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
                 Ns_Total_sums = Dict4[key]["N_sum"]
                 FPS_Total_sums = Dict4[key]["FP_Total_sum"]
                 Negs_Total_sums = Dict4[key]["Neg_Total_sum"]
+                Pred_Total_sums = Dict4[key]["Pred_Total_sum"]
                 if key in Master:
                     Master[key]["ns"].append(Ns_Total_sums)
                     Master[key]["tps"].append(TP_Total_sums)
@@ -220,7 +221,11 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
                     "fps":  [FPS_Total_sums],            
                     "negs": [Negs_Total_sums],
                      "ns" : [Ns_Total_sums], 
-                    "AUC": []
+                     "pred": [Pred_Total_sums],
+                    "AUC": [],
+                    "PR_AUC": [],
+                    "precision": [],
+                    "recall": []
                     }
                     Master[key] = D
     for key in Dict4:
@@ -228,13 +233,17 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
         tps = Master[key]["tps"] 
         fps = Master[key]["fps"] 
         ns = Master[key]["ns"] 
-        negs = Master[key]["negs"]         
+        negs = Master[key]["negs"]  
+        pred = Master[key]["pred"]       
         globaltps = []
         globalfps = []
         globalnegs = []
         globalns = []
+        globalpreds = []
         TPRS = []
         FPRS = []
+        precisions =[]
+        recalls =[]
 
         for i in zip(*tps):
             tpr = sum(i)
@@ -248,6 +257,9 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
         for i in zip(*negs):
             N = sum(i)
             globalnegs.append(N)
+        for i in zip(*pred):
+            N = sum(i)
+            globalpreds.append(N)
         for i,j in zip(globaltps,globalns):
             TPR = i/j
             TPRS.append(TPR)
@@ -255,7 +267,16 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
         for i,j in zip(globalfps,globalnegs):
             FPR = i/j
             FPRS.append(FPR)
-            # print(FPR)
+        for i,j,k in zip(globaltps,globalfps,globalns):
+            if i == 0:
+                prec = 0
+                rec == 0
+            else:
+                prec = i/(i+j)
+                rec = i/k
+            precisions.append(prec)
+            recalls.append(rec)
+            
         final_results = pd.DataFrame({
             'TPR': TPRS,
             'FPR': FPRS
@@ -267,11 +288,32 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
         AUC = (distance) * (midpoint)
         AUC = AUC/2
         sum_AUC = AUC.sum()
+
+        final_results_pr = pd.DataFrame({
+            'Precision': precisions,
+            'Recall': recalls
+            })
+        print(final_results_pr.head())
+        distance_pr = final_results_pr["Recall"].diff()
+        midpoint_pr  = final_results_pr["Precision"].rolling(2).sum()
+        distance_pr = distance_pr * -1
+        AUC_pr= (distance_pr) * (midpoint_pr)
+        AUC_pr = AUC_pr/2
+        sum_AUC_pr = AUC_pr.sum()
         print(key)
-        print("Global AUC:",sum_AUC)
+        print("Global ROC AUC:",sum_AUC)
+        print("Global PR AUC:", sum_AUC_pr)
         Master[key]["AUC"].append(sum_AUC)
         Master[key]["TPRS"].append(TPRS)
         Master[key]["FPRS"].append(FPRS)
+        Master[key]["PR_AUC"].append(sum_AUC_pr)
+        Master[key]["precision"].append(precisions)
+        Master[key]["recall"].append(recalls)
+    # print("prec:",Master[key]["precision"])
+    # print("rec:",Master[key]["recall"])
+
+
+
     # save results for per cv metrics
     frame_auc_per_cv = pd.DataFrame.from_dict(auc_per_cv,orient= 'index')
     folder = "{}Crossvaltest{}" .format(results_path,code)
@@ -287,6 +329,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
     frame_pr_per_cv.to_csv("{}/pr_per_cv.csv".format(folder))
     # ROC plot
     ROC_Plt(Master,code,results_path)
+    PR_Plt(Master,code,results_path)
 
     # Tree vizualization 
     if viz == False :
@@ -439,7 +482,7 @@ def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path):
     Dict3 = {}
     Dict4 = {}
     Dict5 ={}
-    
+    # make better
     for i in predictors:
         Dict[i] = {}
         Dict2[i] = {}
@@ -458,6 +501,7 @@ def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path):
         Dict4[i]['TP_Total_sum'] = []
         Dict4[i]['FP_Total_sum'] = []
         Dict4[i]['Neg_Total_sum'] = [] 
+        Dict4[i]['Pred_Total_sum'] = [] 
         
 
     for i in np.arange(0.00, 1.02, .01):
@@ -517,7 +561,7 @@ def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path):
             else:
                 Recall = 0
                 Precision = 0
-
+            
             Dict2[predictor]['threshholds'].append(threshhold)
             Dict2[predictor]['TPR'].append(TPR)
             Dict2[predictor]['FPR'].append(FPR)
@@ -528,6 +572,7 @@ def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path):
             Dict4[predictor]['FP_Total_sum'].append(FP_Total_sum)
             Dict4[predictor]['N_sum'].append(N_sum)
             Dict4[predictor]['TP_Total_sum'].append(TP_Total_sum)
+            Dict4[predictor]['Pred_Total_sum'].append(pred_sum_total)
     for i in predictors: 
         threshholds = Dict2[i]['threshholds']
         TPRS = Dict2[i]['TPR']
@@ -544,22 +589,22 @@ def ROC_calc(frame,protein_in_cv,code,timer,results_path,data_path):
         AUC = AUC/2
         sum_AUC = AUC.sum()
         Dict3[i] = sum_AUC 
-    for i in predictors: 
+
         threshholds = Dict2[i]['threshholds']
         Precision = Dict2[i]['Precision']
         Recall = Dict2[i]['Recall']
-        final_results = pd.DataFrame(
+        final_results_pr = pd.DataFrame(
         {'threshold': threshholds,
         'Precision': Precision,
         'Recall': Recall
         })
-        distance = final_results["Recall"].diff()
-        midpoint  = final_results["Precision"].rolling(2).sum()
-        distance = distance * -1
-        AUC = (distance) * (midpoint)
-        AUC = AUC/2
-        sum_AUC = AUC.sum()
-        Dict5[i] = sum_AUC 
+        distance_pr = final_results_pr["Recall"].diff()
+        midpoint_pr  = final_results_pr["Precision"].rolling(2).sum()
+        distance_pr = distance_pr * -1
+        AUC_pr = (distance_pr) * (midpoint_pr)
+        AUC_pr = AUC_pr/2
+        sum_AUC_pr = AUC_pr.sum()
+        Dict5[i] = sum_AUC_pr 
     
     return Dict2 ,Dict3, Dict4,predictors ,Dict5
 
@@ -575,7 +620,7 @@ def ROC_Plt(Master, code,results_path):
     color_index = 0    
     colors = ["#0000FF","#ff8333","#008000","#FFFF00","#800080","#00FF00","#808000","#00FFFF","#FF0000","#008080","#000080","#FF00FF"]
     plt.title('Receiver Operating Characteristic')
-    plt.title('Receiver Operating Characteristic')
+   
     for key in predictors:
         AUC = Master[key]["AUC"][0]
         AUC = AUC.round(3)
@@ -591,6 +636,33 @@ def ROC_Plt(Master, code,results_path):
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
     plt.savefig( "{}/Crossvaltest{}/ROC.png" .format(results_path,code))
+    plt.clf()
+
+def PR_Plt(Master, code, results_path):
+    predictors = []
+    for key in Master:
+        predictors.append(key)
+    color_index = 0    
+    colors = ["#0000FF","#ff8333","#008000","#FFFF00","#800080","#00FF00","#808000","#00FFFF","#FF0000","#008080","#000080","#FF00FF"]
+    plt.title('PR Curve')
+   
+    for key in predictors:
+        AUC = Master[key]["PR_AUC"][0]
+        AUC = AUC.round(3)
+        precision = Master[key]['precision'][0] 
+        # precision =[i for i in precision if i != 0]
+        recall = Master[key]['recall'][0]
+        # recall =[i for i in recall if i != 0]
+        plt.plot(recall, precision, c=colors[color_index], label = '{}: PR-AUC = {}'.format(Master[key]["name"],AUC))
+        color_index += 1
+    plt.style.use("fivethirtyeight")
+    plt.legend(loc = 'upper right')
+    # plt.plot([0, 1], [0, 1],'r--')
+    plt.xlim([0.1, 1])
+    plt.ylim([0.1, 1])
+    plt.ylabel('precision')
+    plt.xlabel('recall')
+    plt.savefig( "{}/Crossvaltest{}/PR.png" .format(results_path,code))
     plt.clf()
 
 # RF tree vizualizer

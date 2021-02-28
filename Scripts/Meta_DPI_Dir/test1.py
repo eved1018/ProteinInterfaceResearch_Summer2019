@@ -20,5 +20,7 @@ import pandas as pd
 #     df = "apple"
 
 li = ["L","b","c"]
-(a,b,c ) = li
-print(a) 
+K = "k"
+tup = [(i,K) for i in li]
+print(tup)
+

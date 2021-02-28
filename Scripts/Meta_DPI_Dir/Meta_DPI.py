@@ -94,16 +94,13 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
     df["protein"] = [x.split('_')[1] for x in df['residue']]
     proteins = df["protein"].unique()
     df.set_index('residue', inplace= True )
-    # remove any null or missing data from the dataset
+    # remove any null or missing data from the dataset and check that annoted is number 
     df.isnull().any()
     data = df.fillna(method='ffill')
     data = data[data['annotated'] != "ERROR"]
     data["annotated"] = pd.to_numeric(data["annotated"])
-
+    # setup params for process pool 
     param_list = []
-    cpus = multiprocessing.cpu_count()
-    print("starting parellel \n number of cpus {}".format(cpus))
-
     for protein in proteins:
         test = data[data["protein"] == protein] 
         train = data[data["protein"] != protein] 
@@ -127,10 +124,8 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
     result_frame = pd.concat(frames)
     if print_out == True:
         result_frame.to_csv("{}/META_DPI_RESULTS{}/Meta_DPI_result.csv" .format(results_path,code), float_format='{:f}'.format)
-    params_list = []
-    for i in predictors:
-        param = (i,result_frame)
-        params_list.append(param)
+    
+    params_list = [(i,result_frame) for i in predictors]
     # print(param_list)
     with concurrent.futures.ProcessPoolExecutor() as executor:
         params_list = params_list

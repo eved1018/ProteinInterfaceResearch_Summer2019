@@ -52,6 +52,7 @@ def ROC(params):
         all_res_sum = 0
         for protein in proteins:
             frame = df[df["protein"] == protein] 
+            # to numeric 
             annotated_frame = frame[frame['annotated'] == 1]
             annotated_res_prot = annotated_frame.index.tolist()
             annotated_res = [x.split('_')[0] for x in annotated_res_prot] 

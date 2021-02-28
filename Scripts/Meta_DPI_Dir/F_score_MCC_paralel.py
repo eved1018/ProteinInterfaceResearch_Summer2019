@@ -9,11 +9,14 @@ from numpy import sqrt
 
 
 def Main():
+#   predictors = ["vorffip"]
+#   check that predictor is in columns
     predictors = ['predus', 'ispred', 'dockpred', 'rfscore','logreg']
     path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPi_result.csv"
     # path = "/Users/evanedelstein/Desktop/1p_test.csv"
     result_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/results/"
     cutoff_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/All_protein_cutoffs.csv"
+    # cutoff = (6.1^-residues)(constant) 
     # F_score(predictors,path,cutoff_path)
     cutoff_csv = pd.read_csv(cutoff_path)
     df = pd.read_csv(path)
@@ -105,19 +108,8 @@ def Run(params):
     thresholdframe = predictedframesort.head(threshhold) 
     predicted_res = thresholdframe.index.values.tolist()
     predicted_res = [str(i) for i in predicted_res]
-    pred_res = []
-    # print("ann", annotated_res)
-    for i in predicted_res: 
-        res_prot = i.split("_")
-        res = res_prot[0]
-        pred_res.append(res)
-    # print("pred res", pred_res)
-
-    Truepos = []
-    for res in annotated_res:
-        if res in pred_res:
-            Truepos.append(res)
-
+    pred_res = [i.split("_")[0] for i in predicted_res]
+    Truepos = [i for i in annotated_res if i in pred_res]
     pred = len(pred_res)
     TP = len(Truepos)
     FP = pred - TP

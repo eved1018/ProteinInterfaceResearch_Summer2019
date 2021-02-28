@@ -775,15 +775,17 @@ def F_score_MCC(predictors,df,cutoff_csv,protein_in_cv):
             thresholdframe = predictedframesort.head(threshhold) 
             predicted_res = thresholdframe.index.values.tolist()
             predicted_res = [str(i) for i in predicted_res]
-            pred_res = []
-            for i in predicted_res: 
-                res_prot = i.split("_")
-                res = res_prot[0]
-                pred_res.append(res)
-            Truepos = []
-            for res in annotated_res:
-                if res in pred_res:
-                    Truepos.append(res)
+            pred_res = [i.split("_")[0] for i in predicted_res]
+            Truepos = [i for i in annotated_res if i in pred_res]
+            # pred_res = []
+            # for i in predicted_res: 
+            #     res_prot = i.split("_")
+            #     res = res_prot[0]
+            #     pred_res.append(res)
+            # Truepos = []
+            # for res in annotated_res:
+            #     if res in pred_res:
+            #         Truepos.append(res)
 
             pred = len(pred_res)
             TP = len(Truepos)

@@ -1,0 +1,129 @@
+
+predus
+
+set: CV1   AUC:0.718
+set: CV2   AUC:0.713
+set: CV3   AUC:0.687
+set: CV4   AUC:0.615
+set: CV5   AUC:0.681
+set: CV6   AUC:0.641
+set: CV7   AUC:0.685
+set: CV8   AUC:0.694
+set: CV9   AUC:0.777
+set: CV10   AUC:0.756
+STDEV:0.04576690944339589
+AVRG: 0.6967000000000001
+
+ispred
+
+set: CV1   AUC:0.801
+set: CV2   AUC:0.804
+set: CV3   AUC:0.781
+set: CV4   AUC:0.796
+set: CV5   AUC:0.827
+set: CV6   AUC:0.835
+set: CV7   AUC:0.826
+set: CV8   AUC:0.775
+set: CV9   AUC:0.835
+set: CV10   AUC:0.799
+STDEV:0.020617710833164743
+AVRG: 0.8079000000000001
+
+dockpred
+
+set: CV1   AUC:0.854
+set: CV2   AUC:0.786
+set: CV3   AUC:0.797
+set: CV4   AUC:0.811
+set: CV5   AUC:0.827
+set: CV6   AUC:0.666
+set: CV7   AUC:0.734
+set: CV8   AUC:0.789
+set: CV9   AUC:0.892
+set: CV10   AUC:0.88
+STDEV:0.06413922356873365
+AVRG: 0.8036000000000001
+
+rfscore
+params: 
+	 number of trees: 100 
+	 depth of trees: 10
+	 pruning paramter: 4.00902332e-05 
+
+set: CV1   AUC:0.885
+set: CV2   AUC:0.865
+set: CV3   AUC:0.847
+set: CV4   AUC:0.851
+set: CV5   AUC:0.896
+set: CV6   AUC:0.842
+set: CV7   AUC:0.876
+set: CV8   AUC:0.84
+set: CV9   AUC:0.925
+set: CV10   AUC:0.905
+STDEV:0.02771930735065365
+AVRG: 0.8732
+
+logreg
+
+set: CV1   AUC:0.857
+coefficients:
+constant:-3.856809405756156
+ predus:1.4207145377492192
+ ispred:2.6149095637787796
+ dockpred:2.3353348870390733
+set: CV2   AUC:0.843
+coefficients:
+constant:-3.875313545567676
+ predus:1.429304257382067
+ ispred:2.643478594665623
+ dockpred:2.398244524526254
+set: CV3   AUC:0.82
+coefficients:
+constant:-3.874711456190185
+ predus:1.5267913833754494
+ ispred:2.6625876290398325
+ dockpred:2.4146855619449803
+set: CV4   AUC:0.828
+coefficients:
+constant:-3.8467514775874414
+ predus:1.664221002472962
+ ispred:2.6492726951777907
+ dockpred:2.3013238711112294
+set: CV5   AUC:0.884
+coefficients:
+constant:-3.830660123504922
+ predus:1.5489803715138124
+ ispred:2.578847073895275
+ dockpred:2.3105023301058343
+set: CV6   AUC:0.848
+coefficients:
+constant:-3.8674638081049704
+ predus:1.4486506211512802
+ ispred:2.493050659266035
+ dockpred:2.578245381611061
+set: CV7   AUC:0.858
+coefficients:
+constant:-3.8352891393548525
+ predus:1.502075701984904
+ ispred:2.58371200126419
+ dockpred:2.456441900107149
+set: CV8   AUC:0.822
+coefficients:
+constant:-3.8527954406112204
+ predus:1.454806596864617
+ ispred:2.638277454963678
+ dockpred:2.3826377164765526
+set: CV9   AUC:0.903
+coefficients:
+constant:-3.7789638117525644
+ predus:1.47045836477557
+ ispred:2.6253273867237668
+ dockpred:2.1795364207595704
+set: CV10   AUC:0.878
+coefficients:
+constant:-3.802029634569364
+ predus:1.4139205576398661
+ ispred:2.641328332185149
+ dockpred:2.3060602867706352
+STDEV:0.02629619744373702
+AVRG: 0.8541000000000001

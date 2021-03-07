@@ -1,0 +1,124 @@
+
+digraph G {
+    splines=line;
+    nodesep=0.1;
+    ranksep=.2;
+    rankdir=TD;
+    margin=0.0;
+    node [margin="0.03" penwidth="0.5" width=.1, height=.1];
+    edge [arrowsize=.4 penwidth="0.3"]
+
+    node3 [margin="0" shape=none label=<<font face="Helvetica" color="#444443" point-size="12">ispred@0.73</font>>]
+	node2 [margin="0" shape=none label=<<font face="Helvetica" color="#444443" point-size="12">predus@0.07</font>>]
+	node1 [margin="0" shape=none label=<<font face="Helvetica" color="#444443" point-size="12">predus@0.21</font>>]
+	node9 [margin="0" shape=none label=<<font face="Helvetica" color="#444443" point-size="12">predus@0.15</font>>]
+	node8 [margin="0" shape=none label=<<font face="Helvetica" color="#444443" point-size="12">dockpred@0.71</font>>]
+	node0 [margin="0" shape=none label=<<font face="Helvetica" color="#444443" point-size="12">dockpred@0.19</font>>]
+    node3 -> leaf4 [penwidth=0.3 color="#444443" label=<>]
+	node3 -> leaf5 [penwidth=0.3 color="#444443" label=<>]
+	
+            {
+                rank=same;
+                leaf4 -> leaf5 [style=invis]
+            }
+            
+	node2 -> node3 [penwidth=0.3 color="#444443" label=<>]
+	node2 -> leaf6 [penwidth=0.3 color="#444443" label=<>]
+	
+            {
+                rank=same;
+                node3 -> leaf6 [style=invis]
+            }
+            
+	node1 -> node2 [penwidth=0.3 color="#444443" label=<>]
+	node1 -> leaf7 [penwidth=0.3 color="#444443" label=<>]
+	
+            {
+                rank=same;
+                node2 -> leaf7 [style=invis]
+            }
+            
+	node9 -> leaf10 [penwidth=0.3 color="#444443" label=<>]
+	node9 -> leaf11 [penwidth=0.3 color="#444443" label=<>]
+	
+            {
+                rank=same;
+                leaf10 -> leaf11 [style=invis]
+            }
+            
+	node8 -> node9 [penwidth=0.3 color="#444443" label=<>]
+	node8 -> leaf12 [penwidth=0.3 color="#444443" label=<>]
+	
+            {
+                rank=same;
+                node9 -> leaf12 [style=invis]
+            }
+            
+	node0 -> node1 [penwidth=0.3 color="#444443" label=<&lt;>]
+	node0 -> node8 [penwidth=0.3 color="#444443" label=<&ge;>]
+	
+            {
+                rank=same;
+                node1 -> node8 [style=invis]
+            }
+            
+    leaf4 [margin="0" shape=box penwidth="0" color="#444443" label=<<table border="0" CELLBORDER="0">
+        <tr><td CELLPADDING="0" CELLSPACING="0"><font face="Helvetica" color="#444443" point-size="14"><i>Node 4</i></font></td></tr>
+        <tr>
+                <td><img src="/var/folders/zf/9pl7d5r576d35_tkz5g668_80000gn/T/leaf4_10256.svg"/></td>
+        </tr>
+        </table>>]
+	leaf5 [margin="0" shape=box penwidth="0" color="#444443" label=<<table border="0" CELLBORDER="0">
+        <tr><td CELLPADDING="0" CELLSPACING="0"><font face="Helvetica" color="#444443" point-size="14"><i>Node 5</i></font></td></tr>
+        <tr>
+                <td><img src="/var/folders/zf/9pl7d5r576d35_tkz5g668_80000gn/T/leaf5_10256.svg"/></td>
+        </tr>
+        </table>>]
+	leaf6 [margin="0" shape=box penwidth="0" color="#444443" label=<<table border="0" CELLBORDER="0">
+        <tr><td CELLPADDING="0" CELLSPACING="0"><font face="Helvetica" color="#444443" point-size="14"><i>Node 6</i></font></td></tr>
+        <tr>
+                <td><img src="/var/folders/zf/9pl7d5r576d35_tkz5g668_80000gn/T/leaf6_10256.svg"/></td>
+        </tr>
+        </table>>]
+	leaf7 [margin="0" shape=box penwidth="0" color="#444443" label=<<table border="0" CELLBORDER="0">
+        <tr><td CELLPADDING="0" CELLSPACING="0"><font face="Helvetica" color="#444443" point-size="14"><i>Node 7</i></font></td></tr>
+        <tr>
+                <td><img src="/var/folders/zf/9pl7d5r576d35_tkz5g668_80000gn/T/leaf7_10256.svg"/></td>
+        </tr>
+        </table>>]
+	leaf10 [margin="0" shape=box penwidth="0" color="#444443" label=<<table border="0" CELLBORDER="0">
+        <tr><td CELLPADDING="0" CELLSPACING="0"><font face="Helvetica" color="#444443" point-size="14"><i>Node 10</i></font></td></tr>
+        <tr>
+                <td><img src="/var/folders/zf/9pl7d5r576d35_tkz5g668_80000gn/T/leaf10_10256.svg"/></td>
+        </tr>
+        </table>>]
+	leaf11 [margin="0" shape=box penwidth="0" color="#444443" label=<<table border="0" CELLBORDER="0">
+        <tr><td CELLPADDING="0" CELLSPACING="0"><font face="Helvetica" color="#444443" point-size="14"><i>Node 11</i></font></td></tr>
+        <tr>
+                <td><img src="/var/folders/zf/9pl7d5r576d35_tkz5g668_80000gn/T/leaf11_10256.svg"/></td>
+        </tr>
+        </table>>]
+	leaf12 [margin="0" shape=box penwidth="0" color="#444443" label=<<table border="0" CELLBORDER="0">
+        <tr><td CELLPADDING="0" CELLSPACING="0"><font face="Helvetica" color="#444443" point-size="14"><i>Node 12</i></font></td></tr>
+        <tr>
+                <td><img src="/var/folders/zf/9pl7d5r576d35_tkz5g668_80000gn/T/leaf12_10256.svg"/></td>
+        </tr>
+        </table>>]
+
+    
+            subgraph cluster_legend {
+                style=invis;
+                legend [penwidth="0" margin="0" shape=box margin="0.03" width=.1, height=.1 label=<
+                
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td border="0" cellspacing="0" cellpadding="0"><img src="/var/folders/zf/9pl7d5r576d35_tkz5g668_80000gn/T/legend_10256.svg"/></td>
+            </tr>
+        </table>
+        
+                >]
+            }
+            
+    
+}
+    

@@ -1,0 +1,139 @@
+
+predus
+
+set: CV1   AUC:0.705
+set: CV2   AUC:0.439
+set: CV3   AUC:0.37
+set: CV4   AUC:0.345
+set: CV5   AUC:0.841
+set: CV6   AUC:0.445
+set: CV7   AUC:0.432
+set: CV8   AUC:0.968
+set: CV9   AUC:0.317
+set: CV10   AUC:0.407
+set: CV11   AUC:0.693
+STDEV:0.21097350113656022
+AVRG: 0.5419999999999999
+
+ispred
+
+set: CV1   AUC:0.895
+set: CV2   AUC:0.879
+set: CV3   AUC:0.965
+set: CV4   AUC:0.824
+set: CV5   AUC:0.932
+set: CV6   AUC:0.352
+set: CV7   AUC:0.854
+set: CV8   AUC:0.889
+set: CV9   AUC:0.437
+set: CV10   AUC:0.845
+set: CV11   AUC:0.718
+STDEV:0.1927176241152534
+AVRG: 0.7809090909090909
+
+dockpred
+
+set: CV1   AUC:0.491
+set: CV2   AUC:0.44
+set: CV3   AUC:0.43
+set: CV4   AUC:0.224
+set: CV5   AUC:0.705
+set: CV6   AUC:0.611
+set: CV7   AUC:0.693
+set: CV8   AUC:1.0
+set: CV9   AUC:0.731
+set: CV10   AUC:0.361
+set: CV11   AUC:0.784
+STDEV:0.21195060238470584
+AVRG: 0.588181818181818
+
+rfscore
+params: 
+	 number of trees: 100 
+	 depth of trees: 10
+	 pruning paramter: 4.00902332e-05 
+
+set: CV1   AUC:0.705
+set: CV2   AUC:0.818
+set: CV3   AUC:0.74
+set: CV4   AUC:0.705
+set: CV5   AUC:0.825
+set: CV6   AUC:0.224
+set: CV7   AUC:0.752
+set: CV8   AUC:0.821
+set: CV9   AUC:0.305
+set: CV10   AUC:0.779
+set: CV11   AUC:0.628
+STDEV:0.19729296083919015
+AVRG: 0.6638181818181818
+
+logreg
+
+set: CV1   AUC:0.896
+coefficients:
+	constant:-2.9736376610378583
+	predus:-0.9658620970150564
+	ispred:2.010055050474926
+	dockpred:0.3211524861312985
+set: CV2   AUC:0.879
+coefficients:
+	constant:-3.0737284121545234
+	predus:-0.03880754885148898
+	ispred:1.9668736262434123
+	dockpred:0.3333920016862553
+set: CV3   AUC:0.91
+coefficients:
+	constant:-3.0493714136366887
+	predus:-0.05083235309223797
+	ispred:2.041748746520502
+	dockpred:0.14996827421660716
+set: CV4   AUC:0.737
+coefficients:
+	constant:-3.1729147873407677
+	predus:0.054034483529850144
+	ispred:2.0938855906493545
+	dockpred:0.3665511071125522
+set: CV5   AUC:0.913
+coefficients:
+	constant:-2.9824529413243033
+	predus:-0.7387660279718197
+	ispred:1.9929985578700056
+	dockpred:0.2393248530730431
+set: CV6   AUC:0.217
+coefficients:
+	constant:-3.133742539632201
+	predus:-0.1501042936926644
+	ispred:2.8777616634916456
+	dockpred:-0.4157434501391208
+set: CV7   AUC:0.841
+coefficients:
+	constant:-2.9130098402473545
+	predus:0.027360276585460485
+	ispred:1.8409906323656107
+	dockpred:0.05262445871303825
+set: CV8   AUC:0.742
+coefficients:
+	constant:-2.9545921309654335
+	predus:-0.19084888735459649
+	ispred:2.2674663205923045
+	dockpred:-0.34806289387532896
+set: CV9   AUC:0.336
+coefficients:
+	constant:-3.071270126680694
+	predus:0.12940950281461613
+	ispred:2.4386792271544198
+	dockpred:-0.8965812152799184
+set: CV10   AUC:0.859
+coefficients:
+	constant:-3.037955902403019
+	predus:0.06932821871321655
+	ispred:1.86203971405945
+	dockpred:0.467194469980356
+set: CV11   AUC:0.678
+coefficients:
+	constant:-3.018840186242015
+	predus:-0.28372387587951936
+	ispred:2.304225403959874
+	dockpred:-0.08924570856022263
+STDEV:0.22680909072690109
+AVRG: 0.7280000000000001

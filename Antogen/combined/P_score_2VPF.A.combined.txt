@@ -1,4 +1,0 @@
-bgcolor="white"> 
-Not 
-17	 PHE
-21	 TYR

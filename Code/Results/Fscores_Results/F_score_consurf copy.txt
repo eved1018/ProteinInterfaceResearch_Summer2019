@@ -1,0 +1,37 @@
+Proteinid  Number_of_known_Interface_residues  True_positives  False_positives  F_score
+1ACB.E     13                                  5               8                .384
+1ACB.I     11                                  1               10               .090
+1AK4.A     9                                   2               7                .222
+1AVX.A     19                                  4               15               .210
+1AY7.A     9                                   3               6                .333
+1DE4.E     21                                  3               18               .142
+1DFJ.E     18                                  0               18               0
+1DQJ.A     18                                  0               18               0
+1E4K.C     12                                  1               11               .083
+1E6J.H     7                                   0               7                0
+1EXB.E     3                                   0               3                0
+1F34.A     23                                  3               20               .130
+1FC2.D     10                                  0               10               0
+1FFW.A     8                                   1               7                .125
+1GHQ.A     5                                   0               5                0
+1GXD.C     18                                  1               17               .055
+1IRA.X     23                                  0               23               0
+1JIW.P     20                                  4               16               .200
+1JPS.H     16                                  0               16               0
+1KAC.A     9                                   0               9                0
+
+global F score = .102 
+average F score = 0.094
+
+consurf pdb not on database
+
+1AHW.A
+1AY7.B
+1BGX.H
+1DFJ.I
+1FFW.B
+1FLE.E
+1GXD.A
+1JIW.I
+1KAC.B
+1KLU.D

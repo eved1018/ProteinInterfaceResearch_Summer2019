@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+
+for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/ROC_3/final/*
+do
+  sed -i '' '/^,/d' $file
+done

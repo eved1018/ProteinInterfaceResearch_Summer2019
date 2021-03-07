@@ -1,0 +1,63 @@
+ StAR: Statistical Analysis of ROC Curves
+Ismael Vergara, Tomas Norambuena, Evandro Ferrada, Alex W. Slater and Francisco Melo
+
+UNIX/LINUX INSTALLATION
+=======================
+
+Before compilig and running StAR your system must have:
+
+1. g++   C/C++ compiler
+2. gsl   GNU Scientific Library
+
+To compile StAR:
+
+$ make
+
+RUN StAR
+========
+
+$ ./star [--sort] file1 file2 alpha
+
+where:
+
+--sort:   (Optional) To sort results by descending AUC (area under the ROC curve)
+file1:    File containing CLASS 1 data
+file2:    File containing CLASS 2 data
+alpha:    Significance level to make statistical inference.  0.00 < alpha < 1.00
+
+The format of file1 and file2:
+
+Each file must contain two or more fields (i.e. a minimum of two classiffiers data must
+be provided). The number of rows in the class1 and class2 files does not need to be the
+same. The fields must be separated by tabs. The first row must contain the
+name of the classifier(s) that will be used to further reference the data.
+
+The comparison between classifiers will be carried out assuming that the consecutive
+position of the fileds corresponds to the same classifier in the negative and positive
+input files (i.e. the order of the fields must be the same between the positive and
+negative data).
+
+Example of valid input files:
+
+Class1 data (file1)         Class2 data (file2)
+
+Csf1  Csf2  Csf3  Csf4      Csf1  Csf2  Csf3  Csf4
+0.343 0.451 0.674 1.559     0.124 0.545 0.771 5.880
+0.272 0.531 0.793 2.510     0.170 0.583 0.651 9.646
+0.565 0.442 0.954 1.438     0.196 0.374 0.763 7.434
+0.436 0.350 0.787 2.767     0.232 0.430 0.984 8.277
+0.213 0.685 0.345 3.026
+0.327 0.652 0.992 2.679
+
+In the example input files above, there are 4 classifiers that will be compared (represented
+by labels "Csf1", "Csf2", "Csf3", and "Csf4"). The class1 input matrix contains 6 instances
+and the class2 input matrix contain 4 instances.
+
+DEMO
+====
+
+Find the files positives.dat and negatives.dat provided with this README file and run StAR
+as follows:
+
+$ ./star positives.dat negatives.dat 0.05
+

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+for file in /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/PDB241/Nox_Raji_PDB/*
+do
+  filename=`echo $file | awk -F/ '{print $10}' |  sed 's/\./_/g' `
+  filename+=".pdb"
+
+  mv $file /Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/PDB241/Nox_Raji_PDB/${filename}
+done

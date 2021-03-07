@@ -1,6 +1,7 @@
 {
-    "python.pythonPath": "/Users/evanedelstein/.pyenv/versions/RajiResearch3.9.1/bin/python",
+    "python.pythonPath": "/Users/user/.pyenv/versions/RajiResearch3.9.1/bin/python",
     "git.ignoreLimitWarning": true,
+    "terminal.integrated.fontFamily": "Hack Nerd Font",
     "workbench.colorCustomizations": {
         "statusBar.background": "#25252528",
         "activityBar.background": "#25252528",

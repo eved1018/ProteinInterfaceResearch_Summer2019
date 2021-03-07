@@ -1,0 +1,15 @@
+bgcolor="white"> 
+Not 
+Not 
+ 
+ 
+100	 LYS
+103	 ASN
+104	 GLU
+36	 PHE
+37	 GLY
+60	 LYS
+61	 GLU
+62	 GLU
+96	 ALA
+99	 LYS

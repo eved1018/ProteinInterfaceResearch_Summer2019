@@ -1,8 +1,0 @@
-#!/usr/bin/python3
-import requests
-
-file = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDB_Files/PDB241/Nox_Raji_PDB/1a0f_A.pdb"
-url = "https://honiglab.c2b2.columbia.edu/PredUs/index_omega.html"
-with open(file, 'rb') as f:
-    r = requests.post(url, files={file: f})
-    print(r.text)

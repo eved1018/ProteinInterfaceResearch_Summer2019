@@ -2,14 +2,17 @@ import pandas as pd
 import numpy as np
 import concurrent.futures
 import multiprocessing
+from pathlib import Path
 # ROC and PR per predictor 
 
 def Main():
+    path = Path(__file__).resolve().parent.parent.parent
     predictors = ['predus', 'ispred', 'dockpred',"rfscore","logreg"]
     # predictors = ["rfscore"]
     # path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPI_result.csv"
-    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
-    frame = pd.read_csv(path)
+    # path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
+    data_path = f"{path}/Meta_DPI/Results/MetaDPIResults"
+    frame = pd.read_csv(data_path)
     frame.set_index('residue', inplace= True )
     param_list = []
     for i in predictors:
@@ -27,22 +30,14 @@ def Main():
     
 
 def ROC(params):
-    
     results_dict= {}
     pr_dict = {}
     (predictor,df) = params    
     df["protein"] = [x.split('_')[1] for x in df.index]
     proteins = df["protein"].unique()
-    # print(proteins)
-    # print(df.head())
     df = df[df['annotated'] != "ERROR"]    
-    # print(annotated_res)
-    # TPRS = []
-    # FPRS = []
-    # Thresholds = []
     for i in np.arange(0.00, 1.02, .01):
         threshhold = float(str(round(i,2)))  
-        # print(threshhold)
         TP_sum = 0
         FP_sum =0
         negs_sum = 0

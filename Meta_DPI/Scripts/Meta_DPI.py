@@ -8,6 +8,11 @@ import concurrent.futures
 import multiprocessing
 import matplotlib.pyplot as plt
 from AUCscript import ROC
+from Treeviz import treeviz
+from Star import Star, ROC_Star
+from pathlib import Path
+import warnings
+warnings.filterwarnings("ignore")
 
 
 
@@ -25,32 +30,34 @@ from AUCscript import ROC
 #   (C) K-fold Cross-validation: Meta_DPI_Cross_Validation.py 
 
 def Main():
-    
+    path = Path(__file__).parents[2]
     start = time.perf_counter()
     code = 1
     # print out any files or just have ROC printed in terminal 
     print_out = False
-    param_test = False
+    param_test = True
     trees = 100
     depth  = 5 
-    ccp = 0.0002
+    # ccp = 0.0002
+    ccp = 0
     viz = False 
     # set col names
-    col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
+    col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated'] #<- make this automatic
 
     # which columns to look at (ie which dependent variables to use)
-    var_col_names =['predus', 'ispred', 'dockpred',"vorfip"]
+    var_col_names =['predus', 'ispred', 'dockpred'] # <- make this automatic 
     # ROC predicter
     predictors = ["rfscore"]
     # change to where u need it to to go 
-    results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI"
-    # data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Logistic_regresion_corrected/final_sort.csv"
-    data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
+    results_path = f"{path}/Meta_DPI/Results/MetaDPIResults"
+    data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort.csv"
+    # data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
     folder = "{}/META_DPI_RESULTS{}" .format(results_path,code)
     if print_out == True:
         while os.path.isdir(folder) is True:
             code = code + 1 
             folder = "{}/META_DPI_RESULTS{}" .format(results_path,code)
+        os.mkdir(folder)
     if param_test == True:
         Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out)
     else:
@@ -58,20 +65,29 @@ def Main():
         ROC_AUC,PR_AUC,predictor = Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars)
         print(f"{predictor} ROC AUC: {ROC_AUC}")
         print(f"{predictor} PR AUC: {PR_AUC}")
+        # try:
+        #     Star_path = f"{path}/Meta_DPI/Data/star-v.1.0/star-v.1.0/"
+        #     Star(results_path,code,Star_path,var_col_names)
+        # except:
+        #     print("Star not working")
         finish = time.perf_counter()
         print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
 
 # test params of RF 
 def Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out):
     
-    ccps = [0.0002,0.0001]
+    # ccps = [0.0002,0.0001]
+    # trees = [500]
+    depth = [5,10,15,25,50]
 
     results_frame = pd.DataFrame(columns=['param','ROC','PR'])
-    for i in ccps:
-        vars = [depth,trees,i]
+    for i in depth:
+        vars = [i,trees,ccp]
         ROC_AUC,PR_AUC,predictor = Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars)
         results_frame.loc[len(results_frame)] = [i,ROC_AUC,PR_AUC]
-    results_frame.plot.scatter(x="param",y="ROC",xlabel = "ccp" ) 
+        print("depth:",i)
+        print("ROC AUC:", ROC_AUC)
+    results_frame.plot.scatter(x="param",y="ROC",xlabel = "param" ) 
     plt.show()
 
 # def Meta_DPI(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out,vars):
@@ -79,8 +95,8 @@ def Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_na
 def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars):
     (depth,trees,ccp) = vars
     if print_out == True:
-        folder = "{}/META_DPI_RESULTS{}" .format(results_path,code)
-        os.mkdir(folder)
+        # folder = "{}/META_DPI_RESULTS{}" .format(results_path,code)
+        # os.mkdir(folder)
         folder = "{}/META_DPI_RESULTS{}/tests" .format(results_path,code)
         os.mkdir(folder)
         os.mkdir( "{}/META_DPI_RESULTS{}/Trees".format(results_path,code))
@@ -101,7 +117,7 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
     data["annotated"] = pd.to_numeric(data["annotated"])
     # setup params for process pool 
     param_list = []
-    for protein in proteins:
+    for count, protein in enumerate(proteins):
         test = data[data["protein"] == protein] 
         train = data[data["protein"] != protein] 
         col_namestest = var_col_names + ["annotated"]
@@ -111,20 +127,25 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
         X = test[feature_cols] 
         # Target variable, noninterface or interface 
         y = test.annotated
-        params = (X,y, train,feature_cols,code,results_path,protein ,trees,depth,ccp,viz,data_path,test,print_out )
+        params = (X,y, train,feature_cols,code,results_path,protein ,trees,depth,ccp,viz,data_path,test,print_out,count )
         param_list.append(params)
     frames =[]
+    
     with concurrent.futures.ProcessPoolExecutor() as executor:
             param_list = param_list
             results = executor.map( Run, param_list)
-            for i in results:
+            for count,i in enumerate(results):
                 (totalframe ,treeparams,coefficients) = i
                 frames.append(totalframe)
+                if count == 1 and viz == True:
+                    treeviz(treeparams,results_path,code,feature_cols)
+
+                
 
     result_frame = pd.concat(frames)
     if print_out == True:
         result_frame.to_csv("{}/META_DPI_RESULTS{}/Meta_DPI_result.csv" .format(results_path,code), float_format='{:f}'.format)
-    
+
     params_list = [(i,result_frame) for i in predictors]
     # print(param_list)
     with concurrent.futures.ProcessPoolExecutor() as executor:
@@ -138,9 +159,10 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
 
 
 def Run(params):
-    (X,y, train,feature_cols,code,results_path,protein ,trees,depth,ccp,viz,data_path,test,print_out ) = params
-    log_results , coefficients = LogReg(feature_cols,X,y,code,results_path,protein,test,print_out )
+    (X,y, train,feature_cols,code,results_path,protein ,trees,depth,ccp,viz,data_path,test,print_out,count) = params
+    log_results , coefficients = LogReg(feature_cols,X,y,code,results_path,protein,test,print_out)
     totalframe, treeparams = RandomFor(X,y,protein,feature_cols,code,trees,depth,ccp,viz,results_path,data_path,log_results,train,test,print_out)
+    # ROC_Star(totalframe,code,count,results_path,feature_cols)
     return totalframe ,treeparams,coefficients
 
 def LogReg(feature_cols,X,y,code,results_path,protein,test,print_out):
@@ -167,9 +189,6 @@ def LogReg(feature_cols,X,y,code,results_path,protein,test,print_out):
         log_results = test.assign(logreg = pval)
         return log_results , coefficients
 
-# in order for the RF to "see" the logistic regresion score and use it in its prediction model changes are needed 
-# something like feature_cols + ["logreg"] and changing X to be from log_results instead. 
-
 def RandomFor(X,y,protein,feature_cols,code,trees,depth,ccp,viz,results_path,data_path,log_results,train,test,print_out):
         
         # X includes the predus, ispred and dockpred score 
@@ -191,14 +210,12 @@ def RandomFor(X,y,protein,feature_cols,code,trees,depth,ccp,viz,results_path,dat
         # y_prob_intr_dec = [round(prob, d) for prob in y_prob_interface]
         # save the residue and probabilty score of the test set to the same folder as the logistic regresion
         df2 = test.assign(rfscore = y_prob_interface )
-        if viz is True:
-            # for i in range(0,100):
-            #     tree = model.estimators_[i]
-            #     print(tree.get_depth())
+        if viz is True:        
             tree = model.estimators_[0]
+            depth = tree.get_depth()
         else:
             tree = False  
-        treeparams = (X, y, tree)
+        treeparams = (X, y, tree,depth)
         totalframe = df2.copy()
         logframe = log_results
         logs = logframe["logreg"]

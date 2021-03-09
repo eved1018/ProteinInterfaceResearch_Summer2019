@@ -28,7 +28,6 @@ import time
 import concurrent.futures
 import multiprocessing
 import subprocess
-import re
 import imgkit
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -46,9 +45,11 @@ from pathlib import Path
 # set all paths 
 
 def main():
-    path = Path(__file__).resolve().parent.parent
-    os.chdir(path)
+    path = Path(__file__).resolve().parent.parent.parent
+    # print("path",path)
     # path = os.path.join
+    # path2 = f"{path}/Results/CrossValidation/hello"
+    # os.mkdir(path2)
     start = time.perf_counter()
     code = 1
     # params for RF
@@ -56,7 +57,7 @@ def main():
     depth  = 10 
     ccp = 0.0000400902332
     # for 5 fold use 44 for 10 use 22  
-    size = 44
+    size = 22
     viz = False 
     Leave_one_Out = False  
     if Leave_one_Out is True:
@@ -67,22 +68,23 @@ def main():
     # which columns to look at (ie which dependent variables to use)
     var_col_names = ['predus', 'ispred', 'dockpred']
     # file containing predictor data and annotated data 
-    data_path = "/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/final_sort.csv"
+    data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort.csv"
     # data_path = "~/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
     # change to where u need it to to go 
-    results_path = "Meta_DPI/Results/CrossValidation/CrossVal_logreg_RF/"
+    results_path = f"{path}/Meta_DPI/Results/CrossValidation/"
     # path to star, get it here http://melolab.org/star/download.php
-    Star_path= "Meta_DPI/Data/star-v.1.0/star-v.1.0/"
+    Star_path= f"{path}/Meta_DPI/Data/star-v.1.0/star-v.1.0/"
     # print("path:", sys.path)
     folder = "{}Crossvaltest{}" .format(results_path,code)
+    # os.mkdir(folder)
     while os.path.isdir(folder) is True:
         code = code + 1 
         folder = "{}Crossvaltest{}" .format(results_path,code)
-        os.mkdir(folder)
+    os.mkdir(folder)
 
-    CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col_names,var_col_names )
+    CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col_names,var_col_names,path)
     try:
-        Star(results_path,code,Star_path)
+        Star(results_path,code,Star_path,var_col_names)
     except:
         print("Star not working")
     finish = time.perf_counter()
@@ -91,7 +93,7 @@ def main():
 # core of the program, creates the chunks of proteins and runs programs in parrelel
 # then unpacks data and computes AUC and ROC image
 
-def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col_names,var_col_names):
+def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col_names,var_col_names,path):
     # dict for results 
     Master= {}
     auc_per_cv ={}
@@ -194,7 +196,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
             # perfrom per cv actions (auc,fscore, mcc,pr)
             auc_per_cv[name] = Dict3
             pr_per_cv[name] = Dict5
-            fscore_mcc_percv_dict = f_score_mcc_wrapper(predictors,totalframe,timer,protein_in_cv)
+            fscore_mcc_percv_dict = f_score_mcc_wrapper(predictors,totalframe,timer,protein_in_cv,path)
             fscore_dict = {}
             mcc_dict = {}
             for i in fscore_mcc_percv_dict: 
@@ -299,7 +301,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
             'Precision': precisions,
             'Recall': recalls
             })
-        print(final_results_pr.head())
+        # print(final_results_pr.head())
         distance_pr = final_results_pr["Recall"].diff()
         midpoint_pr  = final_results_pr["Precision"].rolling(2).sum()
         distance_pr = distance_pr * -1
@@ -338,7 +340,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
     PR_Plt(Master,code,results_path)
 
     # Tree vizualization 
-    if viz == False :
+    if viz == False:
         pass
     else:
         treeviz(treeparams,params,results_path) 
@@ -349,7 +351,7 @@ def Run(params):
     log_results , coefficients = LogReg(test_frame,train_frame,timer,feature_cols,code,results_path )
     totalframe, treeparams = RandomFor(test_frame,train_frame,timer,feature_cols,code,protein_in_cv,trees,depth,ccp,viz,results_path,data_path,log_results)
     Dict2 ,Dict3, Dict4,predictors,Dict5 = ROC_calc(totalframe,protein_in_cv,code,timer,results_path,data_path)
-    ROC_Star(totalframe,code,timer,results_path)
+    ROC_Star(totalframe,code,timer,results_path,feature_cols)
     return timer ,treeparams ,coefficients,Dict2 ,Dict3,Dict4,predictors,totalframe,protein_in_cv,Dict5
 
 
@@ -688,22 +690,25 @@ def treeviz(treeparams, params,results_path):
     viz.save(savefile)
 
 #  three functions that perfrom star covariance plot 
-def ROC_Star(data, code,timer,results_path):
+def ROC_Star(data, code,timer,results_path,cols):
     
     data = data.round({'predus': 3, 'ispred': 3, 'dockpred': 3, 'rfscore': 3,"logreg":3})
     Star_interface = data[data.annotated == 1] 
     Star_non_interface = data[data.annotated == 0]
     Star_interface = Star_interface.drop(columns="annotated")
     Star_non_interface = Star_non_interface.drop(columns="annotated")
-    Star_interface = Star_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
-    Star_non_interface =Star_non_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
+    # Star_interface = Star_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
+    # Star_non_interface =Star_non_interface.rename(columns={'predus':"T1", 'ispred': "T2", 'dockpred':"T3", 'rfscore':"T4",'logreg': 'T5'})
+    for count, pred in enumerate(cols):
+        Star_interface = Star_interface.rename(columns={f"{pred}":f"T{count}"})
+        Star_non_interface = Star_non_interface.rename(columns={f"{pred}":f"T{count}"})
     os.mkdir("{}Crossvaltest{}/Star/CV{}".format(results_path,code,timer))
     path = "{}Crossvaltest{}/Star/CV{}/StarinterfaceCV.txt".format(results_path,code,timer)
     Star_interface.to_csv(path,sep="\t", index=False, header=True)
     path = "{}Crossvaltest{}/Star/CV{}/StarnoninterfaceCV.txt".format(results_path, code,timer)
     Star_non_interface.to_csv(path,sep="\t", index=False, header=True)
 
-def Star(results_path,code,Star_path):
+def Star(results_path,code,Star_path,cols):
     path = "{}Crossvaltest{}/Star".format(results_path, code)
     pathlist = os.listdir(path)
     pathlist.sort(key=natural_keys)
@@ -718,11 +723,18 @@ def Star(results_path,code,Star_path):
             subprocess.run(cmd, shell= True)
             data = pd.read_csv("{}results_sorted.txt".format(Star_path),header =1,engine='python',index_col = 0 , sep = '\t')
             pd.set_option('display.float_format', lambda x: '%.5f' % x)
-            data = data.rename(columns={'T1':"predus", 'T2': "ispred", 'T3':"dockpred", 'T4':"rfscore",'T5': 'logreg'})
+            # data = data.rename(columns={'T1':"predus", 'T2': "ispred", 'T3':"dockpred", 'T4':"rfscore",'T5': 'logreg'})
+            # for col in data.columns:
+            #     data[col] = pd.to_numeric(data[col], errors='coerce')
+            #     data[col] = data[col].replace(np.nan, col , regex=True)
+            # data = data.rename({'T1':"predus", 'T2': "ispred", 'T3':"dockpred", 'T4':"rfscore",'T5': 'logreg'},axis = 'index')
+            for count, pred in enumerate(cols):
+                data = data.rename(columns={f"T{count}":f"{pred}"})
             for col in data.columns:
                 data[col] = pd.to_numeric(data[col], errors='coerce')
                 data[col] = data[col].replace(np.nan, col , regex=True)
-            data = data.rename({'T1':"predus", 'T2': "ispred", 'T3':"dockpred", 'T4':"rfscore",'T5': 'logreg'},axis = 'index')
+            for count, pred in enumerate(cols):
+                data = data.rename(columns={f"T{count}":f"{pred}"},axis='index')
             values = data.values
             lower_triangular = values[np.tril_indices(values.shape[0], -1)]
             html = data.style.applymap(Color,lower_range =lower_triangular)
@@ -743,8 +755,8 @@ def Color(val,lower_range):
 def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 
-def f_score_mcc_wrapper(predictors,df,timer,protein_in_cv):
-    cutoff_path = "~/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/All_protein_cutoffs.csv"
+def f_score_mcc_wrapper(predictors,df,timer,protein_in_cv,path):
+    cutoff_path = f"{path}/Meta_DPI/Data/Test_data/All_protein_cutoffs.csv"
     cutoff_csv = pd.read_csv(cutoff_path) 
     dict = F_score_MCC(predictors,df,cutoff_csv,protein_in_cv)
     return dict
@@ -783,16 +795,6 @@ def F_score_MCC(predictors,df,cutoff_csv,protein_in_cv):
             predicted_res = [str(i) for i in predicted_res]
             pred_res = [i.split("_")[0] for i in predicted_res]
             Truepos = [i for i in annotated_res if i in pred_res]
-            # pred_res = []
-            # for i in predicted_res: 
-            #     res_prot = i.split("_")
-            #     res = res_prot[0]
-            #     pred_res.append(res)
-            # Truepos = []
-            # for res in annotated_res:
-            #     if res in pred_res:
-            #         Truepos.append(res)
-
             pred = len(pred_res)
             TP = len(Truepos)
             FP = pred - TP

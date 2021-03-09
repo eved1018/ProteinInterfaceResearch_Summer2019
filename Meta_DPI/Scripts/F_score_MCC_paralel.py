@@ -4,22 +4,24 @@ import os
 import concurrent.futures
 import multiprocessing
 from numpy import sqrt
-
+from pathlib import Path
 # fscore and mcc  per protein(saved as csv) and per predictor (printed)
 
 
 def Main():
+    path = Path(__file__).resolve().parent.parent.parent
 #   predictors = ["vorffip"]
 #   check that predictor is in columns
-    predictors = ['predus', 'ispred', 'dockpred', 'rfscore','logreg']
-    path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPi_result.csv"
+    predictors = ['vorffip']
+    # path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPi_result.csv"
+    data_path = f"{path}/Meta_DPI/Data/Test_data/vorffip_reformatted.csv"
     # path = "/Users/evanedelstein/Desktop/1p_test.csv"
-    result_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/results/"
-    cutoff_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/All_protein_cutoffs.csv"
+    result_path = f"{path}/Meta_DPI/Results/Fscore_MCC/"
+    cutoff_path = f"{path}/Meta_DPI/Data/Test_data/All_protein_cutoffs.csv"
     # cutoff = (6.1^-residues)(constant) 
     # F_score(predictors,path,cutoff_path)
     cutoff_csv = pd.read_csv(cutoff_path)
-    df = pd.read_csv(path)
+    df = pd.read_csv(data_path)
     df.set_index('residue', inplace= True )
     df["protein"] = [x.split('_')[1] for x in df.index]
     proteins = df["protein"].unique()
@@ -32,7 +34,7 @@ def Main():
     mcc_score_per_protein["protein"] = proteins
     mcc_score_per_protein.set_index('protein', inplace=True)
     np.seterr(all='raise')
-    for predictor in predictors:
+    for ∆ in predictors:
             # print(predictor)
             TP_sum = 0
             FP_sum =0
@@ -42,7 +44,6 @@ def Main():
             TN_sum = 0
             params_list = []
             for protein in proteins:
-                
                 frame = df[df["protein"] == protein] 
                 params = [predictor,protein,cutoff_csv,frame] 
                 params_list.append(params)

@@ -57,7 +57,7 @@ def main():
     depth  = 10 
     ccp = 0.0000400902332
     # for 5 fold use 44 for 10 use 22  
-    size = 22
+    size = 44
     viz = False 
     Leave_one_Out = False  
     if Leave_one_Out is True:
@@ -236,6 +236,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
                     "recall": []
                     }
                     Master[key] = D
+
     for key in Dict4:
         
         tps = Master[key]["tps"] 
@@ -302,6 +303,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
             'Recall': recalls
             })
         # print(final_results_pr.head())
+        
         distance_pr = final_results_pr["Recall"].diff()
         midpoint_pr  = final_results_pr["Precision"].rolling(2).sum()
         distance_pr = distance_pr * -1
@@ -317,6 +319,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
         Master[key]["PR_AUC"].append(sum_AUC_pr)
         Master[key]["precision"].append(precisions)
         Master[key]["recall"].append(recalls)
+        
     # print("prec:",Master[key]["precision"])
     # print("rec:",Master[key]["recall"])
 
@@ -622,18 +625,27 @@ def atoi(text):
 
 # ROC plot 
 def ROC_Plt(Master, code,results_path):
-    predictors = []
-    for key in Master:
-        predictors.append(key)
+   
+
+    predictors = [i for i in Master]
+    # for key in Master:
+    #     predictors.append(key)
     color_index = 0    
     colors = ["#0000FF","#ff8333","#008000","#FFFF00","#800080","#00FF00","#808000","#00FFFF","#FF0000","#008080","#000080","#FF00FF"]
     plt.title('Receiver Operating Characteristic')
-   
-    for key in predictors:
+
+    cols = [[f"{key}_FPR",f"{key}_TPR"] for key in predictors]
+    excel = pd.DataFrame(columns = cols)
+    
+
+    for key in predictors:  
+          
         AUC = Master[key]["AUC"][0]
         AUC = AUC.round(3)
         TPRS = Master[key]['TPRS'][0]
         FPRS = Master[key]['FPRS'][0]
+        excel[f"{key}_FPR"] = FPRS
+        excel[f"{key}_TPR"] = TPRS
         plt.plot(FPRS, TPRS, c=colors[color_index], label = '{}: AUC = {}'.format(Master[key]["name"],AUC))
         color_index += 1
     plt.style.use("fivethirtyeight")
@@ -645,11 +657,15 @@ def ROC_Plt(Master, code,results_path):
     plt.xlabel('False Positive Rate')
     plt.savefig( "{}/Crossvaltest{}/ROC.png" .format(results_path,code))
     plt.clf()
+    # excel.head()
+    excel.to_csv(f"{results_path}/Crossvaltest{code}/ROC_csv.csv")
 
 def PR_Plt(Master, code, results_path):
-    predictors = []
-    for key in Master:
-        predictors.append(key)
+    predictors = [i for i in Master]
+    cols = [[f"{key}_Recall",f"{key}_Precsion",f"{key}_AUC"] for key in predictors]
+    excel = pd.DataFrame(columns = cols)
+    # for key in Master:
+    #     predictors.append(key)
     color_index = 0    
     colors = ["#0000FF","#ff8333","#008000","#FFFF00","#800080","#00FF00","#808000","#00FFFF","#FF0000","#008080","#000080","#FF00FF"]
     plt.title('PR Curve')
@@ -661,8 +677,15 @@ def PR_Plt(Master, code, results_path):
         # precision =[i for i in precision if i != 0]
         recall = Master[key]['recall'][0]
         # recall =[i for i in recall if i != 0]
+        excel[f"{key}_Recall"] = recall
+        excel[f"{key}_Precsion"] = precision
+        # excel[f"{key}_AUC"] = AUC
+        if color_index == 13:
+            color_index = 1
+        else: 
+            color_index += 1
         plt.plot(recall, precision, c=colors[color_index], label = '{}: PR-AUC = {}'.format(Master[key]["name"],AUC))
-        color_index += 1
+        
     plt.style.use("fivethirtyeight")
     plt.legend(loc = 'upper right')
     # plt.plot([0, 1], [0, 1],'r--')
@@ -671,7 +694,9 @@ def PR_Plt(Master, code, results_path):
     plt.ylabel('precision')
     plt.xlabel('recall')
     plt.savefig( "{}/Crossvaltest{}/PR.png" .format(results_path,code))
-    plt.clf()
+    plt.clf()   
+    excel.to_csv(f"{results_path}/Crossvaltest{code}/PR_csv.csv")
+
 
 # RF tree vizualizer
 def treeviz(treeparams, params,results_path):
@@ -691,7 +716,6 @@ def treeviz(treeparams, params,results_path):
 
 #  three functions that perfrom star covariance plot 
 def ROC_Star(data, code,timer,results_path,cols):
-    
     data = data.round({'predus': 3, 'ispred': 3, 'dockpred': 3, 'rfscore': 3,"logreg":3})
     Star_interface = data[data.annotated == 1] 
     Star_non_interface = data[data.annotated == 0]

@@ -1,7 +1,6 @@
 TEST	AUC
-T4	0.914572
-T5	0.905464
-T3	0.881546
-T2	0.816816
-T1	0.769475
-protein	0.518331
+logreg	0.919637
+rfscore	0.873596
+ispred	0.810067
+dockpred	0.802611
+predus	0.697029

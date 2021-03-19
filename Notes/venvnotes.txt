@@ -1,0 +1,26 @@
+Venv:
+Mac/linux
+1) download python and homebrew 
+2) python3 -m venv <location>
+3) source <location>/bin/activate 
+4) deactivate 
+
+Windows
+
+1)download python 
+2)python3 -m venv <location>
+3)<location>Scripts/activate.bat
+4) deactivate
+
+Alias activate
+1) make ~/.bashrc file 
+2) add alias Ractivate="source <venv loaction>/bin/activate" 
+
+ 
+Requirements: 
+
+pip freeze > reqs.txt
+pip install r reqs.txt 
+
+
+

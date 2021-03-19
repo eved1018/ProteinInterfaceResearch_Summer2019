@@ -9,7 +9,7 @@ import multiprocessing
 import matplotlib.pyplot as plt
 from AUCscript import ROC
 from Treeviz import treeviz
-from Star import Star, ROC_Star
+from Star import Star_Leave_one_out
 from pathlib import Path
 import warnings
 warnings.filterwarnings("ignore")
@@ -35,64 +35,72 @@ def Main():
     code = 1
     # print out any files or just have ROC printed in terminal 
     print_out = False
-    param_test = True
+    param_test = False
     trees = 100
-    depth  = 5 
+    depth  = 10 
     # ccp = 0.0002
     ccp = 0
     viz = False 
     # set col names
-    col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated'] #<- make this automatic
+    col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated'] #<-  make this automatic
 
     # which columns to look at (ie which dependent variables to use)
-    var_col_names =['predus', 'ispred', 'dockpred'] # <- make this automatic 
-    # ROC predicter
-    predictors = ["rfscore"]
+    var_col_names =['predus', 'ispred', 'dockpred'] # <- TODO make this automatic '
+ 
+    # ROC predicter 
+    predictors = ["rfscore"] # <- TODO  make auto 
     # change to where u need it to to go 
     results_path = f"{path}/Meta_DPI/Results/MetaDPIResults"
     data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort.csv"
     # data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
-    folder = "{}/META_DPI_RESULTS{}" .format(results_path,code)
-    if print_out == True:
-        while os.path.isdir(folder) is True:
-            code = code + 1 
-            folder = "{}/META_DPI_RESULTS{}" .format(results_path,code)
-        os.mkdir(folder)
+    folder = "{}/Meta_DPI_results{}" .format(results_path,code)
+    # if print_out == True:
+    while os.path.isdir(folder) is True:
+        code = code + 1 
+        folder = "{}/Meta_DPI_results{}" .format(results_path,code)
+    os.mkdir(folder)
     if param_test == True:
-        Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out)
+        Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out,path)
     else:
         vars = [depth,trees,ccp]
-        ROC_AUC,PR_AUC,predictor = Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars)
-        print(f"{predictor} ROC AUC: {ROC_AUC}")
-        print(f"{predictor} PR AUC: {PR_AUC}")
+        result_list,roc_excel,pr_excel = Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars,path)
+        for i in result_list:
+            (predictor, ROC_AUC,PR_AUC) = i 
+            print(f"{predictor} ROC AUC: {ROC_AUC}")
+            print(f"{predictor} PR AUC: {PR_AUC}")
         # try:
         #     Star_path = f"{path}/Meta_DPI/Data/star-v.1.0/star-v.1.0/"
         #     Star(results_path,code,Star_path,var_col_names)
         # except:
         #     print("Star not working")
+        pr_excel.to_csv(f"{path}/pr_excel.csv")
+        roc_excel.to_csv(f"{path}/roc_excel.csv")
         finish = time.perf_counter()
         print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
 
 # test params of RF 
-def Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out):
+def Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out,path):
     
-    # ccps = [0.0002,0.0001]
+    # ccps = [0.000025,0.00005, 0.000075]
     # trees = [500]
-    depth = [5,10,15,25,50]
-
+    # depth = [5,10,15,25,50]
+    ccps = [0]
     results_frame = pd.DataFrame(columns=['param','ROC','PR'])
-    for i in depth:
-        vars = [i,trees,ccp]
-        ROC_AUC,PR_AUC,predictor = Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars)
-        results_frame.loc[len(results_frame)] = [i,ROC_AUC,PR_AUC]
-        print("depth:",i)
-        print("ROC AUC:", ROC_AUC)
-    results_frame.plot.scatter(x="param",y="ROC",xlabel = "param" ) 
-    plt.show()
+    for i in ccps:
+        print("start")
+        vars = [depth,trees,i]
+        result_list,roc_excel,pr_excel = Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars,path)
+        for i in result_list:
+            (predictor, ROC_AUC,PR_AUC) = i 
+            results_frame.loc[len(results_frame)] = [i,ROC_AUC,PR_AUC]
+            print("ccp:",i)
+            print("ROC AUC:", ROC_AUC)
+        results_frame.plot.scatter(x="param",y="ROC",xlabel = "param" ) 
+        plt.show()
 
 # def Meta_DPI(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out,vars):
 
-def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars):
+def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars,path):
     (depth,trees,ccp) = vars
     if print_out == True:
         # folder = "{}/META_DPI_RESULTS{}" .format(results_path,code)
@@ -145,15 +153,30 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
     result_frame = pd.concat(frames)
     if print_out == True:
         result_frame.to_csv("{}/META_DPI_RESULTS{}/Meta_DPI_result.csv" .format(results_path,code), float_format='{:f}'.format)
-
+    result_frame.to_csv("{}/META_DPI_RESULTS{}/Meta_DPI_result.csv" .format(results_path,code), float_format='{:f}'.format)
+    Star_Leave_one_out(result_frame,path,results_path,code)
     params_list = [(i,result_frame) for i in predictors]
     # print(param_list)
+    
+    roc_cols = [[f"{key}_Recall",f"{key}_Precsion",f"{key}_AUC"] for key in predictors]
+    roc_excel = pd.DataFrame(columns = roc_cols)
+    pr_cols = [[f"{key}_FPR",f"{key}_TPR"] for key in predictors]
+    pr_excel = pd.DataFrame(columns = pr_cols)
+    result_list = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
         params_list = params_list
         results = executor.map( ROC_wrapper, params_list)
         for i in results:
-            (predictor, ROC_AUC,PR_AUC) = i
-            return ROC_AUC,PR_AUC,predictor
+            (predictor, ROC_AUC,PR_AUC, PR_frame,results_frame) = i
+            roc_cols[f"{predictor}_TPR"]=results_frame["TPR"]
+            roc_cols[f"{predictor}_FPR"]=results_frame["FPR"]
+            pr_excel[f"{predictor}_Precsion"] = PR_frame["Precision"]
+            pr_excel[f"{predictor}_Recall"] = PR_frame["Recall"]
+            results = (predictor, ROC_AUC,PR_AUC)
+            result_list.append(results)
+            # return ROC_AUC,PR_AUC,predictor
+    return result_list,roc_excel,pr_excel
+    
 
                 
 
@@ -229,8 +252,9 @@ def RandomFor(X,y,protein,feature_cols,code,trees,depth,ccp,viz,results_path,dat
 def ROC_wrapper(params):
     (predictor,df) = params
     # print(predictor)
-    predictor , ROC_AUC ,PR_AUC = ROC(params)
-    return predictor , ROC_AUC ,PR_AUC
+    predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame = ROC(params)
+
+    return predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame
     
 
 if __name__ == '__main__':

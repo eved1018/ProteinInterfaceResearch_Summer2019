@@ -103,6 +103,8 @@ def ROC(params):
     sum_AUC = AUC.sum()
     ROC_AUC = sum_AUC
 
+
+
     PR_frame = pd.DataFrame.from_dict(pr_dict,columns = ["Precision","Recall"],orient= 'index')
     # print(results_frname)
     distance = PR_frame["Recall"].diff()
@@ -112,7 +114,7 @@ def ROC(params):
     PR_AUC = PR_AUC/2
     sum_AUC = PR_AUC.sum()
     PR_AUC = sum_AUC
-    return predictor , ROC_AUC ,PR_AUC
+    return predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame
     
 # if __name__ == '__main__':
 #     Main()

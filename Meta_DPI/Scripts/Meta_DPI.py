@@ -45,7 +45,7 @@ def Main():
     col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated'] #<-  make this automatic
 
     # which columns to look at (ie which dependent variables to use)
-    var_col_names =['predus', 'ispred', 'dockpred'] # <- TODO make this automatic '
+    var_col_names =['predus', 'ispred', 'dockpred'] # <- TODO make this automatic 
  
     # ROC predicter 
     predictors = ["rfscore"] # <- TODO  make auto 
@@ -73,8 +73,8 @@ def Main():
         #     Star(results_path,code,Star_path,var_col_names)
         # except:
         #     print("Star not working")
-        pr_excel.to_csv(f"{path}/pr_excel.csv")
-        roc_excel.to_csv(f"{path}/roc_excel.csv")
+        pr_excel.to_csv(f"{results_path}/pr_excel.csv")
+        roc_excel.to_csv(f"{results_path}/roc_excel.csv")
         finish = time.perf_counter()
         print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
 
@@ -157,10 +157,9 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
     Star_Leave_one_out(result_frame,path,results_path,code)
     params_list = [(i,result_frame) for i in predictors]
     # print(param_list)
-    
-    roc_cols = [[f"{key}_Recall",f"{key}_Precsion",f"{key}_AUC"] for key in predictors]
+    roc_cols = [[f"{key}_FPR",f"{key}_TPR"] for key in predictors]
     roc_excel = pd.DataFrame(columns = roc_cols)
-    pr_cols = [[f"{key}_FPR",f"{key}_TPR"] for key in predictors]
+    pr_cols = [[f"{key}_Recall",f"{key}_Precsion"] for key in predictors]
     pr_excel = pd.DataFrame(columns = pr_cols)
     result_list = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
@@ -168,8 +167,8 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
         results = executor.map( ROC_wrapper, params_list)
         for i in results:
             (predictor, ROC_AUC,PR_AUC, PR_frame,results_frame) = i
-            roc_cols[f"{predictor}_TPR"]=results_frame["TPR"]
-            roc_cols[f"{predictor}_FPR"]=results_frame["FPR"]
+            roc_excel[f"{predictor}_TPR"]=results_frame["TPR"]
+            roc_excel[f"{predictor}_FPR"]=results_frame["FPR"]
             pr_excel[f"{predictor}_Precsion"] = PR_frame["Precision"]
             pr_excel[f"{predictor}_Recall"] = PR_frame["Recall"]
             results = (predictor, ROC_AUC,PR_AUC)

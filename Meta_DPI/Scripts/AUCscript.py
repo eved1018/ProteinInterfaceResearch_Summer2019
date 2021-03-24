@@ -49,8 +49,9 @@ from pathlib import Path
 #     pr_excel.to_csv("/Users/user/Desktop/Research_Evan/MetaDPI/Meta_DPI/Data/Test_data/pr_resulst.csv")
 def test_wrap2():
     path = Path(__file__).parents[2]
-    predictors = ["logreg","rfscore"]
-    data_path = "/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv"
+    predictors = ["vorffip"]
+    # data_path = "/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv"
+    data_path = f"{path}/Meta_DPI/Data/Test_data/vorffip_columns.txt"
     frame = pd.read_csv(data_path)
     frame.set_index('residue', inplace= True )
     print(frame.head()) 

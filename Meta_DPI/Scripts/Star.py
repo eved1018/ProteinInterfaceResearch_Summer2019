@@ -117,6 +117,8 @@ def star_file_collecter(Star_path,path,results_folder,code):
     cmd_2 = "cat results_sorted.txt >> Star_results.txt"
     cm_3 = f"mv Star_results.txt {results_folder}"
     subprocess.run(cmd, shell= True)
+    subprocess.run(cmd_2, shell= True)
+    subprocess.run(cm_3, shell= True)
     return 
 
 

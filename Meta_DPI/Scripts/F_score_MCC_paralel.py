@@ -53,7 +53,7 @@ def Main():
             with concurrent.futures.ProcessPoolExecutor() as executor:
                 params_list = params_list
                 # results = executor.map( Run, params_list)
-                results = executor.map(debug_run, params_list)
+                results = executor.map(Run, params_list)
                 for i in results:
                     (TP, TN, FP, FN, threshhold, N,predictor, protein) = i
                     TP_sum += TP
@@ -94,7 +94,6 @@ def Main():
 
 def Run(params): 
     (predictor,protein,cutoff_csv,frame) = params
-    print(predictor, protein)
     total_res = len(frame.index)
     annotated_frame = frame[frame['annotated'] == 1]
     annotated_res_prot = annotated_frame.index.tolist()

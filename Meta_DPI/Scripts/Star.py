@@ -129,6 +129,6 @@ def test_wrapper():
     results_path = "/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults"
     Star_Leave_one_out(df,path,results_path, code)
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # Star_Leave_one_out()
-    test_wrapper()
+    # test_wrapper()

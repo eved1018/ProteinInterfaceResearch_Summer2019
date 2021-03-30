@@ -15,7 +15,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-
 # Runs Meta_DPI which performs logistic regresion (LR) and random forest(RF) to combine interface predictors into a single interface metric. 
 # Takes in file of columns residue_protein | predictor 1 |predictor 2....| annotated
 # annotated should be a binary classifier, 0 for non-interface and 1 for interface
@@ -163,7 +162,7 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
     pr_excel = pd.DataFrame(columns = pr_cols)
     result_list = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        params_list = params_list
+        params_list = params_list #<- take out 
         results = executor.map( ROC_wrapper, params_list)
         for i in results:
             (predictor, ROC_AUC,PR_AUC, PR_frame,results_frame) = i

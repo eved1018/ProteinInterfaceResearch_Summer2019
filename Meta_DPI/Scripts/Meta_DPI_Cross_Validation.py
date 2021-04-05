@@ -31,6 +31,7 @@ import subprocess
 import imgkit
 import matplotlib.pyplot as plt
 from pathlib import Path
+import random 
 
 # TO DO 
 # (1) softcode star stuff
@@ -55,7 +56,7 @@ def main():
     # params for RF
     trees = 100
     depth  = 10 
-    ccp = 0.0000400902332
+    ccp = 0.000025
     # for 5 fold use 44 for 10 use 22  
     size = 44
     viz = False 
@@ -139,9 +140,10 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
 
     # create sublist of sets containing 22 proteins in each set or "chunk"
     # n controls the number of proteins in each set
-    lst = proteinids
+    # lst = random.shuffle(proteinids)
+    protein_lst = random.sample(proteinids, k=len(proteinids))
     n = size
-    chunks = [lst[i:i + n] for i in range(0, len(lst), n)]
+    chunks = [protein_lst[i:i + n] for i in range(0, len(protein_lst), n)]
     # checks to make sure the last set contains n number of proteins in it, if not it will give one of its proteins to each previous set.
     # that is if teh last chunk contains 3 proteins, the last three chunks will conatin 23 instead of 22 proteins in them. 
     timer = 0 

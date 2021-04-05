@@ -2,6 +2,7 @@
 import os 
 import multiprocessing
 import subprocess
+from typing import Reversible
 import imgkit
 import re 
 import pandas as pd 
@@ -129,6 +130,39 @@ def test_wrapper():
     results_path = "/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults"
     Star_Leave_one_out(df,path,results_path, code)
 
+def meta_methods_comparison():
+    Star_path = "/Users/user/Desktop/Research_Evan/MetaDPI/Meta_DPI/Data/star-v.1.0/"
+    meta_results = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv")
+    vorfip = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/vorffip_columns.txt")
+    ppisp = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/meta-ppisp-results-comma-new.txt")
+    results = pd.DataFrame()
+    results["residue"] = meta_results["residue"]
+    results["logreg"] = meta_results["logreg"]
+    results["rfscore"] = meta_results["rfscore"]
+    results["vorffip"] = vorfip["vorffip"]
+    results["meta_ppisp"] = ppisp["meta-ppisp"]
+    results["annotated"] = meta_results["annotated"]
+
+    df_interface  = results[results.annotated == 1]
+    non_interface = results[results.annotated == 0]
+
+    df_interface = df_interface.drop(columns = ['residue','annotated'])
+    non_interface  =non_interface.drop(columns = ['residue','annotated'])
+    df_interface.to_csv(f"{Star_path}StarinterfaceCV.txt",index= False,sep="\t")
+    non_interface.to_csv(f"{Star_path}StarnoninterfaceCV.txt",index=False,sep="\t") 
+
+    cmd ='./star --sort StarinterfaceCV.txt StarnoninterfaceCV.txt 0.05' #<- TODO makesure pval of 0.05 is actually working 
+    os.chdir(Star_path)
+    subprocess.run(cmd, shell= True)
+
+
+    
+
+meta_methods_comparison()
+
+
+# test_wrapper()
+    
 # if __name__ == '__main__':
     # Star_Leave_one_out()
-    # test_wrapper()
+    

@@ -130,18 +130,29 @@ def test_wrapper():
     results_path = "/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults"
     Star_Leave_one_out(df,path,results_path, code)
 
+
+
 def meta_methods_comparison():
+    print("start")
     Star_path = "/Users/user/Desktop/Research_Evan/MetaDPI/Meta_DPI/Data/star-v.1.0/"
     meta_results = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv")
     vorfip = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/vorffip_columns.txt")
+    vorfip["residue"] = [i.split("_")[0]+ "_" +i.split("_")[1] for i in vorfip["residue"]]
+    vorfip = vorfip.drop(columns = ['annotated'])
+    print(vorfip.head())
+
     ppisp = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/meta-ppisp-results-comma-new.txt")
+    ppisp = ppisp.drop(columns = ['annotated'])
+
     results = pd.DataFrame()
     results["residue"] = meta_results["residue"]
     results["logreg"] = meta_results["logreg"]
     results["rfscore"] = meta_results["rfscore"]
-    results["vorffip"] = vorfip["vorffip"]
-    results["meta_ppisp"] = ppisp["meta-ppisp"]
+
     results["annotated"] = meta_results["annotated"]
+    results = results.merge(vorfip,how="inner", on="residue")
+    results = results.merge(ppisp,how="inner", on="residue")
+    print(results.head())
 
     df_interface  = results[results.annotated == 1]
     non_interface = results[results.annotated == 0]
@@ -154,12 +165,9 @@ def meta_methods_comparison():
     cmd ='./star --sort StarinterfaceCV.txt StarnoninterfaceCV.txt 0.05' #<- TODO makesure pval of 0.05 is actually working 
     os.chdir(Star_path)
     subprocess.run(cmd, shell= True)
-
-
-    
+    print("done")
 
 meta_methods_comparison()
-
 
 # test_wrapper()
     

@@ -1,3 +1,5 @@
+from datetime import MAXYEAR
+from numpy import positive
 import pandas as pd
 from pathlib import Path
 # cols = ["x","y","z","a","b"]
@@ -75,7 +77,7 @@ print(len(head.index))
 print(f"new \n line?")
 # %%
 import pandas as pd
-final_sort = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/final_sort.csv", names=["residue","predus","ispred","dockpred","annotated"])
+final_sort = pd.read_csv("/Users/user/Des`k`top/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/final_sort.csv", names=["residue","predus","ispred","dockpred","annotated"])
 # final_sort.head()
 vorffip_frame = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/vorffip_renumbered.txt")
 # vorffip_frame.head()
@@ -98,3 +100,214 @@ print(f"final sort {final_sort.info()}\nvorffip {vorffip_frame.info()}")
 # vorffip_updated_frame.head()
 
 # %%
+from scipy import stats
+import pandas as pd 
+x= pd.read_csv("")      
+stats.kstest(x, 'norm')
+
+
+# #%%
+# from sklearn.metrics import precision_recall_curve
+# import pandas as pd 
+# from pathlib import Path
+# import matplotlib.pyplot as plt
+
+# def PR(params):
+#     predictor,data_path = params
+#     path = Path(__file__).parents[2]
+#     data_path = f"{path}/Meta_DPI/{data_path}"
+#     frame = pd.read_csv(data_path)
+#     frame= frame.fillna(method='ffill')
+#     y_true = frame["annotated"]
+#     y_scores = frame[f"{predictor}"]
+#     # print(y_true,y_scores)
+#     precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
+#     # print(precision, recall, thresholds)
+#     pr_frame = pd.DataFrame()
+#     pr_frame["precision"] = precision
+#     pr_frame["recall"] = recall
+#     max = pr_frame["precision"].max()
+#     print(max)
+#     plt.plot(recall,precision,label=f"{predictor}")
+#     plt.legend()    
+
+# params = [("rfscore","Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv"),("logreg","Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv"),("vorffip","Data/Test_data/vorffip_columns.txt"),("meta-ppisp","Data/Test_data/meta-ppisp-results-comma-new.txt")]
+# for i in params:
+#     PR(i)
+# %%
+from sklearn.metrics import precision_recall_curve
+import pandas as pd 
+from pathlib import Path
+import matplotlib.pyplot as plt
+
+def PR(params):
+    predictor,data_path = params
+    path = Path(__file__).parents[2]
+    data_path = f"{path}/Meta_DPI/{data_path}"
+    frame = pd.read_csv(data_path)
+    frame= frame.fillna(method='ffill')
+    y_true = frame["annotated"]
+    y_scores = frame[f"{predictor}"]
+    # print(y_true,y_scores)
+    precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
+    # print(precision, recall, thresholds)
+    pr_frame = pd.DataFrame()
+    pr_frame["precision"] = precision
+    pr_frame["recall"] = recall
+    pr_frame = pr_frame[pr_frame.precision != 1]
+    max = pr_frame["precision"].idxmax()
+    pr_frame= pr_frame.head(max)
+    pr_excel[f"{predictor}_Precsion"] = pr_frame["precision"]
+    pr_excel[f"{predictor}_Recall"] = pr_frame["recall"]
+    plt.plot(pr_frame["recall"] ,pr_frame["precision"],label=f"{predictor}")
+    plt.legend()
+
+pr_excel = pd.DataFrame()
+params = [("rfscore","Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv"),("logreg","Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv"),("vorffip","Data/Test_data/vorffip_columns.txt"),("meta-ppisp","Data/Test_data/meta-ppisp-results-comma-new.txt")]
+for i in params:
+    PR(i)
+pr_excel.to_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_Results7/PR_baseline.csv")
+
+# %%
+import pandas as pd 
+from pathlib import Path
+import os 
+import subprocess
+
+path = Path(__file__).parents[2]
+Star_path = "/Users/user/Desktop/Research_Evan/MetaDPI/Meta_DPI/Data/star-v.1.0/"
+meta_results = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv")
+ppisp = pd.read_csv(f"{path}/Meta_DPI/Data/Test_data/meta-ppisp-results-comma-new.txt")
+vorfip = pd.read_csv(f"{path}/Meta_DPI/Data/Test_data/vorffip_columns.txt")
+vorfip = vorfip.drop(columns = ['annotated'])
+ppisp = ppisp.drop(columns = ['annotated'])
+
+results = pd.DataFrame()
+results["residue"] = meta_results["residue"]
+results["logreg"] = meta_results["logreg"]
+results["rfscore"] = meta_results["rfscore"]
+vorfip["residue"] = [i.split("_")[0]+ "_" +i.split("_")[1] for i in vorfip["residue"]]
+results["annotated"] = meta_results["annotated"]
+results = results.merge(vorfip,how="inner", on="residue")
+results = results.merge(ppisp,how="inner", on="residue")
+# print(results)
+results["protein"] = [x.split('_')[1] for x in results['residue']]
+proteins = results["protein"].unique()
+proteins = proteins[0:50]
+
+results = results[results["protein"].isin(proteins)]
+print(results)
+df_interface  = results[results.annotated == 1]
+non_interface = results[results.annotated == 0]
+df_interface = df_interface.drop(columns = ['residue','annotated','protein'])
+non_interface  =non_interface.drop(columns = ['residue','annotated','protein'])
+# print(df_interface)
+df_interface.to_csv(f"{Star_path}StarinterfaceCV.txt",index= False,sep="\t")
+non_interface.to_csv(f"{Star_path}StarnoninterfaceCV.txt",index=False,sep="\t") 
+print("made")
+cmd ='./star --sort StarinterfaceCV.txt StarnoninterfaceCV.txt 0.05' #<- TODO makesure pval of 0.05 is actually working 
+os.chdir(Star_path)
+subprocess.run(cmd, shell= True)
+print("done")
+
+# %%
+params = [("rfscore","Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv")]
+from sklearn.metrics import precision_recall_curve
+import pandas as pd 
+from pathlib import Path
+import matplotlib.pyplot as plt
+
+def PR(params):
+    predictor,data_path = params
+    path = Path(__file__).parents[2]
+    data_path = f"{path}/Meta_DPI/{data_path}"
+    frame = pd.read_csv(data_path)
+    frame= frame.fillna(method='ffill')
+    y_true = frame["annotated"]
+    y_scores = frame[f"{predictor}"]
+    # print(y_true,y_scores)
+    precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
+    # print(precision, recall, thresholds)
+    pr_frame = pd.DataFrame()
+    pr_frame["precision"] = precision
+    pr_frame["recall"] = recall
+    pr_frame = pr_frame[pr_frame.precision != 1]
+    max = pr_frame["precision"].max()
+    print(max)
+for i in params:
+    PR(i)
+# %%
+import pandas as pd 
+
+l = [10,11,12,13,9,8,7]
+m = [45,46,47,48,49,50,40]
+df = pd.DataFrame()
+df["low"] = l 
+df["high"] = m 
+max =df.low.idxmax()
+df = df.head(max+1)
+df
+# df[f"{i}"]loc[2,:]
+# %%
+
+li = [0,1,2,3,4,5]
+print(li[0:2])
+
+# %%
+import pandas as pd
+import numpy as np 
+import scipy.stats as ss
+
+f_scores = pd.read_excel("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Notes/Spring2021/Fscore_results.xlsx")
+mcc  = pd.read_excel("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Notes/Spring2021/MCC_results.xlsx")
+predus = f_scores.predus
+ispred = f_scores.ispred
+dockpred = f_scores.dockpred 
+rfscore = f_scores.rfscore
+logreg = f_scores.logreg
+
+df = f_scores
+ind = ["meta-ppisp", "vorffip"]
+
+# stats -> largest dist , pval > 0.05 we accept the HA ie are sig. dif. 
+for i in ind:
+    ks_test = ss.ks_2samp(df[f"{i}"], logreg)
+    print(i,ks_test[1])
+
+# # CI 95%
+# df = f_scores
+# # preds = ["predus","ispred","dockpred","rfscore","logreg"]
+# preds = ["vorffip","meta-ppisp"]
+# for i in preds:
+#     mean = df[f"{i}"].mean()
+#     stderr = df[f"{i}"].std()/(len(df[f"{i}"])**0.5)
+#     upper = (ss.norm.ppf(0.975) * stderr )+ mean
+#     lower = mean + (ss.norm.ppf(0.025) * stderr )
+#     print(i,f"[{upper:.3f}:{lower:.3f}]")
+
+
+
+
+# %%
+import pandas as pd
+df = pd.DataFrame(columns=["a","b"])
+df =df.append({"a":1,"b":2},ignore_index=True)
+print(df)
+
+# %%
+import pandas as pd 
+df = pd.read_excel("/Users/evanedelstein/Desktop/prcurve.xlsx")
+preds = ["rfscore", "logreg", "vorffip","meta-ppisp"]
+for k in preds:
+    # PR_frame = df.columns[df.columns.str.startswith(k)]
+    distance = df[f"{k}_Recall"].diff()
+    midpoint  = df[f"{k}_Precsion"].rolling(2).sum()
+    distance = distance * -1
+    PR_AUC = (distance) * (midpoint)
+    PR_AUC = PR_AUC/2
+    sum_AUC = PR_AUC.sum()
+    PR_AUC = sum_AUC
+    print(k, PR_AUC)
+# %%
+
+

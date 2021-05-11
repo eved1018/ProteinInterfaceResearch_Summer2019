@@ -154,6 +154,10 @@ def meta_methods_comparison():
     results = results.merge(ppisp,how="inner", on="residue")
     print(results.head())
 
+    results["protein"] = [x.split('_')[1] for x in results['residue']]
+    proteins = results["protein"].unique()
+    
+
     df_interface  = results[results.annotated == 1]
     non_interface = results[results.annotated == 0]
 
@@ -161,6 +165,7 @@ def meta_methods_comparison():
     non_interface  =non_interface.drop(columns = ['residue','annotated'])
     df_interface.to_csv(f"{Star_path}StarinterfaceCV.txt",index= False,sep="\t")
     non_interface.to_csv(f"{Star_path}StarnoninterfaceCV.txt",index=False,sep="\t") 
+    print("made")
 
     cmd ='./star --sort StarinterfaceCV.txt StarnoninterfaceCV.txt 0.05' #<- TODO makesure pval of 0.05 is actually working 
     os.chdir(Star_path)

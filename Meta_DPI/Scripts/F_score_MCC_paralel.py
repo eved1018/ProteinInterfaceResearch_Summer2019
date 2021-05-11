@@ -5,6 +5,8 @@ import concurrent.futures
 import multiprocessing
 from numpy import sqrt
 from pathlib import Path
+
+
 # fscore and mcc  per protein(saved as csv) and per predictor (printed)
 
 
@@ -14,11 +16,12 @@ def Main():
 #   check that predictor is in columns
     predictors = ['vorffip']
     # path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPi_result.csv"
-    data_path = f"{path}/Meta_DPI/Data/Test_data/vorffip_columns.txt"
+    data_path = f"{path}/Meta_DPI/Data/Test_data/vorffip_columns.txt" #<- TODO change to metta ppisp 
     # path = "/Users/evanedelstein/Desktop/1p_test.csv"
-    result_path = f"{path}/Meta_DPI/Results/Fscore_MCC/"
+    # result_path = f"{path}/Meta_DPI/Results/Fscore_MCC/"
+    result_path = f"{path}/Meta_DPI/Results/Fscore_MCC/Zerotest/" 
     cutoff_path = f"{path}/Meta_DPI/Data/Test_data/All_protein_cutoffs.csv"
-    # cutoff = (6.1^-residues)(constant) 
+    # cutoff = (6.1^-residues)(constant) # <- TODO make dynamic cutoff in script 
     cutoff_csv = pd.read_csv(cutoff_path)
     cut_off_protein = cutoff_csv["Protein"].tolist()
     df = pd.read_csv(data_path)
@@ -59,31 +62,33 @@ def Main():
                     threshold_sum += threshhold
                     recall_f_score = TP/N
                     precision_f_score = TP/threshhold
-                    MCC_num = (TP * TN) - (FP * FN)
-                    mcc_denom = sqrt((TP + FP) * (TP + FN)  * (TN + FP) * (TN + FN))
-                    mcc = MCC_num / mcc_denom
+                    
                     if TP != 0:
                         f_score = (2 * recall_f_score *precision_f_score)/(recall_f_score + precision_f_score)
+                        MCC_num = (TP * TN) - (FP * FN)
+                        mcc_denom = sqrt((TP + FP) * (TP + FN)  * (TN + FP) * (TN + FN))
+                        mcc = MCC_num / mcc_denom
                         
                     else:
                         f_score = 0
+                        mcc = 0 # <- TODO do once with 0 and another wiht undefinded 
                         
                     f_score_per_protein.loc[protein,predictor] = f_score
                     mcc_score_per_protein.loc[protein,predictor] = mcc 
 
 
-            recall = TP_sum/Ns_sum
-            precision = TP_sum/threshold_sum
-            f_score = (2 * recall * precision)/(recall + precision)
-            print("{} Global f_score: {}".format(predictor,np.round(f_score,3)))
+            # recall = TP_sum/Ns_sum
+            # precision = TP_sum/threshold_sum
+            # f_score = (2 * recall * precision)/(recall + precision)
+            # print("{} Global f_score: {}".format(predictor,np.round(f_score,3)))
 
-            MCC_num = (TP_sum * TN_sum) -(FP_sum * FN_sum)
-            mcc_denom = sqrt((TP_sum + FN_sum) * (TP_sum + FP_sum) * (TN_sum + FP_sum) * (TN_sum + FN_sum))
-            mcc = MCC_num / mcc_denom
-            print("{} Global MCC: {}".format(predictor,np.round(mcc,3)) ) 
+            # MCC_num = (TP_sum * TN_sum) -(FP_sum * FN_sum)
+            # mcc_denom = sqrt((TP_sum + FN_sum) * (TP_sum + FP_sum) * (TN_sum + FP_sum) * (TN_sum + FN_sum))
+            # mcc = MCC_num / mcc_denom
+            # print("{} Global MCC: {}".format(predictor,np.round(mcc,3)) ) 
 
-            f_score_per_protein.to_csv("{}fscore_per_protein.csv".format(result_path))
-            mcc_score_per_protein.to_csv("{}mcc_per_protein.csv".format(result_path))
+            f_score_per_protein.to_csv("{}vorffip_fscore_per_protein.csv".format(result_path))
+            mcc_score_per_protein.to_csv("{}vorffip_mcc_per_protein.csv".format(result_path))
 
 def Run(params): 
     (predictor,protein,cutoff_csv,frame) = params

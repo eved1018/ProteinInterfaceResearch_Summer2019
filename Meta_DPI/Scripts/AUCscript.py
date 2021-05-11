@@ -5,7 +5,6 @@ import numpy as np
 import concurrent.futures
 # import multiprocessing
 from pathlib import Path
-# ROC and PR per predictor 
 
 # def test_wrap():
 #     path = Path(__file__).parents[2]
@@ -47,23 +46,41 @@ from pathlib import Path
 #             print(f"{predictor} PR AUC: {PR_AUC}")
 #     roc_excel.to_csv("/Users/user/Desktop/Research_Evan/MetaDPI/Meta_DPI/Data/Test_data/roc_results.csv")
 #     pr_excel.to_csv("/Users/user/Desktop/Research_Evan/MetaDPI/Meta_DPI/Data/Test_data/pr_resulst.csv")
+
 def test_wrap2():
     path = Path(__file__).parents[2]
-    predictors = ["vorffip"]
-    # data_path = "/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv"
-    data_path = f"{path}/Meta_DPI/Data/Test_data/vorffip_columns.txt"
-    frame = pd.read_csv(data_path)
+    predictors = ["predus","ispred","dockpred","rfscore","logreg"]
+    # predictors = ["rfscore","logreg","vorffip","meta-ppisp"]
+    meta_results = pd.read_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results6/Meta_DPI_result.csv")
+    ppisp = pd.read_csv(f"{path}/Meta_DPI/Data/Test_data/meta-ppisp-results-comma-new.txt")
+    vorffip = pd.read_csv(f"{path}/Meta_DPI/Data/Test_data/vorffip_columns.txt")
+    results = pd.DataFrame()
+    results["residue"] = meta_results["residue"]
+    results["logreg"] = meta_results["logreg"]
+    results["predus"] = meta_results["predus"]
+    results["ispred"] = meta_results["ispred"]
+    results["dockpred"] = meta_results["dockpred"]
+    results["rfscore"] = meta_results["rfscore"]
+    # vorffip["residue"] = [i.split("_")[0]+ "_" +i.split("_")[1] for i in vorffip["residue"]]
+    results["annotated"] = meta_results["annotated"]
+    # results = results.merge(vorffip,how="inner", on="residue")
+    # frame = results.merge(ppisp,how="inner", on="residue")
+    # frame = pd.read_csv(data_path)
+    frame = results
     frame.set_index('residue', inplace= True )
-    print(frame.head()) 
+    # print(frame.head()) 
     param_list = [] 
     for i in predictors:
         param = (i,frame)
         param_list.append(param)
+    
+
     # print(param_list)
     roc_cols = [[f"{key}_FPR",f"{key}_TPR"] for key in predictors]
     roc_excel = pd.DataFrame(columns = roc_cols)
     pr_cols = [[f"{key}_Recall",f"{key}_Precsion"] for key in predictors]
-    pr_excel = pd.DataFrame(columns = pr_cols)
+    # pr_excel = pd.DataFrame(columns = pr_cols)
+    pr_excel = pd.DataFrame()
     with concurrent.futures.ProcessPoolExecutor() as executor:
         param_list = param_list
         results = executor.map( ROC, param_list)
@@ -71,14 +88,19 @@ def test_wrap2():
             (predictor, ROC_AUC,PR_AUC, PR_frame,results_frame) = i
             roc_excel[f"{predictor}_TPR"]=results_frame["TPR"]
             roc_excel[f"{predictor}_FPR"]=results_frame["FPR"]
-            pr_excel[f"{predictor}_Precsion"] = PR_frame["Precision"]
-            pr_excel[f"{predictor}_Recall"] = PR_frame["Recall"]
+            # pr_excel[f"{predictor}_Precsion"] = PR_frame["Precision"]
+            # pr_excel[f"{predictor}_Recall"] = PR_frame["Recall"]
+            df = pd.DataFrame()
+            df[f"{predictor}_Precsion"] = PR_frame["Precision"]
+            df[f"{predictor}_Recall"] = PR_frame["Recall"]
+            df_merge = [pr_excel,df]
+            pr_excel = pd.concat(df_merge, axis = 1)
             print(f"{predictor} ROC AUC: {ROC_AUC}")
             print(f"{predictor} PR AUC: {PR_AUC}")
-    roc_excel.to_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results6/roc_results.csv")
-    pr_excel.to_csv("/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results6/pr_resulst.csv")
+    resulst_path = "/Users/user/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/Fscore_MCC/Zerotest"
+    roc_excel.to_csv(f"{resulst_path}/roc_results.csv")
+    pr_excel.to_csv(f"{resulst_path}/pr_resulst.csv")
     
-
 def Main():
     path = Path(__file__).resolve().parent.parent.parent
     predictors = ['predus', 'ispred', 'dockpred',"rfscore","logreg"]
@@ -180,14 +202,25 @@ def ROC(params):
 
 
     PR_frame = pd.DataFrame.from_dict(pr_dict,columns = ["Precision","Recall"],orient= 'index')
-    # print(results_frname)
-    distance = PR_frame["Recall"].diff()
-    midpoint  = PR_frame["Precision"].rolling(2).sum()
-    distance = distance * -1
-    PR_AUC = (distance) * (midpoint)
-    PR_AUC = PR_AUC/2
-    sum_AUC = PR_AUC.sum()
-    PR_AUC = sum_AUC
+    PR_frame = PR_frame.reset_index()
+    PR_frame = PR_frame[PR_frame.Precision != 1]
+    max = PR_frame["Precision"].idxmax()
+    max2 = PR_frame["Precision"].max()
+    print(predictor,"index:", max,"precision:", max2)
+    PR_frame = PR_frame.head(max+1)
+    PR_frame = PR_frame.append({"Precision":1,"Recall":0},ignore_index=True)
+    # print(PR_frame)
+    try:
+        distance = PR_frame["Recall"].diff()
+        midpoint  = PR_frame["Precision"].rolling(2).sum()
+        distance = distance * -1
+        PR_AUC = (distance) * (midpoint)
+        PR_AUC = PR_AUC/2
+        sum_AUC = PR_AUC.sum()
+        PR_AUC = sum_AUC
+    except:
+        PR_AUC = 0
+    
     return predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame
     
 if __name__ == '__main__':

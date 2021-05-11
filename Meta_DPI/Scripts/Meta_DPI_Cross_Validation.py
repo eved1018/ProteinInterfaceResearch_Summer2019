@@ -29,7 +29,6 @@ import concurrent.futures
 import multiprocessing
 import subprocess
 import imgkit
-import matplotlib.pyplot as plt
 from pathlib import Path
 import random 
 

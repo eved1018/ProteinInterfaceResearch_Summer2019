@@ -190,7 +190,7 @@ vorfip["residue"] = [i.split("_")[0]+ "_" +i.split("_")[1] for i in vorfip["resi
 results["annotated"] = meta_results["annotated"]
 results = results.merge(vorfip,how="inner", on="residue")
 results = results.merge(ppisp,how="inner", on="residue")
-# print(results)
+print(results)
 results["protein"] = [x.split('_')[1] for x in results['residue']]
 proteins = results["protein"].unique()
 proteins = proteins[0:50]
@@ -309,5 +309,11 @@ for k in preds:
     PR_AUC = sum_AUC
     print(k, PR_AUC)
 # %%
+import pymol
 
-
+# %%
+h= "hello"
+g = "goodbye"
+f = h+g 
+f
+# %%

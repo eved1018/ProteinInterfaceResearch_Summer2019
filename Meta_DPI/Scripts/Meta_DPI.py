@@ -7,13 +7,32 @@ from sklearn.ensemble import RandomForestClassifier
 import concurrent.futures
 import multiprocessing
 import matplotlib.pyplot as plt
-from AUCscript import ROC
-from Treeviz import treeviz
-from Star import Star_Leave_one_out
-from pathlib import Path
+import Treeviz 
+import AUCscript   
+import Star 
+import F_score_MCC_paralel 
+import pymol_visualization
+from pathlib import Path 
+import os.path
 import warnings
 warnings.filterwarnings("ignore")
 
+"""TODO:  
+        1) make roc and pr graphs? or at least have that option , maybe put that in the AUCscript
+        2) comment,clean up , spellcheck 
+"""
+"""
+things to make this much faster:
+1) have fscore run when auc threshold is alligned with dynamic cutoff
+2) have pymol run when fscore runs, that way only one list of residues needs to be made
+"""
+
+"""
+Instructions:
+to download all the modules needed for this program dowload homebrew at https://brew.sh/ 
+then cd into the project and run "pip3 install -r requirements.txt" followed by "brew bundle"
+for protein visualization pymol is required. 
+"""
 
 # Runs Meta_DPI which performs logistic regresion (LR) and random forest(RF) to combine interface predictors into a single interface metric. 
 # Takes in file of columns residue_protein | predictor 1 |predictor 2....| annotated
@@ -28,57 +47,58 @@ warnings.filterwarnings("ignore")
 #   (B) Fscore and MCC per protein and per predictor: F_score_MCC_paralel.py
 #   (C) K-fold Cross-validation: Meta_DPI_Cross_Validation.py 
 
-def Main():
+def Main(*kwargs):
     path = Path(__file__).parents[2]
     start = time.perf_counter()
     code = 1
-    # print out any files or just have ROC printed in terminal 
-    print_out = False
-    param_test = False
-    trees = 100
-    depth  = 10 
-    # ccp = 0.0002
-    ccp = 0
-    viz = False 
-    # set col names
-    col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated'] #<-  make this automatic
+    try:
+        if len(kwargs) == 0:
+            trees,depth, ccp = [int(x) for x in input("Enter random forest parameters: trees, depth, ccp:").split()]
+            print_out = True if input("print out all results (y,n): ") == "y" else False
+            param_test = True if input("run parameter tester (y,n): ") == "y" else False
+            viz = True if input("run tree visualization (y,n): ") == "y" else False
+            protein_viz = True if input("run protein visualization (y,n): ") == "y" else False
+        else:
+            (trees,depth, ccp,print_out,param_test,viz,protein_viz) = kwargs
+            [int(i) for i in kwargs[0:3]]
+            [bool(i) for i in kwargs[3:7]]
+    except:
+        print("Incorect parameters please try again")
+        return  
 
-    # which columns to look at (ie which dependent variables to use)
-    var_col_names =['predus', 'ispred', 'dockpred'] # <- TODO make this automatic 
- 
-    # ROC predicter 
-    predictors = ["rfscore"] # <- TODO  make auto 
+    file_exists = False
+    while file_exists is False:
+        data_filename = input("file name of predictor csv with columns first column as res_proterin and last columns whetehr teh residue is annotated(1:yes, 0:no): ")
+        data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort_headers_test.csv" if data_filename == "test" else f"{path}/Meta_DPI/Data/Test_data/{data_filename}"
+        file_exists = os.path.isfile(data_path)
+    
+    # load in dataset and get predictors 
+    df = pd.read_csv(data_path)
+    predictors = df.columns.tolist()[2:-1]
     # change to where u need it to to go 
     results_path = f"{path}/Meta_DPI/Results/MetaDPIResults"
-    data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort.csv"
-    # data_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
-    folder = "{}/Meta_DPI_results{}" .format(results_path,code)
-    # if print_out == True:
+
+    folder = f"{results_path}/Meta_DPI_results{code}" 
     while os.path.isdir(folder) is True:
         code = code + 1 
-        folder = "{}/Meta_DPI_results{}" .format(results_path,code)
+        folder = f"{results_path}/Meta_DPI_results{code}" 
     os.mkdir(folder)
     if param_test == True:
-        Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out,path)
+        Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,predictors,print_out,path)
     else:
         vars = [depth,trees,ccp]
-        result_list,roc_excel,pr_excel = Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars,path)
+        result_list,roc_excel,pr_excel = Meta_DPI(df,data_path,viz, code, start,results_path,predictors,print_out,vars,path,protein_viz)
         for i in result_list:
             (predictor, ROC_AUC,PR_AUC) = i 
             print(f"{predictor} ROC AUC: {ROC_AUC}")
             print(f"{predictor} PR AUC: {PR_AUC}")
-        # try:
-        #     Star_path = f"{path}/Meta_DPI/Data/star-v.1.0/star-v.1.0/"
-        #     Star(results_path,code,Star_path,var_col_names)
-        # except:
-        #     print("Star not working")
-        pr_excel.to_csv(f"{results_path}/pr_excel.csv")
-        roc_excel.to_csv(f"{results_path}/roc_excel.csv")
+        pr_excel.to_csv(f"{folder}/pr_excel.csv")
+        roc_excel.to_csv(f"{folder}/roc_excel.csv")
         finish = time.perf_counter()
         print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
 
 # test params of RF 
-def Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out,path):
+def Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,predictors,print_out,path):
     
     # ccps = [0.000025,0.00005, 0.000075]
     # trees = [500]
@@ -88,7 +108,7 @@ def Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_na
     for i in ccps:
         print("start")
         vars = [depth,trees,i]
-        result_list,roc_excel,pr_excel = Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars,path)
+        result_list,roc_excel,pr_excel = Meta_DPI(data_path,viz, code, start,results_path,predictors,print_out,vars,path)
         for i in result_list:
             (predictor, ROC_AUC,PR_AUC) = i 
             results_frame.loc[len(results_frame)] = [i,ROC_AUC,PR_AUC]
@@ -99,19 +119,20 @@ def Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,col_na
 
 # def Meta_DPI(data_path,viz, code, trees, depth, ccp, start,results_path,col_names,var_col_names,predictors,print_out,vars):
 
-def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,predictors,print_out,vars,path):
+def Meta_DPI(df,data_path,viz, code,start,results_path,predictors,print_out,vars,path,protein_viz):
     (depth,trees,ccp) = vars
     if print_out == True:
         # folder = "{}/META_DPI_RESULTS{}" .format(results_path,code)
         # os.mkdir(folder)
-        folder = "{}/META_DPI_RESULTS{}/tests" .format(results_path,code)
+        folder = "{}/META_DPI_RESULTS{}/By_protein" .format(results_path,code)
         os.mkdir(folder)
         os.mkdir( "{}/META_DPI_RESULTS{}/Trees".format(results_path,code))
+        os.mkdir( "{}/META_DPI_RESULTS{}/Fscore_MCC".format(results_path,code))
     # set up DataFrame 
     # col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
     # load dataset which is a csv file containing all the residues in Nox and Benchmark as well as predus, ispred, and dockpred scores. 
     # The last column is a binary annotated classifier, 0 is noninetrface 1 is interface. 
-    df = pd.read_csv("{}".format(data_path), header=None, names=col_names)
+
     # df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Antogen/predictionvalue/res_pred/test.csv", header=0)
     # set the residue_protein ID as the index of the DataFrame 
     df["protein"] = [x.split('_')[1] for x in df['residue']]
@@ -127,9 +148,9 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
     for count, protein in enumerate(proteins):
         test = data[data["protein"] == protein] 
         train = data[data["protein"] != protein] 
-        col_namestest = var_col_names + ["annotated"]
+        col_namestest = predictors + ["annotated"]
         test = test[col_namestest]
-        feature_cols = var_col_names
+        feature_cols = predictors
         # Features, ie prediction scores from predus, ispred and dockpred 
         X = test[feature_cols] 
         # Target variable, noninterface or interface 
@@ -145,15 +166,17 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
                 (totalframe ,treeparams,coefficients) = i
                 frames.append(totalframe)
                 if count == 1 and viz == True:
-                    treeviz(treeparams,results_path,code,feature_cols)
-
-                
+                    Treeviz.treeviz(treeparams,results_path,code,feature_cols)
 
     result_frame = pd.concat(frames)
     if print_out == True:
         result_frame.to_csv("{}/META_DPI_RESULTS{}/Meta_DPI_result.csv" .format(results_path,code), float_format='{:f}'.format)
     result_frame.to_csv("{}/META_DPI_RESULTS{}/Meta_DPI_result.csv" .format(results_path,code), float_format='{:f}'.format)
-    Star_Leave_one_out(result_frame,path,results_path,code)
+    Star.Star_Leave_one_out(result_frame,path,results_path,code)
+    predictors += ["logreg","rfscore"]
+    F_score_MCC_paralel.Main(predictors,result_frame,results_path,code)
+    if protein_viz == True:
+        pymol_visualization.Main(predictors,result_frame,results_path,code)
     params_list = [(i,result_frame) for i in predictors]
     # print(param_list)
     roc_cols = [[f"{key}_FPR",f"{key}_TPR"] for key in predictors]
@@ -175,10 +198,6 @@ def Meta_DPI(data_path,viz, code, start,results_path,col_names,var_col_names,pre
             # return ROC_AUC,PR_AUC,predictor
     return result_list,roc_excel,pr_excel
     
-
-                
-
-
 def Run(params):
     (X,y, train,feature_cols,code,results_path,protein ,trees,depth,ccp,viz,data_path,test,print_out,count) = params
     log_results , coefficients = LogReg(feature_cols,X,y,code,results_path,protein,test,print_out)
@@ -193,7 +212,7 @@ def LogReg(feature_cols,X,y,code,results_path,protein,test,print_out):
         coefficients = result.params
         # create folder for output data and save the coef in it 
         if print_out == True:
-            folder = "{}/META_DPI_RESULTS{}/tests/result_{}" .format(results_path,code,protein)
+            folder = "{}/META_DPI_RESULTS{}/By_protein/result_{}" .format(results_path,code,protein)
             os.mkdir(folder)
         vals = []
         num = 1
@@ -242,7 +261,7 @@ def RandomFor(X,y,protein,feature_cols,code,trees,depth,ccp,viz,results_path,dat
         logs = logframe["logreg"]
         totalframe = totalframe.join(logs)
         if print_out == True:
-            path="{}/META_DPI_RESULTS{}/tests/result_{}/vals{}.csv".format(results_path,code,protein, protein)
+            path="{}/META_DPI_RESULTS{}/By_protein/result_{}/vals{}.csv".format(results_path,code,protein, protein)
             totalframe.to_csv(path,sep=",", index=True, header=True)
         return totalframe ,treeparams 
 
@@ -250,10 +269,12 @@ def RandomFor(X,y,protein,feature_cols,code,trees,depth,ccp,viz,results_path,dat
 def ROC_wrapper(params):
     (predictor,df) = params
     # print(predictor)
-    predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame = ROC(params)
+    predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame = AUCscript.ROC(params)
 
     return predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame
     
-
+# kwargs should have tuple of form kwargs = (trees,depth, ccp,print_out,param_test,tree_viz,protein_viz) 
+# or leave empty for user input
+kwargs = (100,10,0,True,False,True,True)
 if __name__ == '__main__':
-    Main()
+    Main(*kwargs)

@@ -4,13 +4,13 @@ import os
 
 # fscore per predictor 
 
-def Main():
-    predictors = ['predus', 'ispred', 'dockpred', 'rfscore','logreg']
+def Main(df,predictors,results_path):
+    # predictors = ['predus', 'ispred', 'dockpred', 'rfscore','logreg']
     # path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS2/Meta_DPi_result.csv"
-    path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPi_result.csv"
+    # path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPi_result.csv"
     cutoff_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Fscore_MCC/All_protein_cutoffs.csv"
     cutoff_csv = pd.read_csv(cutoff_path)
-    df = pd.read_csv(path)
+    # df = pd.read_csv(path)
     dict = F_score(predictors,df,cutoff_csv)
     for i in dict: 
         f_score, mcc = dict[i]
@@ -74,5 +74,5 @@ def F_score(predictors,df,cutoff_csv):
     return dict       
 
 
-if __name__ == '__main__':
-    Main()
+# if __name__ == '__main__':
+#     Main()

@@ -10,22 +10,24 @@ from pathlib import Path
 # fscore and mcc  per protein(saved as csv) and per predictor (printed)
 
 
-def Main():
+def Main(predictors,df,result_path,code):
+    results_folder = f"{result_path}/Meta_DPI_results{code}/Fscore_MCC/"
     path = Path(__file__).parents[2]
 #   predictors = ["vorffip"]
 #   check that predictor is in columns
-    predictors = ['vorffip']
+    # predictors = ['vorffip']
     # path ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/Meta_DPI/META_DPI_RESULTS3/Meta_DPi_result.csv"
-    data_path = f"{path}/Meta_DPI/Data/Test_data/vorffip_columns.txt" #<- TODO change to metta ppisp 
+    # data_path = f"{path}/Meta_DPI/Data/Test_data/vorffip_columns.txt" #<- TODO change to metta ppisp 
     # path = "/Users/evanedelstein/Desktop/1p_test.csv"
     # result_path = f"{path}/Meta_DPI/Results/Fscore_MCC/"
-    result_path = f"{path}/Meta_DPI/Results/Fscore_MCC/Zerotest/" 
+    # result_path = f"{path}/Meta_DPI/Results/Fscore_MCC/Zerotest/" 
     cutoff_path = f"{path}/Meta_DPI/Data/Test_data/All_protein_cutoffs.csv"
     # cutoff = (6.1^-residues)(constant) # <- TODO make dynamic cutoff in script 
     cutoff_csv = pd.read_csv(cutoff_path)
+    
     cut_off_protein = cutoff_csv["Protein"].tolist()
-    df = pd.read_csv(data_path)
-    df.set_index('residue', inplace= True )
+    # df = pd.read_csv(data_path)
+    # df.set_index('residue', inplace= True )
     df["protein"] = [x.split('_')[1] for x in df.index]
     proteins = df["protein"].unique()
     proteins = [i for i in proteins if i in cut_off_protein]
@@ -77,18 +79,18 @@ def Main():
                     mcc_score_per_protein.loc[protein,predictor] = mcc 
 
 
-            # recall = TP_sum/Ns_sum
-            # precision = TP_sum/threshold_sum
-            # f_score = (2 * recall * precision)/(recall + precision)
-            # print("{} Global f_score: {}".format(predictor,np.round(f_score,3)))
+            recall = TP_sum/Ns_sum
+            precision = TP_sum/threshold_sum
+            f_score = (2 * recall * precision)/(recall + precision)
+            print("{} Global f_score: {}".format(predictor,np.round(f_score,3)))
 
-            # MCC_num = (TP_sum * TN_sum) -(FP_sum * FN_sum)
-            # mcc_denom = sqrt((TP_sum + FN_sum) * (TP_sum + FP_sum) * (TN_sum + FP_sum) * (TN_sum + FN_sum))
-            # mcc = MCC_num / mcc_denom
-            # print("{} Global MCC: {}".format(predictor,np.round(mcc,3)) ) 
+            MCC_num = (TP_sum * TN_sum) -(FP_sum * FN_sum)
+            mcc_denom = sqrt((TP_sum + FN_sum) * (TP_sum + FP_sum) * (TN_sum + FP_sum) * (TN_sum + FN_sum))
+            mcc = MCC_num / mcc_denom
+            print("{} Global MCC: {}".format(predictor,np.round(mcc,3)) ) 
 
-            f_score_per_protein.to_csv("{}vorffip_fscore_per_protein.csv".format(result_path))
-            mcc_score_per_protein.to_csv("{}vorffip_mcc_per_protein.csv".format(result_path))
+            f_score_per_protein.to_csv(f"{results_folder}fscore_per_protein.csv")
+            mcc_score_per_protein.to_csv(f"{results_folder}mcc_per_protein.csv")
 
 def Run(params): 
     (predictor,protein,cutoff_csv,frame) = params
@@ -117,5 +119,5 @@ def Run(params):
            
 
 
-if __name__ == '__main__':
-    Main()
+# if __name__ == '__main__':
+#     Main()

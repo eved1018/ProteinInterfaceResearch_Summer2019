@@ -1,0 +1,40 @@
+
+proteins:
+
+    1At3.A
+    1DE4.E
+    1BUH.A
+    1FCZ.D
+
+
+*** for each protein have 7 images: 3 preds, 2 meta preds and annotated****
+
+1) figure out how to open pymol and color a residue
+2) find predicted residues for each predictor using single cutoof
+	2a) get cutoff from mordichia files
+	2b) get pred values from csv file 
+	2c) color each dif color 
+	3d) color annotated res as well 
+3) iteraate 
+4) capture/image/zoom (shahar stuff)  
+
+
+proteins with high fscore 
+1acb.I - high ispred (meduim all 3) 
+iahw.A - high dockpred and ispred
+ide4.E - high dockpred hight predus low ispred
+1one.A - high ispred low rest 
+
+1jps.H
+
+
+proteins 
+7CEI.A
+1QOR.A
+1B34.A
+
+
+
+1KXP.D
+2UTG.A
+4xxh.A

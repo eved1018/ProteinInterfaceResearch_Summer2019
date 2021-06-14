@@ -126,6 +126,7 @@ def Main():
     
 
 def ROC(params):
+    dyn_cutoff  = 10 
     results_dict= {}
     pr_dict = {}
     (predictor,df) = params    
@@ -152,7 +153,7 @@ def ROC(params):
             predictedframesort = frame.sort_values(by=[predictor], inplace =False, ascending=False)
             thresholdframe= predictedframesort[predictedframesort[predictor] >= threshhold] 
             threshold_sum += threshhold
-            predicted_res = thresholdframe.index.values.tolist()
+            predicted_res = thresholdframe.index.values.tolist()                
             predicted_res = [str(i) for i in predicted_res]
             pred_res = [i.split("_")[0] for i in predicted_res]
             Truepos = [i for i in pred_res if i in annotated_res]
@@ -199,8 +200,6 @@ def ROC(params):
     sum_AUC = AUC.sum()
     ROC_AUC = sum_AUC
 
-
-
     PR_frame = pd.DataFrame.from_dict(pr_dict,columns = ["Precision","Recall"],orient= 'index')
     PR_frame = PR_frame.reset_index()
     PR_frame = PR_frame[PR_frame.Precision != 1]
@@ -222,7 +221,8 @@ def ROC(params):
         PR_AUC = 0
     
     return predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame
+
     
-if __name__ == '__main__':
-    # Main()
-    test_wrap2()
+# if __name__ == '__main__':
+#     # Main()
+#     test_wrap2()

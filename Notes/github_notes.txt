@@ -1,0 +1,11 @@
+1) open terminal (for macs i recomend downloading iterm) and use "cd" to change into an empty folder on your desktop 
+2) type ->  git clone https://github.com/eved1018/Antigen_project
+3) type -> cd Antigen_project
+4) type -> git checkout -b "branchname"
+5) add a file to the Antigen_project folder just to make sure everything is working
+6) type -> git add -A
+7) type -> git commit -m "commmit"
+7) type -> git push --set-upstream origin "branchname"
+8) open vscode into Antigen_project 
+9) in the bottom left corner your branchname should show, if not click it and switch to your branch 
+10) to add files to the branch follow the steps here https://zeroesandones.medium.com/how-to-commit-and-push-your-changes-to-your-github-repository-in-vscode-77a7a3d7dd02 

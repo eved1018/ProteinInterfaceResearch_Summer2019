@@ -13,7 +13,7 @@ def treeviz(treeparams,result_path,code,cols):
         fancy=False 
         )  
     
-    path = f"{result_path}/META_DPI_RESULTS{code}/tests/Rftree_{depth}.svg" 
+    path = f"{result_path}/META_DPI_RESULTS{code}/Trees/Rftree_{depth}.svg" 
     viz.save(path)
     
     

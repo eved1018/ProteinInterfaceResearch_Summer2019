@@ -5,23 +5,8 @@ import numpy as np
 import statsmodels.api as sm
 import os 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
-from sklearn.tree import export_graphviz
-import graphviz
-import pydot 
-from sklearn.metrics import roc_auc_score
-from sklearn import tree
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.tree import plot_tree
-from sklearn.model_selection import RandomizedSearchCV
 import math 
-from sklearn.datasets import *
-from sklearn import tree
 from dtreeviz.trees import *
 import re 
 import time 
@@ -32,9 +17,17 @@ import imgkit
 from pathlib import Path
 import random 
 
-# TO DO 
-# (1) softcode star stuff
-# (2) figure out what all the dicts do 
+"""
+TODO:
+1) /add in all softcode path stuff
+2) /kwargs options and user input 
+3) fix all the star stuff 
+8) add int rounding in roc_star function  
+6) fix headers for to_excel outputs
+4) comment, cleanup, spell check 
+5) figure out what all the dics do. 
+7) this is a good lesson as to why u should always comment ur code and not write code while having sangria. I have no clue what the zip stuff is doing. 
+"""
 
 # main function, set all parameters here!
 # code is just used to keep track of multiple runs
@@ -44,47 +37,59 @@ import random
 # Leave_one_Out sets size to 1 
 # set all paths 
 
-def main():
-    path = Path(__file__).resolve().parent.parent.parent
-    # print("path",path)
-    # path = os.path.join
-    # path2 = f"{path}/Results/CrossValidation/hello"
-    # os.mkdir(path2)
+def main(*kwargs):
+    path = Path(__file__).parents[2]
     start = time.perf_counter()
     code = 1
-    # params for RF
-    trees = 100
-    depth  = 10 
-    ccp = 0.000025
-    # for 5 fold use 44 for 10 use 22  
-    size = 44
-    viz = False 
-    Leave_one_Out = False  
-    if Leave_one_Out is True:
-        size = 1
-    # set col names
-    col_names = ['residue', 'predus', 'ispred', 'dockpred', 'annotated']
-    # col_names = ['residue', "meta-ppisp", 'annotated']
-    # which columns to look at (ie which dependent variables to use)
-    var_col_names = ['predus', 'ispred', 'dockpred']
-    # file containing predictor data and annotated data 
-    data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort.csv"
-    # data_path = "~/Desktop/Research_Evan/Raji_Summer2019_atom/PDBtest.csv"
+    try:
+        if len(kwargs) == 0:
+            trees,depth, ccp = [int(x) for x in input("Enter random forest parameters: trees, depth, ccp:").split()]
+            print_out = True if input("print out all results (y,n): ") == "y" else False # add functionality 
+            param_test = True if input("run parameter tester (y,n): ") == "y" else False #add functionality
+            viz = True if input("run tree visualization (y,n): ") == "y" else False
+            protein_viz = True if input("run protein visualization (y,n): ") == "y" else False # add fucntionality
+                    
+        else:
+            (trees,depth, ccp,print_out,param_test,viz,protein_viz) = kwargs
+            [int(i) for i in kwargs[0:3]]
+            [bool(i) for i in kwargs[3:7]]
+    except:
+        print("Incorect parameters please try again")
+        return  
+
+    file_exists = False
+    while file_exists is False:
+        data_filename = input("file name of predictor csv with columns first column as residue and last columns whetehr teh residue is annotated(1:yes, 0:no): ")
+        data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort_headers_test.csv" if data_filename == "test" else f"{path}/Meta_DPI/Data/Test_data/{data_filename}"
+        file_exists = os.path.isfile(data_path)
+
+    df = pd.read_csv(data_path)
+    predictors = df.columns.tolist()[2:-1]
+    proteins = [x.split('_')[1] for x in df.residue]
+    unique_proteins = list(dict.fromkeys(proteins))
+    try:
+        size = 1 if input("(a) Leave on out or (b) k_fold cross validation (a,b): ") == "a" else int(len(unique_proteins)/int(input(f"number of k_fold cross validation sets:({len(unique_proteins)} total proteins) "))) 
+        print(size)
+    except:
+        print("error")
+
     # change to where u need it to to go 
-    results_path = f"{path}/Meta_DPI/Results/CrossValidation/"
-    # path to star, get it here http://melolab.org/star/download.php
-    Star_path= f"{path}/Meta_DPI/Data/star-v.1.0/star-v.1.0/"
-    # print("path:", sys.path)
-    folder = "{}Crossvaltest{}" .format(results_path,code)
-    # os.mkdir(folder)
+    results_path = f"{path}/Meta_DPI/Results/CrossValidation"
+    folder = f"{results_path}/{size}_fold_Crossval{code}" 
     while os.path.isdir(folder) is True:
         code = code + 1 
-        folder = "{}Crossvaltest{}" .format(results_path,code)
+        folder = f"{results_path}/{size}_fold_Crossval{code}"
+        print(f"code:{code}")
+    
     os.mkdir(folder)
+    os.mkdir(f"{folder}/tests")
+    os.mkdir(f"{folder}/Star")
+    os.mkdir( f"{folder}/Trees")
 
-    CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col_names,var_col_names,path)
+    CrossVal(viz, code, trees, depth, ccp,size, start,folder,predictors,path,df,data_path)
     try:
-        Star(results_path,code,Star_path,var_col_names)
+        Star_path = f"{path}/Meta_DPI/Data/star-v.1.0/"
+        Star(folder,code,Star_path,predictors) # TODO fix this 
     except:
         print("Star not working")
     finish = time.perf_counter()
@@ -93,7 +98,7 @@ def main():
 # core of the program, creates the chunks of proteins and runs programs in parrelel
 # then unpacks data and computes AUC and ROC image
 
-def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col_names,var_col_names,path):
+def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,predictors,path,df,data_path):
     # dict for results 
     Master= {}
     auc_per_cv ={}
@@ -101,30 +106,18 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
     mcc_dict_total = {}
     pr_per_cv = {}
     # folders for results
-    # folder = "{}Crossvaltest{}" .format(results_path,code)
+    # folder = f"{results_path}" .format(results_path,code)
     # os.mkdir(folder)
-    folder = "{}Crossvaltest{}/tests" .format(results_path,code)
-    os.mkdir(folder)
-    os.mkdir("{}Crossvaltest{}/Star".format(results_path,code))
-    os.mkdir( "{}Crossvaltest{}/Trees".format(results_path,code))
-
-    # set up DataFrame and check that the columns are the same as set in main
-    df = pd.read_csv("{}".format(data_path))
-    if df.columns.tolist() != col_names:
-        print("changing cols")
-        df = pd.read_csv(data_path, names= col_names)
-    else:
-        pass
-
+    
     # set the residue_protein ID as the index of the DataFrame 
     df.set_index('residue', inplace= True )
     # remove any null or missing data from the dataset
     df.isnull().any()
     data = df.fillna(method='ffill')
-    col_namestest = var_col_names + ["annotated"]
+    col_namestest = predictors + ["annotated"]
     data = data[col_namestest]
     # set X as the three prediction scores and y as the true annotated value 
-    feature_cols = var_col_names
+    feature_cols = predictors
     proteinname = data.index
     # Features, ie prediction scores from predus, ispred and dockpred 
     X = data[feature_cols] 
@@ -328,17 +321,13 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
 
     # save results for per cv metrics
     frame_auc_per_cv = pd.DataFrame.from_dict(auc_per_cv,orient= 'index')
-    folder = "{}Crossvaltest{}" .format(results_path,code)
-    frame_auc_per_cv.to_csv("{}/auc_per_cv.csv".format(folder))
+    frame_auc_per_cv.to_csv(f"{results_path}/auc_per_cv.csv")
     frame_fscore_per_cv = pd.DataFrame.from_dict(fscore_dict_total,orient= 'index')
-    folder = "{}Crossvaltest{}" .format(results_path,code)
-    frame_fscore_per_cv.to_csv("{}/fscore_per_cv.csv".format(folder))
+    frame_fscore_per_cv.to_csv(f"{results_path}/fscore_per_cv.csv")
     frame_mcc_per_cv = pd.DataFrame.from_dict(mcc_dict_total,orient= 'index')
-    folder = "{}Crossvaltest{}" .format(results_path,code)
-    frame_mcc_per_cv.to_csv("{}/mcc_per_cv.csv".format(folder))
+    frame_mcc_per_cv.to_csv(f"{results_path}/mcc_per_cv.csv")
     frame_pr_per_cv = pd.DataFrame.from_dict(pr_per_cv,orient= 'index')
-    folder = "{}Crossvaltest{}" .format(results_path,code)
-    frame_pr_per_cv.to_csv("{}/pr_per_cv.csv".format(folder))
+    frame_pr_per_cv.to_csv(f"{results_path}/pr_per_cv.csv")
     # ROC plot
     ROC_Plt(Master,code,results_path)
     PR_Plt(Master,code,results_path)
@@ -347,7 +336,7 @@ def CrossVal(viz, code, trees, depth, ccp,size, start,results_path,data_path,col
     if viz == False:
         pass
     else:
-        treeviz(treeparams,params,results_path) 
+        treeviz(treeparams,predictors, results_path) 
 
 # Runs data programs, including logreg, RF and ROC 
 def Run(params):
@@ -374,9 +363,9 @@ def LogReg(test_frame, train_frame,timer,cols,code,results_path):
         result=logit_model.fit()
         coefficients = result.params
         # create folder for output data and save the coef in it 
-        folder = "{}Crossvaltest{}/tests/CV{}" .format(results_path,code,timer)
+        folder = f"{results_path}/tests/CV{timer}" 
         os.mkdir(folder)
-        # file1 = open("{}Crossvaltest{}/tests/CV{}/cvcoef{}.txt" .format(results_path,code,timer,timer), "w")
+        # file1 = open(f"{results_path}/tests/CV{}/cvcoef{}.txt" .format(results_path,code,timer,timer), "w")
         # print(coefficients, file=file1 )
         # file1.close()
         # prediction score calc. 
@@ -406,7 +395,7 @@ def LogReg(test_frame, train_frame,timer,cols,code,results_path):
         # save prediction scores and training set to same folder as coefs 
         # results = pd.DataFrame({"residue": protein, "prediction value": pval})
         log_results = test_frame.assign(logreg = pval)
-        # path="{}Crossvaltest{}/tests/CV{}/predval{}.csv".format(results_path,code,timer,timer)
+        # path=f"{results_path}/tests/CV{}/predval{}.csv".format(results_path,code,timer,timer)
         # results.to_csv(path,sep=",", index=True, header=True)
         # pathtest="~/Desktop/Research_Evan/Raji_Summer2019_atom/Data_Files/CrossVal_logreg_RF/Crossvaltest2/CV{}/trainframe{}.csv".format(timer,timer)
         # train_frame.to_csv(pathtest,sep=",", index=True, header=True)
@@ -465,13 +454,13 @@ def RandomFor(test_frame, train_frame,timer,cols,code,protein_in_cv,trees,depth,
             tree = model.estimators_[0]
         else:
             tree = False  
-        treeparams = (X, y, tree)
+        treeparams = (X, y, tree,depth)
         totalframe = df2.copy()
     
         logframe = log_results
         logs = logframe["logreg"]
         totalframe = totalframe.join(logs)
-        path="{}Crossvaltest{}/tests/CV{}/vals{}.csv".format(results_path,code,timer,timer)
+        path=f"{results_path}/tests/CV{timer}/vals{timer}.csv"
         totalframe.to_csv(path,sep=",", index=True, header=True)
         return totalframe ,treeparams 
 
@@ -656,10 +645,10 @@ def ROC_Plt(Master, code,results_path):
     plt.ylim([0, 1])
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
-    plt.savefig( "{}/Crossvaltest{}/ROC.png" .format(results_path,code))
+    plt.savefig(f"{results_path}/ROC.png" )
     plt.clf()
     # excel.head()
-    excel.to_csv(f"{results_path}/Crossvaltest{code}/ROC_csv.csv")
+    excel.to_csv(f"{results_path}/ROC_csv.csv")
 
 def PR_Plt(Master, code, results_path):
     predictors = [i for i in Master]
@@ -694,30 +683,34 @@ def PR_Plt(Master, code, results_path):
     plt.ylim([0.1, 1])
     plt.ylabel('precision')
     plt.xlabel('recall')
-    plt.savefig( "{}/Crossvaltest{}/PR.png" .format(results_path,code))
+    plt.savefig(f"{results_path}/PR.png")
     plt.clf()   
-    excel.to_csv(f"{results_path}/Crossvaltest{code}/PR_csv.csv")
+    excel.to_csv(f"{results_path}/PR_csv.csv")
 
 
 # RF tree vizualizer
-def treeviz(treeparams, params,results_path):
-    (X, y, tree) = treeparams
-    (results_path,code,timer) = params
-    viz = dtreeviz(tree, 
-        X, 
-        y,
-        target_name='Interface',
-        feature_names= ['predus','ispred','dockpred'], 
-        class_names= ["non_interface", "interface"], 
-        show_node_labels= True, 
-        fancy=False 
-        )  
-    savefile = "{}Crossvaltest{}/Trees/Rftree_CV{}.svg".format(results_path,code,timer)
-    viz.save(savefile)
+def treeviz(treeparams,cols, folder):
+    (X, y, tree,depth) = treeparams
+    try:
+        if type(tree) != bool:
+            viz = dtreeviz(tree, 
+                X, 
+                y,
+                target_name='Interface',
+                feature_names= cols, 
+                class_names= ["non_interface", "interface"], 
+                show_node_labels= True, 
+                fancy=False 
+                )  
+            
+            path = f"{folder}/Trees/Rftree_{depth}.svg" 
+            viz.save(path)
+    except:
+        print("failure to run tree visualization ")
 
 #  three functions that perfrom star covariance plot 
 def ROC_Star(data, code,timer,results_path,cols):
-    data = data.round({'predus': 3, 'ispred': 3, 'dockpred': 3, 'rfscore': 3,"logreg":3})
+    #data = data.round({'predus': 3, 'ispred': 3, 'dockpred': 3, 'rfscore': 3,"logreg":3}) #TODO make this work 
     Star_interface = data[data.annotated == 1] 
     Star_non_interface = data[data.annotated == 0]
     Star_interface = Star_interface.drop(columns="annotated")
@@ -727,14 +720,14 @@ def ROC_Star(data, code,timer,results_path,cols):
     for count, pred in enumerate(cols):
         Star_interface = Star_interface.rename(columns={f"{pred}":f"T{count}"})
         Star_non_interface = Star_non_interface.rename(columns={f"{pred}":f"T{count}"})
-    os.mkdir("{}Crossvaltest{}/Star/CV{}".format(results_path,code,timer))
-    path = "{}Crossvaltest{}/Star/CV{}/StarinterfaceCV.txt".format(results_path,code,timer)
+    os.mkdir(f"{results_path}/Star/CV{timer}")
+    path = f"{results_path}/Star/CV{timer}/StarinterfaceCV.txt"
     Star_interface.to_csv(path,sep="\t", index=False, header=True)
-    path = "{}Crossvaltest{}/Star/CV{}/StarnoninterfaceCV.txt".format(results_path, code,timer)
+    path = f"{results_path}/Star/CV{timer}/StarnoninterfaceCV.txt"
     Star_non_interface.to_csv(path,sep="\t", index=False, header=True)
 
 def Star(results_path,code,Star_path,cols):
-    path = "{}Crossvaltest{}/Star".format(results_path, code)
+    path = f"{results_path}/Star"
     pathlist = os.listdir(path)
     pathlist.sort(key=natural_keys)
     for filename in pathlist:
@@ -764,7 +757,7 @@ def Star(results_path,code,Star_path,cols):
             lower_triangular = values[np.tril_indices(values.shape[0], -1)]
             html = data.style.applymap(Color,lower_range =lower_triangular)
             html = html.render()
-            imgkit.from_string(html,'{}Crossvaltest{}/tests/{}/{}.jpg'.format(results_path,code,filename,filename))
+            imgkit.from_string(html,f'{results_path}/Star/{filename}/{filename}.jpg')
             
 def Color(val,lower_range):
     if val in lower_range: 
@@ -846,6 +839,6 @@ def F_score_MCC(predictors,df,cutoff_csv,protein_in_cv):
     return dict 
 
 
-
+kwargs = (100,10,0,True,False,True,True)
 if __name__ == '__main__':
-    main()
+    main(*kwargs)

@@ -73,15 +73,19 @@ def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 
 def Star_Leave_one_out(df,path,results_path,code):
+    df_cols = df.columns.tolist()
+    if "residue" in df_cols:
+        df = df.drop(columns = ['residue'])
+    # df = df.reset_index(drop=True, inplace=True)
     Star_path = f"{path}/Meta_DPI/Data/star-v.1.0/"
     results_folder = f"{results_path}/Meta_DPI_results{code}"
     df_interface = df[df["annotated"] ==1]
     df_interface_non_interface = df[df["annotated"] == 0 ]
     cols = df_interface.columns.tolist()
     cols.remove('annotated')
-    cols.remove('residue')
-    df_interface = df_interface.drop(columns = ['residue','annotated'])
-    df_interface_non_interface  =df_interface_non_interface.drop(columns = ['residue','annotated'])
+    # cols.remove('residue')
+    df_interface = df_interface.drop(columns = ['annotated'])
+    df_interface_non_interface  =df_interface_non_interface.drop(columns = ['annotated'])
     df_interface.to_csv(f"{Star_path}StarinterfaceCV.txt",index= False,sep="\t")
     df_interface_non_interface.to_csv(f"{Star_path}StarnoninterfaceCV.txt",index=False,sep="\t") 
     # interface = f"{folder}/StarnoninterfaceCV.txt"
@@ -172,7 +176,7 @@ def meta_methods_comparison():
     subprocess.run(cmd, shell= True)
     print("done")
 
-meta_methods_comparison()
+# meta_methods_comparison()
 
 # test_wrapper()
     

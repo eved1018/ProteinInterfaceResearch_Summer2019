@@ -317,3 +317,83 @@ g = "goodbye"
 f = h+g 
 f
 # %%
+import os 
+folder_der = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Code/PDB_Files/Predus_241_for_real"
+for filename in os.listdir(folder_der):
+    if filename.startswith("predus"): 
+        # print(filename)
+        old = f'{folder_der}/{filename}'
+        new_name = filename.split("_")[1]
+        chain = filename.split("_")[2]
+        chain = chain.split(".")[0]
+        new_name = new_name.split(".")[0]
+        new_name = new_name.upper()
+        new_name  = "predus_" + new_name + "_" + chain + ".pdb"
+        new = f'{folder_der}/{new_name}'
+        print(new_name)
+        os.rename(old, new)
+# %%
+total_script=f"""delete all 
+        load {load_file}
+        color blue 
+        set cartoon_transparency,0.75
+        select ann, resi {annotated_res_list}
+        indicate bycalpha ann
+        create annotated, indicate
+        select pred, resi {resi}
+        indicate bycalpha pred
+        create pred_res, indicate
+        show sphere, annotated
+        color pink, annotated
+        set sphere_transparency, 0.5,annotated
+        show sphere, pred_res
+        set sphere_scale,0.5,pred_res
+        color green, pred_res
+        set sphere_transparency,0,pred_res
+        set cartoon_transparency,1,pred_res
+        remove resn hoh
+        zoom complete=1
+        set ray_opaque_background, 1
+        set ray_trace_mode, 3;
+        png {filename},width=900, height=900,ray=1
+        quit"""
+
+
+#%%
+dic ={}
+key = "key"
+val = "val"
+dic[val] =key 
+dic[val]
+# %%
+import pandas as pd 
+from pathlib import Path
+
+
+# filename ="/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/PDBtest.csv"
+filename = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/final_sort_headers.csv"
+df = pd.read_csv(filename)
+
+df.columns =['index','residue', 'predus', 'ispred', 'dockpred',"annotated"]
+df = df.drop(["index"], axis=1)
+df.to_csv("/Users/evanedelstein/Desktop/Research_Evan/MetaDPI/Meta_DPI/Data/Test_data/final_sort_headers.csv")
+print("done")
+# %%
+import os.path
+from pathlib import Path
+path = Path(__file__).parents[2]
+
+file_exists = False
+while file_exists is False:
+    data_filename = input("file name of predictor csv with columns first column as res_proterin and last columns whetehr teh residue is annotated(1:yes, 0:no):  ")
+    data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort_headers.csv" if data_filename == "test" else f"{path}/Meta_DPI/Data/Test_data/{data_filename}"
+    file_exists = os.path.isfile(data_path)
+print("done")
+# %%
+def fun(**kwagrs):
+    if len(kwagrs)==0:
+        print("no args")
+    else:
+        print(kwagrs)
+fun(1,2,3)
+# %%

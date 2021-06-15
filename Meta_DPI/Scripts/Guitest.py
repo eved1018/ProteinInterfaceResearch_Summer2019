@@ -38,12 +38,14 @@ def Main_window():
             [sg.Checkbox('protein viz', default=True)],
             [sg.Button('test')],
             [sg.Submit(), sg.Cancel()]]
-    window = sg.Window("Meta_DPI",layout,size = (1920, 1080))
+    window = sg.Window("Meta_DPI",layout )
+    window.Maximize()
     return window 
 
 def create_output_window(param):
     layout = [[sg.Text(f'{param}')]]
-    window = sg.Window('output', layout, keep_on_top=True, finalize=True,size = (1920, 1080) )
+    window = sg.Window('output', layout, keep_on_top=True, finalize=True)
+    window.Maximize()
     return window
 
     

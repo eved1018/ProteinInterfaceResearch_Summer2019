@@ -279,6 +279,6 @@ def ROC_wrapper(params):
     
 # kwargs should have tuple of form kwargs = (trees,depth, ccp,print_out,param_test,tree_viz,protein_viz) 
 # or leave empty for user input
-# kwargs = (100,10,0,True,False,True,True,False)
-# if __name__ == '__main__':
-#     Main(*kwargs)
+kwargs = (100,10,0,True,False,True,True,False)
+if __name__ == '__main__':
+    Main(*kwargs)

@@ -59,14 +59,17 @@ def Main(*kwargs):
             viz = True if input("run tree visualization (y,n): ") == "y" else False
             protein_viz = True if input("run protein visualization (y,n): ") == "y" else False
         else:
-            (trees,depth, ccp,print_out,param_test,viz,protein_viz) = kwargs
+            (trees,depth, ccp,print_out,param_test,viz,protein_viz,data_path) = kwargs
             [int(i) for i in kwargs[0:3]]
             [bool(i) for i in kwargs[3:7]]
     except:
         print("Incorect parameters please try again")
         return  
 
-    file_exists = False
+    file_exists = False if type(data_path) != str else True
+    if data_path == "test":
+        data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort_headers_test.csv"
+
     while file_exists is False:
         data_filename = input("file name of predictor csv with columns first column as res_proterin and last columns whetehr teh residue is annotated(1:yes, 0:no): ")
         data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort_headers_test.csv" if data_filename == "test" else f"{path}/Meta_DPI/Data/Test_data/{data_filename}"
@@ -96,6 +99,7 @@ def Main(*kwargs):
         roc_excel.to_csv(f"{folder}/roc_excel.csv")
         finish = time.perf_counter()
         print(f"finished in {round((finish - start)/60,2 )} minutes(s)")
+    return finish
 
 # test params of RF 
 def Param_test(data_path,viz, code, trees, depth, ccp, start,results_path,predictors,print_out,path):
@@ -275,6 +279,6 @@ def ROC_wrapper(params):
     
 # kwargs should have tuple of form kwargs = (trees,depth, ccp,print_out,param_test,tree_viz,protein_viz) 
 # or leave empty for user input
-kwargs = (100,10,0,True,False,True,True)
-if __name__ == '__main__':
-    Main(*kwargs)
+# kwargs = (100,10,0,True,False,True,True,False)
+# if __name__ == '__main__':
+#     Main(*kwargs)

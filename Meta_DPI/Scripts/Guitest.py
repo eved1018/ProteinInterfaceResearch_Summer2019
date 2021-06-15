@@ -17,10 +17,8 @@ def main():
             Meta_DPI.Main(*args)
         if event == "test":
             args = (int(values[1]),int(values[2]),int(values[3]),values[4],values[5],values[6],values[7],"test")
-            runCommand(args)
-            break
+            finish = runCommand(args)
             print(finish)
-            
             event, values = create_output_window(finish).read(close=True)
         if event == sg.WIN_CLOSED or event=="Exit" or event=="Cancel":
             break
@@ -51,8 +49,8 @@ def create_output_window(param):
     
 
 def runCommand(args, timeout=None, window=None):
-    # finish = Meta_DPI.Main(*args)
+    finish = Meta_DPI.Main(*args)
     print("hello")
-    # return finish
+    return finish
 
 main()

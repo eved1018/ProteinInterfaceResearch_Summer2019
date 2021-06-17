@@ -12,6 +12,7 @@ from pathlib import Path
 
 def Main(predictors,df,result_path,code):
     results_folder = f"{result_path}/Meta_DPI_results{code}/Fscore_MCC/"
+    os.mkdir(results_folder)
     path = Path(__file__).parents[2]
 #   predictors = ["vorffip"]
 #   check that predictor is in columns

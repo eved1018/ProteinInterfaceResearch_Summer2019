@@ -48,6 +48,7 @@ for protein visualization pymol is required.
 #   (C) K-fold Cross-validation: Meta_DPI_Cross_Validation.py 
 
 def Main(*kwargs):
+    print("start")
     path = Path(__file__).parents[2]
     start = time.perf_counter()
     code = 1
@@ -68,11 +69,11 @@ def Main(*kwargs):
 
     file_exists = False if type(data_path) != str else True
     if data_path == "test":
-        data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort_headers_test.csv"
+        data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort_headers.csv"
 
     while file_exists is False:
         data_filename = input("file name of predictor csv with columns first column as res_proterin and last columns whetehr teh residue is annotated(1:yes, 0:no): ")
-        data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort_headers_test.csv" if data_filename == "test" else f"{path}/Meta_DPI/Data/Test_data/{data_filename}"
+        data_path = f"{path}/Meta_DPI/Data/Test_data/final_sort_headers.csv" if data_filename == "test" else f"{path}/Meta_DPI/Data/Test_data/{data_filename}"
         file_exists = os.path.isfile(data_path)
     
     # load in dataset and get predictors 
@@ -277,8 +278,8 @@ def ROC_wrapper(params):
 
     return predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame
     
-# kwargs should have tuple of form kwargs = (trees,depth, ccp,print_out,param_test,tree_viz,protein_viz) 
+# kwargs should have tuple of form kwargs = (trees,depth, ccp,print_out,param_test,tree_viz,protein_viz,"datapath") 
 # or leave empty for user input
-kwargs = (100,10,0,True,False,True,True,False)
+kwargs = (100,10,0,False,False,False,False,"test")
 if __name__ == '__main__':
     Main(*kwargs)

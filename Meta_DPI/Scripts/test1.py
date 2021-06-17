@@ -396,4 +396,6 @@ def fun(**kwagrs):
     else:
         print(kwagrs)
 fun(1,2,3)
+
+
 # %%

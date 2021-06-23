@@ -5,6 +5,16 @@ import pandas as pd
 from pathlib import Path
 import sys
 
+
+def test():
+    predictors = ['predus', "ispred","dockpred","rfscore","logreg","vorffip","meta-ppisp"]
+    df = pd.read_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/final_sort_headers_images.csv")
+    df.set_index('residue', inplace= True )
+    results_path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Pymol/images_350dpi"
+    code = 1
+    Main(predictors,df,results_path,code)
+
+
 def Main(predictors,df,results_path,code):
     try:
         cmd = f"pymol -c -q -Q " # <- add in location to pymol ex. "~/Application/"
@@ -16,6 +26,7 @@ def Main(predictors,df,results_path,code):
 
     path = Path(__file__).parents[2]
     results_folder = f"{results_path}/Meta_DPI_results{code}/Pymol"
+    # results_folder = f"{results_path}/"
     folder = "Images"
     # df = Df_maker(path)
     df = df.reset_index().rename({'index':'residue'}, axis = 'columns')
@@ -121,5 +132,4 @@ def pml_maker(protein,df,cutoff_csv,folder,path,predictors,results_folder):
         
 
 
-
-
+test()

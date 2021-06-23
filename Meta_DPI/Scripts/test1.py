@@ -1,5 +1,5 @@
 from datetime import MAXYEAR
-from numpy import positive
+from numpy import column_stack, positive
 import pandas as pd
 from pathlib import Path
 # cols = ["x","y","z","a","b"]
@@ -397,5 +397,50 @@ def fun(**kwagrs):
         print(kwagrs)
 fun(1,2,3)
 
+
+# %%
+t = "h.e.l.l.o"
+print(".".join(t.split(".")[1:]))
+
+
+
+# %%
+import pandas as pd 
+from pathlib import Path
+path = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom"
+filename = "/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Results/MetaDPIResults/Meta_DPI_results3/Meta_DPI_result.csv"
+df = pd.read_csv(filename)
+meta_results = pd.read_csv(filename)
+ppisp = pd.read_csv(f"{path}/Meta_DPI/Data/Test_data/meta-ppisp-results-comma-new.txt")
+vorfip = pd.read_csv(f"{path}/Meta_DPI/Data/Test_data/vorffip_columns.txt")
+vorfip = vorfip.drop(columns = ['annotated'])
+ppisp = ppisp.drop(columns = ['annotated'])
+
+results = pd.DataFrame()
+results["residue"] = meta_results["residue"]
+results["logreg"] = meta_results["logreg"]
+results["predus"] = meta_results["predus"]
+results["ispred"] = meta_results["ispred"]
+results["dockpred"] = meta_results["dockpred"]
+results["rfscore"] = meta_results["rfscore"]
+vorfip["residue"] = [i.split("_")[0]+ "_" +i.split("_")[1] for i in vorfip["residue"]]
+results["annotated"] = meta_results["annotated"]
+results = results.merge(vorfip,how="inner", on="residue")
+results = results.merge(ppisp,how="inner", on="residue")
+print(results)
+# df = df.drop(columns=['Unnamed:'])
+results["protein"] = [x.split('_')[1] for x in results.residue]
+proteins = results["protein"].unique()
+# print(proteins)
+df_1 = results[results.protein == "1FC2.D"]
+df_2 = results[results.protein == "1BUH.A"]
+
+
+# print(df_2)
+df_3 = df_1.append(df_2,ignore_index=True)
+
+df_3.drop(columns=["protein"],inplace=True)
+print(df_3)
+df_3.to_csv("/Users/evanedelstein/Desktop/Research_Evan/Raji_Summer2019_atom/Meta_DPI/Data/Test_data/final_sort_headers_images.csv")
 
 # %%

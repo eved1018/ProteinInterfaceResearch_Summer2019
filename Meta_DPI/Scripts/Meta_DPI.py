@@ -78,7 +78,9 @@ def Main(*kwargs):
     
     # load in dataset and get predictors 
     df = pd.read_csv(data_path)
+
     predictors = df.columns.tolist()[2:-1]
+    
     # change to where u need it to to go 
     results_path = f"{path}/Meta_DPI/Results/MetaDPIResults"
 
@@ -278,8 +280,8 @@ def ROC_wrapper(params):
 
     return predictor , ROC_AUC ,PR_AUC, PR_frame,results_frame
     
-# kwargs should have tuple of form kwargs = (trees,depth, ccp,print_out,param_test,tree_viz,protein_viz,"datapath") 
+# kwargs should have tuple of form kwargs = (trees,depth, ccp,print_out,param_test,tree_viz,protein_viz,"datapath",dataframe) 
 # or leave empty for user input
-kwargs = (100,10,0,False,False,False,False,"test")
+kwargs = (100,10,0,False,False,False,True,"test")
 if __name__ == '__main__':
     Main(*kwargs)
